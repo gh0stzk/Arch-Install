@@ -138,10 +138,19 @@ NoColor='\033[0m'
 		done
     
 		echo
-		PS3="Restaurar DoTFiLes?: "
-	select BOXWIN in "Si" "No"
+		PS3="Restaurar dotfiles?: "
+	select DOTS in "Si" "No"
 		do
-			if [ $BOXWIN ]; then
+			if [ $DOTS ]; then
+				break
+			fi
+		done
+		
+		echo
+		PS3="Montar almacenamiento personal?: "
+	select MPW in "Si" "No"
+		do
+			if [ $MPW ]; then
 				break
 			fi
 		done
@@ -171,10 +180,16 @@ NoColor='\033[0m'
 			echo -e "Yay:       ${Rojo}No${NoColor}"
 		fi
 		
-		if [ "${BOXWIN}" = "Si" ]; then
-			echo -e "DoTFiLes:  ${Verde}Si${NoColor}"
+		if [ "${DOTS}" = "Si" ]; then
+			echo -e "Dotfiles:  ${Verde}Si${NoColor}"
 		else
-			echo -e "DoTFiLes:  ${Rojo}No${NoColor}"
+			echo -e "Dotfiles:  ${Rojo}No${NoColor}"
+		fi
+		
+		if [ "${MPW}" = "Si" ]; then
+			echo -e "Montar Almacenamiento:  ${Verde}Si${NoColor}"
+		else
+			echo -e "Montar Almacenamiento:  ${Rojo}No${NoColor}"
 		fi
     
 		echo
@@ -185,7 +200,7 @@ NoColor='\033[0m'
     
 		clear
 
-##########
+########## SISTEMA BASE PACSTRAP
 
 		echo -e "\n\n\n${Amarillo} Instalando sistema base${NoColor}\n"
 		timedatectl set-ntp true
@@ -199,13 +214,15 @@ NoColor='\033[0m'
 		sleep 2
 		clear
     
+########## FSTAB
+    
 		echo -e "\n\n\n${Amarillo} Generando fstab..${NoColor}"
 		genfstab -U /mnt >> /mnt/etc/fstab
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
 		clear
 
-##########
+########## TIEMPO Y LOCALIZACION
 	
 		echo -e "\n\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n" 
 		arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/America/Mexico_City /etc/localtime"
@@ -223,7 +240,7 @@ NoColor='\033[0m'
 		sleep 2
 		clear
 
-##########
+########## RED
 
 		echo -e "\n\n\n${Amarillo} Configurando la red${NoColor}"
 		echo "${HNAME}" >> /mnt/etc/hostname
@@ -231,13 +248,12 @@ NoColor='\033[0m'
 127.0.0.1   localhost
 ::1         localhost
 127.0.1.1   ${HNAME}.localdomain ${HNAME}
-
 EOL
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
 		clear
     
-##########
+########## USUARIOS Y CONTRASEÑAS
     
 		echo -e "\n\n\n${Amarillo} Creando usuario y contraseñas${NoColor}\n"
 		echo "root:$PASSWDR" | arch-chroot /mnt /bin/bash -c "chpasswd"
@@ -245,12 +261,12 @@ EOL
 		echo "$USR:$PASSWD" | arch-chroot /mnt /bin/bash -c "chpasswd"
 		sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 		echo
-		echo -e "Se cambio la contraseña ${Azul}root${NoColor} a ${Rojo}$PASSWDR${NoColor}, se creo el usuario ${Amarillo}$USR${NoColor} con la contraseña ${Rojo}$PASSWD${NoColor} y se le otorgaron persmisos administrativos."
+		echo -e "${Azul}root${NoColor}: ${Rojo}$PASSWDR${NoColor}\n${Amarillo}$USR${NoColor}: ${Rojo}$PASSWD${NoColor}"
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 8
 		clear
 		
-##########
+########## GRUB
 
 		echo -e "\n\n\n${Amarillo} Instalando y configurando grub${NoColor}\n"
 		#arch-chroot /mnt /bin/bash -c "grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch"
@@ -264,7 +280,7 @@ EOL
 		sleep 2
 		clear  
     
-##########
+########## OPTIMIZACIONES
 
 		echo -e "\n\n\n${Amarillo} Enchulando Pacman${NoColor}"
 		sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 10/; /^ParallelDownloads =/a ILoveCandy' /mnt/etc/pacman.conf
@@ -322,19 +338,19 @@ EOL
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
     
-		if [ "${BOXWIN}" == "Si" ]; then
-		echo -e "\n\n${Amarillo} Añadiendo mi almacemaniento personal a fstab${NoColor}\n"
+		if [ "${MPW}" == "Si" ]; then
+		echo -e "\n\n${Amarillo} Montando almacemaniento personal a fstab${NoColor}\n"
 		cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
 UUID=01D3AE59075CA1F0		/run/media/$USR/windows	ntfs-3g		auto,rw,users,hide_hid_files,noatime,umask=000 0 0
 EOL
 		cat /mnt/etc/fstab
-		sleep 3
-		echo -e "${Verde} OK...${NoColor}"
+		sleep 5
+		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		fi
     
- #########
+########## MIRRORS CHROOT
     
 		echo -e "\n\n${Amarillo} Escogiendo los mejores mirrors y sincronizando la base de datos${NoColor}\n"
 		arch-chroot /mnt /bin/bash -c "reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist"
@@ -344,7 +360,7 @@ EOL
 		sleep 2
 		clear
     
-#########
+########## INSTALANDO PAQUETES
 
 		echo -e "\n\n\n${Amarillo} Instalando Xorg, Audio y driver grafico...${NoColor}\n"
 		sleep 2
@@ -388,7 +404,7 @@ EOL
 		sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 		clear
     
-##########
+########## AUR
 
 		if [ "${YAYH}" == "Si" ]; then
 		echo -e "\n\n\n${Amarillo} Instalando yay y apps que yo uso${NoColor}\n\n"
@@ -421,18 +437,26 @@ EOL
 		clear
 		fi
     
-##########
+########## SERVICIOS
 
 		echo -e "\n\n\n${Amarillo} Activando Servicios${NoColor}\n"
 		arch-chroot /mnt /bin/bash -c "systemctl enable ${esys} lightdm cpupower"
 		arch-chroot /mnt /bin/bash -c "systemctl enable zramswap"
+		
+		cat >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf <<EOL
+Section "InputClass"
+		Identifier	"system-keyboard"
+		MatchIsKeyboard	"on"
+		Option	"XkbLayout"	"latam"
+EndSection
+EOL
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		clear
     
-##########
+########## DOTFILES
 
-		if [ "${BOXWIN}" == "Si" ]; then
+		if [ "${DOTS}" == "Si" ]; then
 		echo -e "\n\n\n${Amarillo} Creando archivos especificos de mi configuracion X0RG${NoColor}\n\n"
 		sleep 2
 		cat >> /mnt/etc/X11/xorg.conf.d/20-intel.conf <<EOL		
@@ -464,15 +488,6 @@ Section "ServerLayout"
 EndSection
 EOL
 		echo -e " Creado ${Verde}10-monitor.conf${NoColor} en --> /etc/X11/xorg.conf.d\n\n"
-		
-		cat >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf <<EOL
-Section "InputClass"
-		Identifier	"system-keyboard"
-		MatchIsKeyboard	"on"
-		Option	"XkbLayout"	"latam"
-EndSection
-EOL
-		echo -e " Creado ${Verde}00-keyboard.conf${NoColor} en --> /etc/X11/xorg.conf.d\n\n"
 		
 		cat >> /mnt/etc/drirc <<EOL
 <driconf>
