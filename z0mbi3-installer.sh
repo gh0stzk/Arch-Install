@@ -220,11 +220,10 @@ NoColor='\033[0m'
 		genfstab -U /mnt >> /mnt/etc/fstab
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
-		clear
 
 ########## TIEMPO Y LOCALIZACION
 	
-		echo -e "\n\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n" 
+		echo -e "\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n" 
 		arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/America/Mexico_City /etc/localtime"
 		arch-chroot /mnt /bin/bash -c "timedatectl set-ntp true"
 		arch-chroot /mnt /bin/bash -c "hwclock --systohc"
@@ -238,11 +237,10 @@ NoColor='\033[0m'
 		sleep 3
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
-		clear
 
 ########## RED
 
-		echo -e "\n\n\n${Amarillo} Configurando la red${NoColor}"
+		echo -e "\n\n${Amarillo} Configurando la red${NoColor}"
 		echo "${HNAME}" >> /mnt/etc/hostname
 		cat >> /mnt/etc/hosts <<EOL		
 127.0.0.1   localhost
@@ -251,17 +249,15 @@ NoColor='\033[0m'
 EOL
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
-		clear
     
 ########## USUARIOS Y CONTRASEÑAS
     
-		echo -e "\n\n\n${Amarillo} Creando usuario y contraseñas${NoColor}\n"
+		echo -e "\n\n${Amarillo} Creando usuario y contraseñas${NoColor}"
 		echo "root:$PASSWDR" | arch-chroot /mnt /bin/bash -c "chpasswd"
 		arch-chroot /mnt /bin/bash -c "useradd -m -g users -G wheel -s /usr/bin/zsh ${USR}"
 		echo "$USR:$PASSWD" | arch-chroot /mnt /bin/bash -c "chpasswd"
 		sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
-		echo
-		echo -e "${Azul}root${NoColor}: ${Rojo}$PASSWDR${NoColor}\n${Amarillo}$USR${NoColor}: ${Rojo}$PASSWD${NoColor}"
+		echo -e " ${Azul}root${NoColor} : ${Rojo}$PASSWDR${NoColor}\n ${Amarillo}$USR${NoColor} : ${Rojo}$PASSWD${NoColor}"
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 8
 		clear
