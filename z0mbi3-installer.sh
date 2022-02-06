@@ -163,37 +163,37 @@ NoColor='\033[0m'
 		clear
 	
 		echo
-		echo -e "\n--------------------"
+		echo -e "\n --------------------"
 		echo
 
-		echo -e "Usuario:   ${Azul}$USR${NoColor}"
-		echo -e "Hostname:  ${Azul}$HNAME${NoColor}"
-		echo -e "CPU:       ${Azul}$plat_options${NoColor}"
-		echo -e "Kernel:    ${Azul}$kerneltitle${NoColor}"
-		echo -e "Graficos:  ${Azul}$graftitle${NoColor}"
-		echo -e "Internet:  ${Azul}$redtitle${NoColor}"
-		echo -e "Sonido:    ${Azul}$audiotitle${NoColor}"
+		echo -e " Usuario:   ${Azul}$USR${NoColor}"
+		echo -e " Hostname:  ${Azul}$HNAME${NoColor}"
+		echo -e " CPU:       ${Azul}$plat_options${NoColor}"
+		echo -e " Kernel:    ${Azul}$kerneltitle${NoColor}"
+		echo -e " Graficos:  ${Azul}$graftitle${NoColor}"
+		echo -e " Internet:  ${Azul}$redtitle${NoColor}"
+		echo -e " Sonido:    ${Azul}$audiotitle${NoColor}"
     
 		if [ "${YAYH}" = "Si" ]; then
-			echo -e "Yay:       ${Verde}Si${NoColor}"
+			echo -e " Yay:       ${Verde}Si${NoColor}"
 		else
-			echo -e "Yay:       ${Rojo}No${NoColor}"
+			echo -e " Yay:       ${Rojo}No${NoColor}"
 		fi
 		
 		if [ "${DOTS}" = "Si" ]; then
-			echo -e "Dotfiles:  ${Verde}Si${NoColor}"
+			echo -e " Dotfiles:  ${Verde}Si${NoColor}"
 		else
-			echo -e "Dotfiles:  ${Rojo}No${NoColor}"
+			echo -e " Dotfiles:  ${Rojo}No${NoColor}"
 		fi
 		
 		if [ "${MPW}" = "Si" ]; then
-			echo -e "Montar Almacenamiento:  ${Verde}Si${NoColor}"
+			echo -e " Montar Almacenamiento:  ${Verde}Si${NoColor}"
 		else
-			echo -e "Montar Almacenamiento:  ${Rojo}No${NoColor}"
+			echo -e " Montar Almacenamiento:  ${Rojo}No${NoColor}"
 		fi
     
 		echo
-		read -rp "Continuar con la instalacion? [s/N]: " ANS
+		read -rp " Continuar con la instalacion? [s/N]: " ANS
 		if [ "$ANS" != "s" ]; then
 			exit
 		fi
