@@ -37,7 +37,17 @@ NoColor='\033[0m'
     sleep 5
     clear
 		
-	    
+########## Comprobando UEFI		
+		
+	    if [ -d /sys/firmware/efi/efivars ]; then
+        echo "Este script solo funciona con BIOS/MBR."
+        exit
+    else
+        break
+    fi
+    
+########## Datos    
+    
 		echo -e "\n\n\n${Amarillo} Recopilando datos necesarios${NoColor}\n"
         read -rp "Ingresa tu username: " USR
 	while
@@ -154,6 +164,15 @@ NoColor='\033[0m'
 				break
 			fi
 		done
+		
+		echo
+		PS3="Instalar entorno XFCE?: "
+	select DEXFCE in "Si" "No"
+		do
+			if [ $DEXFCE ]; then
+				break
+			fi
+		done
     
     
         # Detectando tarjeta WiFi
@@ -184,6 +203,12 @@ NoColor='\033[0m'
 			echo -e " Dotfiles:  ${Verde}Si${NoColor}"
 		else
 			echo -e " Dotfiles:  ${Rojo}No${NoColor}"
+		fi
+		
+		if [ "${DEXFCE}" = "Si" ]; then
+			echo -e " Entorno XFCE:  ${Verde}Si${NoColor}"
+		else
+			echo -e " Entorno XFCE:  ${Rojo}No${NoColor}"
 		fi
 		
 		if [ "${MPW}" = "Si" ]; then
@@ -252,7 +277,7 @@ EOL
     
 ########## USUARIOS Y CONTRASEÑAS
     
-		echo -e "\n\n${Amarillo} Creando usuario y contraseñas${NoColor}"
+		echo -e "\n\n${Amarillo} Creando usuario y contraseñas${NoColor}\n"
 		echo "root:$PASSWDR" | arch-chroot /mnt /bin/bash -c "chpasswd"
 		arch-chroot /mnt /bin/bash -c "useradd -m -g users -G wheel -s /usr/bin/zsh ${USR}"
 		echo "$USR:$PASSWD" | arch-chroot /mnt /bin/bash -c "chpasswd"
@@ -399,6 +424,13 @@ EOL
 		echo "sudo pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm" | arch-chroot /mnt /bin/bash -c "su $USR"
 		sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 		clear
+		
+		if [ "$DEXFCE" = "y" ]; then
+		echo -e "\n\n\n${Amarillo} Instalando Entorno XFCE${NoColor}\n"
+		sleep 2
+		echo "sudo pacman -S xfce4 --noconfirm" | arch-chroot /mnt /bin/bash -c "su '${USR}'"
+		clear
+		fi
     
 ########## AUR
 
