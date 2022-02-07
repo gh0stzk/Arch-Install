@@ -399,17 +399,17 @@ EOL
 
 		echo -e "\n\n\n${Amarillo} Instalando Xorg, Audio y driver grafico...${NoColor}\n"
 		sleep 2
-		echo "sudo pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm" | arch-chroot /mnt /bin/bash -c "su $USR"
+		arch-chroot /mnt /bin/bash -c "pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm"
 		clear
     
 		echo -e "\n\n\n${Amarillo} Instalando codecs multimedia y paqueteria${NoColor}\n"
 		sleep 2
-		echo "sudo pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm" | arch-chroot /mnt /bin/bash -c "su $USR"
+		arch-chroot /mnt /bin/bash -c "pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm"
 		clear
     
 		echo -e "\n\n\n${Amarillo} Instalando soporte para montar volumenes y dispositivos multimedia extraibles${NoColor}\n"
 		sleep 2
-		echo "sudo pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm" | arch-chroot /mnt /bin/bash -c "su $USR"
+		arch-chroot /mnt /bin/bash -c "pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm"
 		echo
 		echo "xdg-user-dirs-update" | arch-chroot /mnt /bin/bash -c "su $USR"
 		sleep 2
@@ -417,7 +417,7 @@ EOL
     
 		echo -e "\n\n\n${Amarillo} Instalando las aplicaciones que yo uso...${NoColor}\n"
 		sleep 2
-		echo "sudo pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior geany yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync minidlna --noconfirm" | arch-chroot /mnt /bin/bash -c "su $USR"
+		arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior geany yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync minidlna --noconfirm"
 		clear
     
 		#echo -e "\n\n\n${Amarillo} Instalando QEMU${NoColor}\n\n"
@@ -428,14 +428,14 @@ EOL
 		if [ "$WIFI" = "y" ]; then
 		echo -e "\n\n\n${Amarillo} Instalando herramientas WIFI${NoColor}\n"
 		sleep 2
-		echo "sudo pacman -S wpa_supplicant wireless_tools --noconfirm" | arch-chroot /mnt /bin/bash -c "su '${USR}'"
+		arch-chroot /mnt /bin/bash -c "pacman -S wpa_supplicant wireless_tools --noconfirm"
 		else
 		echo -e "\n\n\nNo tienes tarjeta WiFi.. No se instala soporte..\n\n"
 		fi
     
 		echo -e "\n\n\n${Amarillo} Instalando LightDM${NoColor}\n"
 		sleep 2
-		echo "sudo pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm" | arch-chroot /mnt /bin/bash -c "su $USR"
+		arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm"
 		sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 		clear
 		
