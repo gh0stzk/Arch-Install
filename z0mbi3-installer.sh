@@ -78,7 +78,15 @@ NoColor='\033[0m'
         read -rp "Ingresa el nombre de tu maquina: " HNAME
         clear       
     
-    
+		echo 
+		PS3="Escoge el disco donde se instalara Arch Linux: "
+    select drive in $(lsblk | sed '/\(^├\|^└\|^NAME\)/d' | cut -d " " -f 1) 
+    do
+        if [ $drive ]; then
+            break
+        fi
+    done
+		
 		echo    
 		plat_options=("Intel" "AMD" "VM")
 		PS3="Selecciona tu CPU (1, 2 o 3): "
@@ -128,12 +136,12 @@ NoColor='\033[0m'
 	done	
 
 		echo
-		audio_options=("PulseAudio" "PipeWire")
+		audio_options=("PipeWire" "PulseAudio")
 		PS3="Selecciona el audio (1 o 2): "
 	select opt in "${audio_options[@]}"; do
 		case "$REPLY" in
-		1) audiotitle='PulseAudio';audiopack='pulseaudio';break;;
-		2) audiotitle='PipeWire';audiopack='pipewire pipewire-pulse';break;;
+		1) audiotitle='PipeWire';audiopack='pipewire pipewire-pulse';break;;
+		2) audiotitle='PulseAudio';audiopack='pulseaudio';break;;
 		*) echo "Opcion invalida!! trata de nuevo.";continue;;
 		esac
 	done
@@ -184,7 +192,7 @@ NoColor='\033[0m'
 		echo
 		echo -e "\n --------------------"
 		echo
-
+		
 		echo -e " Usuario:   ${Azul}$USR${NoColor}"
 		echo -e " Hostname:  ${Azul}$HNAME${NoColor}"
 		echo -e " CPU:       ${Azul}$plat_options${NoColor}"
@@ -206,22 +214,30 @@ NoColor='\033[0m'
 		fi
 		
 		if [ "${DEXFCE}" = "Si" ]; then
-			echo -e " Entorno XFCE:  ${Verde}Si${NoColor}"
+			echo -e " Xfce:      ${Verde}Si${NoColor}"
 		else
-			echo -e " Entorno XFCE:  ${Rojo}No${NoColor}"
+			echo -e " Xfce:      ${Rojo}No${NoColor}"
 		fi
 		
 		if [ "${MPW}" = "Si" ]; then
-			echo -e " Montar Almacenamiento:  ${Verde}Si${NoColor}"
+			echo -e " Montar Storage:  ${Verde}Si${NoColor}"
 		else
-			echo -e " Montar Almacenamiento:  ${Rojo}No${NoColor}"
+			echo -e " Montar Storage:  ${Rojo}No${NoColor}"
 		fi
+		
+		echo		
+		echo -e " Arch Linux se instalara en el disco ${Amarillo}[${NoColor}${Rojo}$drive${NoColor}${Amarillo}]${NoColor}"
     
 		echo
-		read -rp " Continuar con la instalacion? [s/N]: " ANS
-		if [ "$ANS" != "s" ]; then
-			exit
-		fi
+		echo
+while true; do
+    read -p "Continuar con la instalacion? [s/N]: " sn
+    case $sn in
+        [Ss]* ) break;;
+        [Nn]* ) exit;;
+        * ) echo "Eres estupido o que, solo tienes que escribir 'si' o 'no'";;
+    esac
+done
     
 		clear
 
@@ -282,6 +298,7 @@ EOL
 		arch-chroot /mnt /bin/bash -c "useradd -m -g users -G wheel -s /usr/bin/zsh ${USR}"
 		echo "$USR:$PASSWD" | arch-chroot /mnt /bin/bash -c "chpasswd"
 		sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
+		echo "Defaults insults" >> /mnt/etc/sudoers
 		echo -e " ${Azul}root${NoColor} : ${Rojo}$PASSWDR${NoColor}\n ${Amarillo}$USR${NoColor} : ${Rojo}$PASSWD${NoColor}"
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 8
@@ -290,8 +307,7 @@ EOL
 ########## GRUB
 
 		echo -e "\n\n\n${Amarillo} Instalando y configurando grub${NoColor}\n"
-		#arch-chroot /mnt /bin/bash -c "grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch"
-		arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc /dev/sda"
+		arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc /dev/$drive"
 		echo
 		sed -i 's/quiet/noibrs noibpb nopti nospectre_v2 nospectre_v1 l1tf=off nospec_store_bypass_disable no_stf_barrier mds=off tsx=on tsx_async_abort=off mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
 		sed -i "s/MODULES=()/MODULES=(${gp})/" /mnt/etc/mkinitcpio.conf
@@ -468,7 +484,7 @@ EOL
 ########## SERVICIOS
 
 		echo -e "\n\n\n${Amarillo} Activando Servicios${NoColor}\n"
-		arch-chroot /mnt /bin/bash -c "systemctl enable ${esys} lightdm cpupower"
+		arch-chroot /mnt /bin/bash -c "systemctl enable ${esys} lightdm cpupower systemd-oomd.service systemd-timesyncd.service"
 		arch-chroot /mnt /bin/bash -c "systemctl enable zramswap"
 		
 		cat >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf <<EOL
@@ -478,6 +494,8 @@ Section "InputClass"
 		Option	"XkbLayout"	"latam"
 EndSection
 EOL
+
+		sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /mnt/etc/sudoers
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		clear
