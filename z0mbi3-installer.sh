@@ -248,8 +248,6 @@ done
 		sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 10/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 		reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
 		echo
-		pacman -Syy
-		echo
 		pacstrap /mnt base base-devel $kernelpack linux-firmware $packa $redpack reflector cpupower grub ntfs-3g os-prober git nano zsh
 		echo -e "\n\n${Verde} OK...${NoColor}"
 		sleep 2
@@ -267,6 +265,7 @@ done
 		echo -e "\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n" 
 		arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime"
 		arch-chroot /mnt /bin/bash -c "hwclock --systohc"
+		echo
 		sed -i 's/#es_MX.UTF-8/es_MX.UTF-8/' /mnt/etc/locale.gen
 		arch-chroot /mnt /bin/bash -c "locale-gen"
 		echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
@@ -440,10 +439,10 @@ EOL
 		sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 		clear
 		
-		if [ "$DEXFCE" = "y" ]; then
+		if [ "$DEXFCE" = "Si" ]; then
 		echo -e "\n\n\n${Amarillo} Instalando Entorno XFCE${NoColor}\n"
 		sleep 2
-		echo "sudo pacman -S xfce4 --noconfirm" | arch-chroot /mnt /bin/bash -c "su '${USR}'"
+		arch-chroot /mnt /bin/bash -c "pacman -S xfce4 --noconfirm"
 		clear
 		fi
     
