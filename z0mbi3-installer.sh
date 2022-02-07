@@ -265,8 +265,7 @@ done
 ########## TIEMPO Y LOCALIZACION
 	
 		echo -e "\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n" 
-		arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/America/Mexico_City /etc/localtime"
-		arch-chroot /mnt /bin/bash -c "timedatectl set-ntp true"
+		arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime"
 		arch-chroot /mnt /bin/bash -c "hwclock --systohc"
 		sed -i 's/#es_MX.UTF-8/es_MX.UTF-8/' /mnt/etc/locale.gen
 		arch-chroot /mnt /bin/bash -c "locale-gen"
