@@ -111,7 +111,7 @@ while true
     
 		echo 
 		PS3="Escoge el disco donde se instalara Arch Linux: "
-    select drive in $(lsblk | sed '/\(^├\|^└\|^NAME\)/d' | cut -d " " -f 1) 
+    select drive in $(lsblk -nd -o NAME) 
     do
         if [ $drive ]; then
             break
@@ -481,13 +481,14 @@ EOL
 		cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
 [greeter]
 icon-theme-name = Qogir-ubuntu
-background = /run/media/$USR/windows/Imagenes/Wallpapers/ueirhndsdifh.jpg
+background = /run/media/z0mbi3/windows/Imagenes/Wallpapers/external-content.duckduckgo.com.jpg
 user-background = false
-default-user-image = /run/media/$USR/windows/Imagenes/Som3shiT/Dzndj8HUt7EcgEBD.png
+default-user-image = /run/media/z0mbi3/windows/Imagenes/Som3shiT/Dzndj8HUt7EcgEBD.png
 indicators = ~host;~spacer;~clock;~spacer;~session;~power
-position = 50%,center 70%,center
-screensaver-timeout = 50
+position = 50%,center 80%,center
+screensaver-timeout = 0
 theme-name = Dracula
+font-name = Terminus 10
 EOL
 		clear
 		
@@ -607,6 +608,7 @@ EOL
 		mkdir /mnt/dots
 		mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
 		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su $USR
+		$CHROOT mv /home/$USR/.themes/Dracula /usr/share/themes
 		$CHROOT cp /dots/stuff/zfetch /usr/bin/
 		echo -e "\n\n${Verde} OK...${NoColor}"
 		sleep 5
