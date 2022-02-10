@@ -109,7 +109,9 @@ while true
 		echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 	done	    
     
-		echo 
+		echo
+		lsblk -nd -e 7,11 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
+		echo
 		PS3="Escoge el disco donde se instalara Arch Linux: "
     select drive in $(lsblk -nd -o NAME) 
     do
