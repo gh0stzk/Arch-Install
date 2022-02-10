@@ -1,13 +1,16 @@
-#!/bin/bash
-
-	loadkeys la-latin1
-	export LANG=es_MX.UTF-8
+#!/bin/env bash
+			
+			
+		clear
+		loadkeys la-latin1
+		export LANG=es_MX.UTF-8
     
 Rojo='\033[0;31m'
 Amarillo='\033[0;33m'
 Verde='\033[0;32m'
 Azul='\033[0;94m'
 NoColor='\033[0m'
+CHROOT="arch-chroot /mnt"
 
 ########################################
 #             Logo z0mbi3              #
@@ -37,46 +40,74 @@ NoColor='\033[0m'
     sleep 5
     clear
 		
-########## Comprobando UEFI		
+########## Comprobando UEFI y Conexion
 		
 	    if [ -d /sys/firmware/efi/efivars ]; then
         echo "Este script solo funciona con BIOS/MBR."
-        exit
-    else
-        break
-    fi
+        sleep 2
+			exit
+		else
+			break
+		fi
     
+		echo "Probando conexion a internet"
+		echo -e "Espera.... ${Verde}OK..${NoColor}"
+		ping archlinux.org -c 1 >/dev/null 2>&1
+
+		if [ $? != "0" ]
+		then
+		echo "Error: Tal parece que no tienes internet.."
+		echo "saliendo...."
+		exit
+		fi
+		
 ########## Datos    
     
-		echo -e "\n\n\n${Amarillo} Recopilando datos necesarios${NoColor}\n"
-        read -rp "Ingresa tu username: " USR
-	while
+		echo -e "\n\n${Amarillo} Recopilando datos necesarios${NoColor}\n"
+while true
+	do 
+		read -p "Ingresa tu nombre de usuario: " USR
+		if [[ "${USR}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
+		then 
+			break
+		fi 
+		echo -e "Incorrecto!! Solo se permiten minusculas.\n"
+	done  
+	
+while
         echo
         read -rsp "Ingresa tu password: " PASSWD
         echo
         read -rsp "Confirma tu password: " CONF_PASSWD
         echo
-			[ "$PASSWD" != "$CONF_PASSWD" ]
-		do 
-			echo "Los passwords no coinciden!!"; 
-		done
-			echo "Password correcto"
-        
-	while
+		[ "$PASSWD" != "$CONF_PASSWD" ]
+	do 
+		echo "Los passwords no coinciden!!"; 
+	done
+		echo "Password correcto"
+		
+while        
         echo
         read -rsp "Ingresa el password para ROOT: " PASSWDR
         echo
         read -rsp "Confirma tu password: " CONF_PASSWDR
         echo
-			[ "$PASSWDR" != "$CONF_PASSWDR" ]
-		do 
-			echo "Los passwords no coinciden!!"; 
-		done
-			echo "Password correcto"
-			
-        echo
-        read -rp "Ingresa el nombre de tu maquina: " HNAME
-        clear       
+		[ "$PASSWDR" != "$CONF_PASSWDR" ]
+	do 
+		echo "Los passwords no coinciden!!"; 
+	done
+		echo "Password correcto"
+		
+		echo		
+while true
+	do 
+		read -rp "Ingresa el nombre de tu maquina: " HNAME
+		if [[ "${HNAME}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
+		then 
+			break 
+		fi
+		echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
+	done	    
     
 		echo 
 		PS3="Escoge el disco donde se instalara Arch Linux: "
@@ -118,7 +149,7 @@ NoColor='\033[0m'
 		case "$REPLY" in
 		1) graftitle='Intel';grafpack='xf86-video-intel vulkan-intel';break;;
 		2) graftitle='AMD';grafpack='xf86-video-amdgpu';break;;
-		3) graftitle='NVIDIA (Open Source)';grafpack='xf86-video-nouveau';break;;
+		3) graftitle='NVIDIA';grafpack='nvidia';break;;
 		4) graftitle='Maquina Virtual';grafpack='xf86-video-vmware';break;;
 		*) echo "Opcion invalida!! trata de nuevo.";continue;;
 		esac
@@ -244,11 +275,10 @@ done
 ########## SISTEMA BASE PACSTRAP
 
 		echo -e "\n\n\n${Amarillo} Instalando sistema base${NoColor}\n"
-		timedatectl set-ntp true
 		sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 10/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 		reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
 		echo
-		pacstrap /mnt base base-devel $kernelpack linux-firmware $packa $redpack reflector cpupower grub ntfs-3g os-prober git nano zsh
+		pacstrap /mnt base base-devel $kernelpack linux-firmware $packa $redpack reflector cpupower grub os-prober zsh
 		echo -e "\n\n${Verde} OK...${NoColor}"
 		sleep 2
 		clear
@@ -263,13 +293,13 @@ done
 ########## TIEMPO Y LOCALIZACION
 	
 		echo -e "\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n" 
-		arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime"
-		arch-chroot /mnt /bin/bash -c "hwclock --systohc"
+		$CHROOT ln -sf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime
+		$CHROOT hwclock --systohc
 		echo
 		sed -i 's/#es_MX.UTF-8/es_MX.UTF-8/' /mnt/etc/locale.gen
-		arch-chroot /mnt /bin/bash -c "locale-gen"
+		$CHROOT locale-gen
 		echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
-		arch-chroot /mnt /bin/bash -c "export LANG=es_MX.UTF-8"
+		$CHROOT export LANG=es_MX.UTF-8
 		echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
 		sleep 3
 		echo -e "\n${Verde} OK...${NoColor}"
@@ -290,9 +320,9 @@ EOL
 ########## USUARIOS Y CONTRASEÑAS
     
 		echo -e "\n\n${Amarillo} Creando usuario y contraseñas${NoColor}\n"
-		echo "root:$PASSWDR" | arch-chroot /mnt /bin/bash -c "chpasswd"
-		arch-chroot /mnt /bin/bash -c "useradd -m -g users -G wheel -s /usr/bin/zsh ${USR}"
-		echo "$USR:$PASSWD" | arch-chroot /mnt /bin/bash -c "chpasswd"
+		echo "root:$PASSWDR" | $CHROOT chpasswd
+		$CHROOT useradd -m -g users -G wheel -s /usr/bin/zsh ${USR}
+		echo "$USR:$PASSWD" | $CHROOT chpasswd
 		sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 		echo "Defaults insults" >> /mnt/etc/sudoers
 		echo -e " ${Azul}root${NoColor} : ${Rojo}$PASSWDR${NoColor}\n ${Amarillo}$USR${NoColor} : ${Rojo}$PASSWD${NoColor}"
@@ -303,12 +333,12 @@ EOL
 ########## GRUB
 
 		echo -e "\n\n\n${Amarillo} Instalando y configurando grub${NoColor}\n"
-		arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc /dev/$drive"
+		$CHROOT grub-install --target=i386-pc /dev/$drive
 		echo
 		sed -i 's/quiet/noibrs noibpb nopti nospectre_v2 nospectre_v1 l1tf=off nospec_store_bypass_disable no_stf_barrier mds=off tsx=on tsx_async_abort=off mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
 		sed -i "s/MODULES=()/MODULES=(${gp})/" /mnt/etc/mkinitcpio.conf
 		echo
-		arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
+		$CHROOT grub-mkconfig -o /boot/grub/grub.cfg
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		clear  
@@ -367,13 +397,13 @@ EOL
 		sleep 2
 		
 		echo -e "\n\n${Amarillo} Deshabilitando servicios innecesarios${NoColor}\n"
-		arch-chroot /mnt /bin/bash -c "systemctl mask lvm2-monitor.service systemd-random-seed.service"
+		$CHROOT systemctl mask lvm2-monitor.service systemd-random-seed.service
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		
 		echo -e "\n\n${Amarillo} Optimizando velocidad de internet${NoColor}\n"
-		echo -e "Cambiando a los DNS de ${Azul}Cloudflare${NoColor}"
-		if arch-chroot /mnt /bin/bash -c "pacman -Qi dhcpcd" > /dev/null ; then
+		echo -e " Cambiando a los DNS de ${Azul}Cloudflare${NoColor}"
+		if $CHROOT pacman -Qi dhcpcd > /dev/null ; then
 		echo "noarp" >> /mnt/etc/dhcpcd.conf
 		echo "static domain_name_servers=1.1.1.1 1.0.0.1" >> /mnt/etc/dhcpcd.conf
 		else
@@ -398,9 +428,9 @@ EOL
 ########## MIRRORS CHROOT
     
 		echo -e "\n\n${Amarillo} Escogiendo los mejores mirrors y sincronizando la base de datos${NoColor}\n"
-		arch-chroot /mnt /bin/bash -c "reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist"
+		$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
 		echo
-		arch-chroot /mnt /bin/bash -c "pacman -Syy"
+		$CHROOT pacman -Syy
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		clear
@@ -409,25 +439,25 @@ EOL
 
 		echo -e "\n\n\n${Amarillo} Instalando Xorg, Audio y driver grafico...${NoColor}\n"
 		sleep 2
-		arch-chroot /mnt /bin/bash -c "pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm"
+		$CHROOT pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm
 		clear
     
 		echo -e "\n\n\n${Amarillo} Instalando codecs multimedia y paqueteria${NoColor}\n"
 		sleep 2
-		arch-chroot /mnt /bin/bash -c "pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm"
+		$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm
 		clear
     
 		echo -e "\n\n\n${Amarillo} Instalando soporte para montar volumenes y dispositivos multimedia extraibles${NoColor}\n"
 		sleep 2
-		arch-chroot /mnt /bin/bash -c "pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm"
+		$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs ntfs-3g gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
 		echo
-		echo "xdg-user-dirs-update" | arch-chroot /mnt /bin/bash -c "su $USR"
+		echo "xdg-user-dirs-update" | $CHROOT su $USR
 		sleep 2
 		clear
     
 		echo -e "\n\n\n${Amarillo} Instalando las aplicaciones que yo uso...${NoColor}\n"
 		sleep 2
-		arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior geany yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync minidlna --noconfirm"
+		$CHROOT pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior geany yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync minidlna git --noconfirm
 		clear
     
 		#echo -e "\n\n\n${Amarillo} Instalando QEMU${NoColor}\n\n"
@@ -438,14 +468,14 @@ EOL
 		if [ "$WIFI" = "y" ]; then
 		echo -e "\n\n\n${Amarillo} Instalando herramientas WIFI${NoColor}\n"
 		sleep 2
-		arch-chroot /mnt /bin/bash -c "pacman -S wpa_supplicant wireless_tools --noconfirm"
+		$CHROOT pacman -S wpa_supplicant wireless_tools --noconfirm
 		else
 		echo -e "\n\n\nNo tienes tarjeta WiFi.. No se instala soporte..\n\n"
 		fi
     
 		echo -e "\n\n\n${Amarillo} Instalando LightDM${NoColor}\n"
 		sleep 2
-		arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm"
+		$CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm
 		sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 		rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
 		cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
@@ -457,13 +487,14 @@ default-user-image = /run/media/$USR/windows/Imagenes/Som3shiT/Dzndj8HUt7EcgEBD.
 indicators = ~host;~spacer;~clock;~spacer;~session;~power
 position = 50%,center 70%,center
 screensaver-timeout = 50
+theme-name = Dracula
 EOL
 		clear
 		
 		if [ "$DEXFCE" = "Si" ]; then
 		echo -e "\n\n\n${Amarillo} Instalando Entorno XFCE${NoColor}\n"
 		sleep 2
-		arch-chroot /mnt /bin/bash -c "pacman -S xfce4 --noconfirm"
+		$CHROOT pacman -S xfce4 --noconfirm
 		clear
 		fi
     
@@ -472,39 +503,39 @@ EOL
 		if [ "${YAYH}" == "Si" ]; then
 		echo -e "\n\n\n${Amarillo} Instalando yay y apps que yo uso${NoColor}\n\n"
 		sleep 2
-		echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | arch-chroot /mnt /bin/bash -c "su $USR"
+		echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su $USR
 		clear
 
 		# Utilidades para WM
 		echo -e "\n\n\n${Amarillo} Instalando zramswap checkupdates-aur picom-jonaburg-git polybar termite xtitle${NoColor}\n\n"
 		sleep 2
-		echo "cd && yay -S zramswap checkupdates-aur picom-jonaburg-git polybar termite xtitle --noconfirm --removemake --cleanafter" | arch-chroot /mnt /bin/bash -c "su $USR"
+		echo "cd && yay -S zramswap checkupdates-aur picom-jonaburg-git polybar termite xtitle --noconfirm --removemake --cleanafter" | $CHROOT su $USR
 		clear
 
 		# Multimedia
 		echo -e "\n\n\n${Amarillo} Instalando spotify spotify-adblock mpv popcorn-time${NoColor}\n\n"
 		sleep 2
-		echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | arch-chroot /mnt /bin/bash -c "su $USR"
+		echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su $USR
 		clear
 
 		# Mensajeria
 		echo -e "\n\n\n${Amarillo} Instalando whatsapp y telegram${NoColor}\n\n"
 		sleep 2
-		echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | arch-chroot /mnt /bin/bash -c "su $USR"
+		echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su $USR
 		clear
 
 		# Complementos
 		echo -e "\n\n\n${Amarillo} Instalando iconos, fuentes y stacer${NoColor}\n\n"
 		sleep 2
-		echo "cd && yay -S stacer nerd-fonts-jetbrains-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | arch-chroot /mnt /bin/bash -c "su $USR"
+		echo "cd && yay -S stacer nerd-fonts-jetbrains-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su $USR
 		clear
 		fi
     
 ########## SERVICIOS
 
 		echo -e "\n\n\n${Amarillo} Activando Servicios${NoColor}\n"
-		arch-chroot /mnt /bin/bash -c "systemctl enable ${esys} lightdm cpupower systemd-oomd.service systemd-timesyncd.service"
-		arch-chroot /mnt /bin/bash -c "systemctl enable zramswap"
+		$CHROOT systemctl enable ${esys} lightdm cpupower systemd-oomd.service systemd-timesyncd.service
+		$CHROOT systemctl enable zramswap
 		
 		cat >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf <<EOL
 Section "InputClass"
@@ -575,8 +606,8 @@ EOL
 		echo -e "\n\n\n${Amarillo} Reestableciendo mis dotfiles${NoColor}\n\n"
 		mkdir /mnt/dots
 		mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
-		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | arch-chroot /mnt /bin/bash -c "su $USR"
-		arch-chroot /mnt /bin/bash -c "cp /dots/stuff/zfetch /usr/bin/"
+		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su $USR
+		$CHROOT cp /dots/stuff/zfetch /usr/bin/
 		echo -e "\n\n${Verde} OK...${NoColor}"
 		sleep 5
 		clear
@@ -597,10 +628,10 @@ EOL
 		rm -vf /mnt/usr/lib/firmware/{iwlwifi-100-5.ucode,iwlwifi-105-6.ucode,iwlwifi-135-6.ucode,iwlwifi-1000-3.ucode,iwlwifi-1000-5.ucode,iwlwifi-2000-6.ucode,iwlwifi-2030-6.ucode,iwlwifi-3160-7.ucode,iwlwifi-3160-8.ucode,iwlwifi-3160-9.ucode,iwlwifi-3160-10.ucode,iwlwifi-3160-12.ucode,iwlwifi-3160-13.ucode,iwlwifi-3160-16.ucode,iwlwifi-3160-17.ucode,iwlwifi-3168-21.ucode,iwlwifi-3168-22.ucode,iwlwifi-3168-27.ucode,iwlwifi-3168-29.ucode,iwlwifi-3945-2.ucode,iwlwifi-4965-2.ucode,iwlwifi-5000-1.ucode,iwlwifi-5000-2.ucode,iwlwifi-5000-5.ucode,iwlwifi-5150-2.ucode,iwlwifi-6000-4.ucode,iwlwifi-6000g2a-5.ucode,iwlwifi-6000g2a-6.ucode,iwlwifi-6000g2b-5.ucode,iwlwifi-6000g2b-6.ucode,iwlwifi-6050-4.ucode,iwlwifi-6050-5.ucode,iwlwifi-7260-7.ucode,iwlwifi-7260-8.ucode,iwlwifi-7260-9.ucode,iwlwifi-7260-10.ucode,iwlwifi-7260-12.ucode,iwlwifi-7260-13.ucode,iwlwifi-7260-16.ucode,iwlwifi-7260-17.ucode,iwlwifi-7265-8.ucode,iwlwifi-7265-9.ucode,iwlwifi-7265-10.ucode,iwlwifi-7265-12.ucode,iwlwifi-7265-13.ucode,iwlwifi-7265-16.ucode,iwlwifi-7265-17.ucode,iwlwifi-7265D-10.ucode,iwlwifi-7265D-12.ucode,iwlwifi-7265D-13.ucode,iwlwifi-7265D-16.ucode,iwlwifi-7265D-17.ucode,iwlwifi-7265D-21.ucode,iwlwifi-7265D-22.ucode,iwlwifi-7265D-27.ucode,iwlwifi-7265D-29.ucode,iwlwifi-8000C-13.ucode,iwlwifi-8000C-16.ucode,iwlwifi-8000C-21.ucode,iwlwifi-8000C-22.ucode,iwlwifi-8000C-27.ucode,iwlwifi-8000C-31.ucode,iwlwifi-8000C-34.ucode,iwlwifi-8000C-36.ucode,iwlwifi-8265-21.ucode,iwlwifi-8265-22.ucode,iwlwifi-8265-27.ucode,iwlwifi-8265-31.ucode,iwlwifi-8265-34.ucode,iwlwifi-8265-36.ucode,iwlwifi-9000-pu-b0-jf-b0-33.ucode,iwlwifi-9000-pu-b0-jf-b0-34.ucode,iwlwifi-9000-pu-b0-jf-b0-38.ucode,iwlwifi-9000-pu-b0-jf-b0-41.ucode,iwlwifi-9000-pu-b0-jf-b0-43.ucode,iwlwifi-9000-pu-b0-jf-b0-46.ucode,iwlwifi-9260-th-b0-jf-b0-33.ucode,iwlwifi-9260-th-b0-jf-b0-34.ucode,iwlwifi-9260-th-b0-jf-b0-38.ucode,iwlwifi-9260-th-b0-jf-b0-41.ucode,iwlwifi-9260-th-b0-jf-b0-43.ucode,iwlwifi-9260-th-b0-jf-b0-46.ucode,iwlwifi-cc-a0-46.ucode,iwlwifi-cc-a0-48.ucode,iwlwifi-cc-a0-50.ucode,iwlwifi-cc-a0-53.ucode,iwlwifi-cc-a0-55.ucode,iwlwifi-cc-a0-59.ucode,iwlwifi-cc-a0-62.ucode,iwlwifi-cc-a0-63.ucode,iwlwifi-Qu-b0-hr-b0-48.ucode,iwlwifi-Qu-b0-hr-b0-50.ucode,iwlwifi-Qu-b0-hr-b0-53.ucode,iwlwifi-Qu-b0-hr-b0-55.ucode,iwlwifi-Qu-b0-hr-b0-59.ucode,iwlwifi-Qu-b0-hr-b0-62.ucode,iwlwifi-Qu-b0-hr-b0-63.ucode,iwlwifi-Qu-b0-jf-b0-48.ucode,iwlwifi-Qu-b0-jf-b0-50.ucode,iwlwifi-Qu-b0-jf-b0-53.ucode,iwlwifi-Qu-b0-jf-b0-55.ucode,iwlwifi-Qu-b0-jf-b0-59.ucode,iwlwifi-Qu-b0-jf-b0-62.ucode,iwlwifi-Qu-b0-jf-b0-63.ucode,iwlwifi-Qu-c0-hr-b0-48.ucode,iwlwifi-Qu-c0-hr-b0-50.ucode,iwlwifi-Qu-c0-hr-b0-53.ucode,iwlwifi-Qu-c0-hr-b0-55.ucode,iwlwifi-Qu-c0-hr-b0-59.ucode,iwlwifi-Qu-c0-hr-b0-62.ucode,iwlwifi-Qu-c0-hr-b0-63.ucode,iwlwifi-Qu-c0-jf-b0-48.ucode,iwlwifi-Qu-c0-jf-b0-50.ucode,iwlwifi-Qu-c0-jf-b0-53.ucode,iwlwifi-Qu-c0-jf-b0-55.ucode,iwlwifi-Qu-c0-jf-b0-59.ucode,iwlwifi-Qu-c0-jf-b0-62.ucode,iwlwifi-Qu-c0-jf-b0-63.ucode,iwlwifi-QuZ-a0-hr-b0-48.ucode,iwlwifi-QuZ-a0-hr-b0-50.ucode,iwlwifi-QuZ-a0-hr-b0-53.ucode,iwlwifi-QuZ-a0-hr-b0-55.ucode,iwlwifi-QuZ-a0-hr-b0-59.ucode,iwlwifi-QuZ-a0-hr-b0-62.ucode,iwlwifi-QuZ-a0-hr-b0-63.ucode,iwlwifi-QuZ-a0-jf-b0-48.ucode,iwlwifi-QuZ-a0-jf-b0-50.ucode,iwlwifi-QuZ-a0-jf-b0-53.ucode,iwlwifi-QuZ-a0-jf-b0-55.ucode,iwlwifi-QuZ-a0-jf-b0-59.ucode,iwlwifi-QuZ-a0-jf-b0-62.ucode,iwlwifi-QuZ-a0-jf-b0-63.ucode,iwlwifi-so-a0-gf-a0.pnvm,iwlwifi-so-a0-gf-a0-64.ucode,iwlwifi-so-a0-hr-b0-64.ucode,iwlwifi-so-a0-jf-b0-64.ucode,iwlwifi-ty-a0-gf-a0.pnvm,iwlwifi-ty-a0-gf-a0-59.ucode,iwlwifi-ty-a0-gf-a0-62.ucode,iwlwifi-ty-a0-gf-a0-63.ucode,iwlwifi-ty-a0-gf-a0-66.ucode}
 
 		echo
-		arch-chroot /mnt /bin/bash -c "pacman -Scc"
-		arch-chroot /mnt /bin/bash -c "pacman -Rns go"
-		arch-chroot /mnt /bin/bash -c "pacman -Rns $(pacman -Qtdq)"
-		arch-chroot /mnt /bin/bash -c "fstrim -av"
+		$CHROOT pacman -Scc
+		$CHROOT pacman -Rns go
+		$CHROOT pacman -Rns $(pacman -Qtdq)
+		$CHROOT fstrim -av
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		clear
@@ -609,10 +640,6 @@ EOL
 #                   Bye                     #
 #############################################
 
-		arch-chroot /mnt /bin/bash -c "/usr/bin/zfetch"
+		$CHROOT /usr/bin/zfetch
 		echo -e "\n\n\n\n\n\n${Verde}  Ya quedo!!${NoColor}"
 		sleep 10
-		
-## To do.. 
-## Si es DHCPCD optimizar con los dns servers de cloudflare
- 
