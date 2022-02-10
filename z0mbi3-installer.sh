@@ -271,8 +271,6 @@ done
 		echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
 		arch-chroot /mnt /bin/bash -c "export LANG=es_MX.UTF-8"
 		echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
-		echo
-		arch-chroot /mnt /bin/bash -c "timedatectl status"
 		sleep 3
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
@@ -372,6 +370,18 @@ EOL
 		arch-chroot /mnt /bin/bash -c "systemctl mask lvm2-monitor.service systemd-random-seed.service"
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
+		
+		echo -e "\n\n${Amarillo} Optimizando velocidad de internet${NoColor}\n"
+		echo -e "Cambiando a los DNS de ${Azul}Cloudflare${NoColor}"
+		if arch-chroot /mnt /bin/bash -c "pacman -Qi dhcpcd" > /dev/null ; then
+		echo "noarp" >> /mnt/etc/dhcpcd.conf
+		echo "static domain_name_servers=1.1.1.1 1.0.0.1" >> /mnt/etc/dhcpcd.conf
+		else
+		echo "[global-dns-domain-*]" >> /mnt/etc/NetworkManager/conf.d/dns-servers.conf
+		echo "servers=1.1.1.1,1.0.0.1" >> /mnt/etc/NetworkManager/conf.d/dns-servers.conf
+		fi
+		echo -e "${Verde} OK...${NoColor}"
+		sleep 2
     
 		if [ "${MPW}" == "Si" ]; then
 		echo -e "\n\n${Amarillo} Montando almacemaniento personal a fstab${NoColor}\n"
@@ -437,6 +447,17 @@ EOL
 		sleep 2
 		arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm"
 		sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
+		rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
+		cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
+[greeter]
+icon-theme-name = Qogir-ubuntu
+background = /run/media/$USR/windows/Imagenes/Wallpapers/ueirhndsdifh.jpg
+user-background = false
+default-user-image = /run/media/$USR/windows/Imagenes/Som3shiT/Dzndj8HUt7EcgEBD.png
+indicators = ~host;~spacer;~clock;~spacer;~session;~power
+position = 50%,center 70%,center
+screensaver-timeout = 50
+EOL
 		clear
 		
 		if [ "$DEXFCE" = "Si" ]; then
@@ -591,3 +612,7 @@ EOL
 		arch-chroot /mnt /bin/bash -c "/usr/bin/zfetch"
 		echo -e "\n\n\n\n\n\n${Verde}  Ya quedo!!${NoColor}"
 		sleep 10
+		
+## To do.. 
+## Si es DHCPCD optimizar con los dns servers de cloudflare
+ 
