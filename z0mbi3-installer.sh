@@ -481,9 +481,9 @@ EOL
 		cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
 [greeter]
 icon-theme-name = Qogir-ubuntu
-background = /run/media/z0mbi3/windows/Imagenes/Wallpapers/external-content.duckduckgo.com.jpg
+background = /run/media/$USR/windows/Imagenes/Wallpapers/external-content.duckduckgo.com.jpg
 user-background = false
-default-user-image = /run/media/z0mbi3/windows/Imagenes/Som3shiT/Dzndj8HUt7EcgEBD.png
+default-user-image = /run/media/$USR/windows/Imagenes/Som3shiT/Dzndj8HUt7EcgEBD.png
 indicators = ~host;~spacer;~clock;~spacer;~session;~power
 position = 50%,center 80%,center
 screensaver-timeout = 0
