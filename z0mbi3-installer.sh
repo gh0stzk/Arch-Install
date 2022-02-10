@@ -110,10 +110,10 @@ while true
 	done	    
     
 		echo
-		lsblk -nd -e 7,11 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
+		lsblk -n -e 7,11,254 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
 		echo
 		PS3="Escoge el disco donde se instalara Arch Linux: "
-    select drive in $(lsblk -nd -e 7,11 -o NAME) 
+    select drive in $(lsblk -nd -e 7,11,254 -o NAME) 
     do
         if [ $drive ]; then
             break
