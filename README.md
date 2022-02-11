@@ -7,19 +7,20 @@ Arch Linux Installer
 
 ## Introduction
 
-Este es mi script altamente personalizado para instalar [Arch Linux](https://www.archlinux.org/). adecuado a mis necesidades y hardware. This is not meant to be a universal guide, but only how I like to setup Arch Linux on my workstations. Since other people might find it useful, I decided to publish it.
+Este es mi script altamente personalizado para instalar [Arch Linux](https://www.archlinux.org/). adecuado a mis necesidades y hardware. <b>NOT BLOATED</b> Es una instalacion super ligera, pulida y totalmente funcional.
 
-Here is the setup I use:
+## Mi Setup:
 
-- UEFI
-- systemd-boot
-- LVM on LUKS, plain `/boot`
-- NetworkManager
-- Xorg
-- KDE / Plasma
-- SDDM
+- BIOS/MBR
+- Grub
+- 2 unicas particiones "/" y "swap"
+- DHCPCD
+- Xorg-server
+- BSPWM
+- Polybar
+- LightDM
 
-## Inital setup
+## Modo de uso
 
 If using a French keyboard:
 
