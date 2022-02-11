@@ -35,7 +35,11 @@ Se habilitan las descargas paralelas y se aumentan a 10. Se enchula pacman con e
 Se agregan los parametros al kernel _noibrs noibpb nopti nospectre_v2 nospectre_v1 l1tf=off nospec_store_bypass_disable no_stf_barrier mds=off tsx=on tsx_async_abort=off mitigations=off nowatchdog_. Desactiva algunas mitigaciones de seguridad lo que lleva a una mejora del rendimiento. <br>https://transformingembedded.sigmatechnology.se/insight-post/make-linux-fast-again-for-mortals/
 * **Mejorando rendimiento ext4:**<br>
 Las opciones **noatime commit=120 barrier=0** se agregan al punto de montaje principal de la instalación. Y se activa el _fast_commit_ ( Desde el kernel 5.10 esta disponible este parche y reporta hasta un 103% de aumento en la velocidad de escritura ).<br>https://wiki.archlinux.org/title/Ext4#Improving_performance
-* i
+* **Optimizando MAKEFLAGS:**<br>
+Se modifican algunos valores en el archivo makepkg.conf para optimizar los binarios. Y se usaran todos tus cores para mejorar los tiempos de compilacion.<br>https://wiki.archlinux.org/title/makepkg#Building_optimized_binaries
+* **CPUPOWER:**<br>
+Se usa cpupower para configurar como trabajara el CPU y se cambia el valor del governor "ondemand" a "performance" para asegurarnos qué siempre trabaje de manera óptima y rapida.<br>https://wiki.archlinux.org/title/CPU_frequency_scaling#cpupower
+* T
 
 ## Modo de uso
 
