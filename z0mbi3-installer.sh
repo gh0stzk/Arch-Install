@@ -297,12 +297,15 @@ done
 ########## TIEMPO Y LOCALIZACION
 	
 		echo -e "\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n" 
-		$CHROOT ln -sf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime
+		IDIOMA=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
+		TIZO=$(curl https://ipapi.co/timezone)
+		$CHROOT ln -sf /usr/share/zoneinfo/$TIZO /etc/localtime
+		
 		$CHROOT hwclock --systohc
 		echo
-		sed -i 's/#es_MX.UTF-8/es_MX.UTF-8/' /mnt/etc/locale.gen
+		sed -i 's/#'"${IDIOMA}"'/'"${IDIOMA}"'/' /mnt/etc/locale.gen
 		$CHROOT locale-gen
-		echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
+		echo "LANG=$IDIOMA" >> /mnt/etc/locale.conf
 		echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
 		sleep 3
 		echo -e "\n${Verde} OK...${NoColor}"
