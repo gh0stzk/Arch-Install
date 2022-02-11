@@ -109,9 +109,10 @@ while true
 		echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 	done	    
     
-        partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
+        partroot="$(findmnt -Dn -M /mnt -o SOURCE >/dev/null)"
 		echo
-		lsblk -n -e 7,11 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
+		lsblk -d -e 7,11 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
+		echo "------------------------------"
 		echo
 		PS3="Escoge el disco donde se instalara Arch Linux: "
     select drive in $(lsblk -nd -e 7,11 -o NAME) 
@@ -302,7 +303,6 @@ done
 		sed -i 's/#es_MX.UTF-8/es_MX.UTF-8/' /mnt/etc/locale.gen
 		$CHROOT locale-gen
 		echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
-		$CHROOT export LANG=es_MX.UTF-8
 		echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
 		sleep 3
 		echo -e "\n${Verde} OK...${NoColor}"
