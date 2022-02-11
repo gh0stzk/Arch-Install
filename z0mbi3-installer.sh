@@ -109,7 +109,7 @@ while true
 		echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 	done	    
     
-        partroot="$(findmnt -Dn -M /mnt -o SOURCE >/dev/null)"
+        partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
 		echo
 		lsblk -d -e 7,11 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
 		echo "------------------------------"
@@ -355,7 +355,7 @@ EOL
     
 		echo -e "\n\n${Amarillo} Optimizando el sistema de archivos ext4 para su uso con SSD${NoColor}"
 		sed -i 's/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
-		$CHROOT tune2fs -O fast_commit $partroot
+		$CHROOT tune2fs -O fast_commit $partroot >/dev/null
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
     
