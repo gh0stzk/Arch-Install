@@ -109,13 +109,12 @@ while true
 		echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 	done	    
     
+        partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
 		echo
-		fdisk -l
-		echo
-		lsblk -n -e 7,11,254 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
+		lsblk -n -e 7,11 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
 		echo
 		PS3="Escoge el disco donde se instalara Arch Linux: "
-    select drive in $(lsblk -nd -e 7,11,254 -o NAME) 
+    select drive in $(lsblk -nd -e 7,11 -o NAME) 
     do
         if [ $drive ]; then
             break
@@ -261,7 +260,7 @@ while true
 		fi
 		
 		echo		
-		echo -e " Arch Linux se instalara en el disco ${Amarillo}[${NoColor}${Rojo}$drive${NoColor}${Amarillo}]${NoColor}"
+		echo -e " Arch Linux se instalara en el disco ${Amarillo}[${NoColor}${Rojo}$drive${NoColor}${Amarillo}]${NoColor} en la particion ${partroot}"
     
 		echo
 		echo
@@ -355,7 +354,8 @@ EOL
 		sleep 2
     
 		echo -e "\n\n${Amarillo} Optimizando el sistema de archivos ext4 para su uso con SSD${NoColor}"
-		sed -i 's/relatime/noatime,commit=120/' /mnt/etc/fstab
+		sed -i 's/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
+		$CHROOT tune2fs -O fast_commit $partroot
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
     
