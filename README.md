@@ -39,7 +39,9 @@ Las opciones **noatime commit=120 barrier=0** se agregan al punto de montaje pri
 Se modifican algunos valores en el archivo makepkg.conf para optimizar los binarios. Y se usaran todos tus cores para mejorar los tiempos de compilacion.<br>https://wiki.archlinux.org/title/makepkg#Building_optimized_binaries
 * **CPUPOWER:**<br>
 Se usa cpupower para configurar como trabajara el CPU y se cambia el valor del governor "ondemand" a "performance" para asegurarnos qué siempre trabaje de manera óptima y rapida.<br>https://wiki.archlinux.org/title/CPU_frequency_scaling#cpupower
-* T
+* **Optmizando el uso en los SSD:**<br>
+Se usa por defecto mq-deadline scheduler no por ser más rápido,  si no por que es el mejor optimizado para los SSD<br>https://wiki.archlinux.org/title/Improving_performance#Changing_I/O_scheduler
+* t
 
 ## Modo de uso
 
