@@ -296,11 +296,10 @@ done
 
 ########## TIEMPO Y LOCALIZACION
 	
-		echo -e "\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n" 
-		IDIOMA=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
+		echo -e "\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n"
 		TIZO=$(curl https://ipapi.co/timezone)
+		IDIOMA=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
 		$CHROOT ln -sf /usr/share/zoneinfo/$TIZO /etc/localtime
-		
 		$CHROOT hwclock --systohc
 		echo
 		sed -i 's/#'"${IDIOMA}"'/'"${IDIOMA}"'/' /mnt/etc/locale.gen
