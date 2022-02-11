@@ -110,6 +110,8 @@ while true
 	done	    
     
 		echo
+		fdisk -l
+		echo
 		lsblk -n -e 7,11,254 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
 		echo
 		PS3="Escoge el disco donde se instalara Arch Linux: "
