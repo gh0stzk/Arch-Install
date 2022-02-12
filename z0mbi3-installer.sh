@@ -61,15 +61,6 @@ while true
 			echo "saliendo...."
 			exit
 		fi
-		#echo -e "Espera.... ${Verde}OK..${NoColor}"
-		#ping archlinux.org -c 1 >/dev/null 2>&1
-
-		#if [ $? != "0" ]
-		#then
-		#echo "Error: Tal parece que no tienes internet.."
-		#echo "saliendo...."
-		#exit
-		#fi
 		
 ########## Datos    
     
@@ -276,11 +267,11 @@ while true
 		echo
 		echo
 while true; do
-    read -rp "Continuar con la instalacion? [s/N]: " sn
+    read -rp " Continuar con la instalacion? [s/N]: " sn
     case $sn in
         [Ss]* ) break;;
         [Nn]* ) exit;;
-        * ) echo "Eres estupido o que, solo tienes que escribir 'si' o 'no'";;
+        * ) echo " Eres estupido o que, solo tienes que escribir 's' o 'n'";;
     esac
 done
     
@@ -340,7 +331,7 @@ EOL
 		echo "$USR:$PASSWD" | $CHROOT chpasswd
 		sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 		echo "Defaults insults" >> /mnt/etc/sudoers
-		echo -e " ${Azul}root${NoColor} : ${Rojo}$PASSWDR${NoColor}\n ${Amarillo}$USR${NoColor} : ${Rojo}$PASSWD${NoColor}"
+		echo -e " ${Azul}root${NoColor} : ${Rojo}$PASSWDR${NoColor}\n ${Amarillo}$USR${NoColor} : ${Rojo}$PASSWD${NoColor}\n"
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 8
 		clear
