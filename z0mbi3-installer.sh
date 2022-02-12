@@ -41,7 +41,9 @@ CHROOT="arch-chroot /mnt"
     clear
 		
 ########## Comprobando UEFI y Conexion
-		
+
+while true
+	do
 	    if [ -d /sys/firmware/efi/efivars ]; then
         echo "Este script solo funciona con BIOS/MBR."
         sleep 2
@@ -49,24 +51,32 @@ CHROOT="arch-chroot /mnt"
 		else
 			break
 		fi
+	done
     
 		echo "Probando conexion a internet"
-		echo -e "Espera.... ${Verde}OK..${NoColor}"
-		ping archlinux.org -c 1 >/dev/null 2>&1
-
-		if [ $? != "0" ]
-		then
-		echo "Error: Tal parece que no tienes internet.."
-		echo "saliendo...."
-		exit
+		if ping archlinux.org -c 1 >/dev/null 2>&1; then
+			echo -e "Espera.... ${Verde}OK..${NoColor}"
+		else
+			echo "Error: Tal parece que no tienes internet.."
+			echo "saliendo...."
+			exit
 		fi
+		#echo -e "Espera.... ${Verde}OK..${NoColor}"
+		#ping archlinux.org -c 1 >/dev/null 2>&1
+
+		#if [ $? != "0" ]
+		#then
+		#echo "Error: Tal parece que no tienes internet.."
+		#echo "saliendo...."
+		#exit
+		#fi
 		
 ########## Datos    
     
 		echo -e "\n\n${Amarillo} Recopilando datos necesarios${NoColor}\n"
 while true
 	do 
-		read -p "Ingresa tu nombre de usuario: " USR
+		read -rp "Ingresa tu nombre de usuario: " USR
 		if [[ "${USR}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
 		then 
 			break
@@ -117,19 +127,19 @@ while true
 		PS3="Escoge el disco donde se instalara Arch Linux: "
     select drive in $(lsblk -nd -e 7,11 -o NAME) 
     do
-        if [ $drive ]; then
+        if [ "$drive" ]; then
             break
         fi
     done
 		
 		echo    
-		plat_options=("Intel" "AMD" "VM")
+		platopts=("Intel" "AMD" "VM")
 		PS3="Selecciona tu CPU (1, 2 o 3): "
-	select opt in "${plat_options[@]}"; do 
+	select opt in "${platopts[@]}"; do 
 		case "$REPLY" in
-		1) packa='intel-ucode';gp='intel_agp i915';break;;
-		2) packa='amd-ucode';gp='amdgpu';break;;
-		3) packa='qemu-guest-agent';gp='vmwgfx';break;;
+		1) plattitle='Intel';packa='intel-ucode';gp='intel_agp i915';break;;
+		2) plattitle='AMD';packa='amd-ucode';gp='amdgpu';break;;
+		3) plattitle='VM';packa='qemu-guest-agent';gp='vmwgfx';break;;
 		*) echo "Opcion invalida!! trata de nuevo.";continue;;
 		esac
 	done
@@ -171,9 +181,9 @@ while true
 	done	
 
 		echo
-		audio_options=("PipeWire" "PulseAudio")
+		audioopts=("PipeWire" "PulseAudio")
 		PS3="Selecciona el audio (1 o 2): "
-	select opt in "${audio_options[@]}"; do
+	select opt in "${audioopts[@]}"; do
 		case "$REPLY" in
 		1) audiotitle='PipeWire';audiopack='pipewire pipewire-pulse';break;;
 		2) audiotitle='PulseAudio';audiopack='pulseaudio';break;;
@@ -230,7 +240,7 @@ while true
 		
 		echo -e " Usuario:   ${Azul}$USR${NoColor}"
 		echo -e " Hostname:  ${Azul}$HNAME${NoColor}"
-		echo -e " CPU:       ${Azul}$plat_options${NoColor}"
+		echo -e " CPU:       ${Azul}$plattitle${NoColor}"
 		echo -e " Kernel:    ${Azul}$kerneltitle${NoColor}"
 		echo -e " Graficos:  ${Azul}$graftitle${NoColor}"
 		echo -e " Internet:  ${Azul}$redtitle${NoColor}"
@@ -266,7 +276,7 @@ while true
 		echo
 		echo
 while true; do
-    read -p "Continuar con la instalacion? [s/N]: " sn
+    read -rp "Continuar con la instalacion? [s/N]: " sn
     case $sn in
         [Ss]* ) break;;
         [Nn]* ) exit;;
@@ -299,7 +309,7 @@ done
 		echo -e "\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n"
 		TIZO=$(curl https://ipapi.co/timezone)
 		IDIOMA=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
-		$CHROOT ln -sf /usr/share/zoneinfo/$TIZO /etc/localtime
+		$CHROOT ln -sf /usr/share/zoneinfo/"$TIZO" /etc/localtime
 		$CHROOT hwclock --systohc
 		echo
 		sed -i 's/#'"${IDIOMA}"'/'"${IDIOMA}"'/' /mnt/etc/locale.gen
@@ -326,7 +336,7 @@ EOL
     
 		echo -e "\n\n${Amarillo} Creando usuario y contraseñas${NoColor}\n"
 		echo "root:$PASSWDR" | $CHROOT chpasswd
-		$CHROOT useradd -m -g users -G wheel -s /usr/bin/zsh ${USR}
+		$CHROOT useradd -m -g users -G wheel -s /usr/bin/zsh "${USR}"
 		echo "$USR:$PASSWD" | $CHROOT chpasswd
 		sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 		echo "Defaults insults" >> /mnt/etc/sudoers
@@ -338,7 +348,7 @@ EOL
 ########## GRUB
 
 		echo -e "\n\n\n${Amarillo} Instalando y configurando grub${NoColor}\n"
-		$CHROOT grub-install --target=i386-pc /dev/$drive
+		$CHROOT grub-install --target=i386-pc /dev/"$drive"
 		echo
 		sed -i 's/quiet/noibrs noibpb nopti nospectre_v2 nospectre_v1 l1tf=off nospec_store_bypass_disable no_stf_barrier mds=off tsx=on tsx_async_abort=off mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
 		sed -i "s/MODULES=()/MODULES=(${gp})/" /mnt/etc/mkinitcpio.conf
@@ -357,13 +367,13 @@ EOL
     
 		echo -e "\n\n${Amarillo} Optimizando el sistema de archivos ext4 para su uso con SSD${NoColor}"
 		sed -i 's/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
-		$CHROOT tune2fs -O fast_commit $partroot >/dev/null
+		$CHROOT tune2fs -O fast_commit "$partroot" >/dev/null
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
     
 		echo -e "\n\n${Amarillo} Optimizando flags para compilar de manera optima segun tu sistema${NoColor}\n"
 		echo -e " Tienes ${Azul}$(nproc)${NoColor} cores."
-		sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j$(nproc)/' /mnt/etc/makepkg.conf
+		sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
     
@@ -457,7 +467,7 @@ EOL
 		sleep 2
 		$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs ntfs-3g gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
 		echo
-		echo "xdg-user-dirs-update" | $CHROOT su $USR
+		echo "xdg-user-dirs-update" | $CHROOT su "$USR"
 		sleep 2
 		clear
     
@@ -510,31 +520,31 @@ EOL
 		if [ "${YAYH}" == "Si" ]; then
 		echo -e "\n\n\n${Amarillo} Instalando yay y apps que yo uso${NoColor}\n\n"
 		sleep 2
-		echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su $USR
+		echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 		clear
 
 		# Utilidades para WM
 		echo -e "\n\n\n${Amarillo} Instalando zramswap checkupdates-aur picom-jonaburg-git polybar termite xtitle${NoColor}\n\n"
 		sleep 2
-		echo "cd && yay -S zramswap checkupdates-aur picom-jonaburg-git polybar termite xtitle --noconfirm --removemake --cleanafter" | $CHROOT su $USR
+		echo "cd && yay -S zramswap checkupdates-aur picom-jonaburg-git polybar termite xtitle --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 		clear
 
 		# Multimedia
 		echo -e "\n\n\n${Amarillo} Instalando spotify spotify-adblock mpv popcorn-time${NoColor}\n\n"
 		sleep 2
-		echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su $USR
+		echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 		clear
 
 		# Mensajeria
 		echo -e "\n\n\n${Amarillo} Instalando whatsapp y telegram${NoColor}\n\n"
 		sleep 2
-		echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su $USR
+		echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 		clear
 
 		# Complementos
 		echo -e "\n\n\n${Amarillo} Instalando iconos, fuentes y stacer${NoColor}\n\n"
 		sleep 2
-		echo "cd && yay -S stacer nerd-fonts-jetbrains-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su $USR
+		echo "cd && yay -S stacer nerd-fonts-jetbrains-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 		clear
 		fi
     
@@ -613,8 +623,8 @@ EOL
 		echo -e "\n\n\n${Amarillo} Reestableciendo mis dotfiles${NoColor}\n\n"
 		mkdir /mnt/dots
 		mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
-		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su $USR
-		$CHROOT mv /home/$USR/.themes/Dracula /usr/share/themes
+		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
+		$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
 		$CHROOT cp /dots/stuff/zfetch /usr/bin/
 		echo -e "\n\n${Verde} OK...${NoColor}"
 		sleep 5
@@ -638,7 +648,7 @@ EOL
 		echo
 		$CHROOT pacman -Scc
 		$CHROOT pacman -Rns go
-		$CHROOT pacman -Rns $(pacman -Qtdq)
+		$CHROOT pacman -Rns "$(pacman -Qtdq)"
 		$CHROOT fstrim -av
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
