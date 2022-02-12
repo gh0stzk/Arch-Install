@@ -1,9 +1,14 @@
 #!/bin/env bash
 			
 			
-		clear
-		loadkeys la-latin1
-		export LANG=es_MX.UTF-8
+#----------------------------------------
+#          Setting some vars
+#----------------------------------------
+
+clear
+loadkeys la-latin1
+setfont ter-v18b
+export LANG=es_MX.UTF-8
     
 Rojo='\033[0;31m'
 Amarillo='\033[0;33m'
@@ -12,9 +17,9 @@ Azul='\033[0;94m'
 NoColor='\033[0m'
 CHROOT="arch-chroot /mnt"
 
-########################################
-#             Logo z0mbi3              #
-########################################
+#----------------------------------------
+#          Logo z0mbi3              
+#----------------------------------------
 
 	echo
 	echo
@@ -39,8 +44,10 @@ CHROOT="arch-chroot /mnt"
     echo -e "${Verde}\n\n\n   Cargando...${NoColor}"
     sleep 5
     clear
-		
-########## Comprobando UEFI y Conexion
+    
+#----------------------------------------
+#          Check BIOS & Internet
+#----------------------------------------
 
 while true
 	do
@@ -54,15 +61,17 @@ while true
 	done
     
 		echo "Probando conexion a internet"
-		if ping archlinux.org -c 1 >/dev/null 2>&1; then
+	if ping archlinux.org -c 1 >/dev/null 2>&1; then
 			echo -e "Espera.... ${Verde}OK..${NoColor}"
 		else
 			echo "Error: Tal parece que no tienes internet.."
 			echo "saliendo...."
-			exit
-		fi
+		exit
+	fi
 		
-########## Datos    
+#----------------------------------------
+#          Getting Information   
+#---------------------------------------- 
     
 		echo -e "\n\n${Amarillo} Recopilando datos necesarios${NoColor}\n"
 while true
@@ -122,7 +131,8 @@ while true
             break
         fi
     done
-		
+
+		clear
 		echo    
 		platopts=("Intel" "AMD" "VM")
 		PS3="Selecciona tu CPU (1, 2 o 3): "
@@ -219,7 +229,7 @@ while true
 		done
     
     
-        # Detectando tarjeta WiFi
+			# Detectando tarjeta WiFi
 			if [ "$(lspci -d ::280)" ]; then
 				WIFI=y
 			fi 
@@ -266,6 +276,7 @@ while true
     
 		echo
 		echo
+		
 while true; do
     read -rp " Continuar con la instalacion? [s/N]: " sn
     case $sn in
@@ -277,7 +288,9 @@ done
     
 		clear
 
-########## SISTEMA BASE PACSTRAP
+#----------------------------------------
+#          Pacstrap base system
+#----------------------------------------
 
 		echo -e "\n\n\n${Amarillo} Instalando sistema base${NoColor}\n"
 		sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 10/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
@@ -287,15 +300,19 @@ done
 		echo -e "\n\n${Verde} OK...${NoColor}"
 		sleep 2
 		clear
-    
-########## FSTAB
+
+#----------------------------------------
+#          Generating FSTAB
+#----------------------------------------
     
 		echo -e "\n\n\n${Amarillo} Generando fstab..${NoColor}"
 		genfstab -U /mnt >> /mnt/etc/fstab
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
 
-########## TIEMPO Y LOCALIZACION
+#----------------------------------------
+#          Timezone, Lang & Keyboard
+#----------------------------------------
 	
 		echo -e "\n\n${Amarillo} Cambiando zona horaria, lenguaje, localizacion y distribucion del teclado${NoColor}\n"
 		TIZO=$(curl https://ipapi.co/timezone)
@@ -311,7 +328,9 @@ done
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 
-########## RED
+#----------------------------------------
+#          Hostname & Hosts
+#----------------------------------------
 
 		echo -e "\n\n${Amarillo} Configurando la red${NoColor}"
 		echo "${HNAME}" >> /mnt/etc/hostname
@@ -322,8 +341,10 @@ done
 EOL
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 2
-    
-########## USUARIOS Y CONTRASEÑAS
+
+#----------------------------------------
+#          Users & Passwords
+#----------------------------------------
     
 		echo -e "\n\n${Amarillo} Creando usuario y contraseñas${NoColor}\n"
 		echo "root:$PASSWDR" | $CHROOT chpasswd
@@ -335,8 +356,10 @@ EOL
 		echo -e "${Verde} OK...${NoColor}"
 		sleep 8
 		clear
-		
-########## GRUB
+
+#----------------------------------------
+#          Install GRUB
+#----------------------------------------
 
 		echo -e "\n\n\n${Amarillo} Instalando y configurando grub${NoColor}\n"
 		$CHROOT grub-install --target=i386-pc /dev/"$drive"
@@ -348,8 +371,10 @@ EOL
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		clear  
-    
-########## OPTIMIZACIONES
+
+#----------------------------------------
+#          Optimizations
+#----------------------------------------
 
 		echo -e "\n\n\n${Amarillo} Enchulando Pacman${NoColor}"
 		sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 10/; /^ParallelDownloads =/a ILoveCandy' /mnt/etc/pacman.conf
@@ -431,9 +456,11 @@ EOL
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		fi
-    
-########## MIRRORS CHROOT
-    
+		
+#----------------------------------------
+#          Installing Packages
+#----------------------------------------
+
 		echo -e "\n\n${Amarillo} Escogiendo los mejores mirrors y sincronizando la base de datos${NoColor}\n"
 		$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
 		echo
@@ -442,7 +469,6 @@ EOL
 		sleep 2
 		clear
     
-########## INSTALANDO PAQUETES
 
 		echo -e "\n\n\n${Amarillo} Instalando Xorg, Audio y driver grafico...${NoColor}\n"
 		sleep 2
@@ -467,18 +493,19 @@ EOL
 		$CHROOT pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior geany yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync minidlna git --noconfirm
 		clear
     
-		#echo -e "\n\n\n${Amarillo} Instalando QEMU${NoColor}\n\n"
-		#sleep 2
-		#echo "sudo pacman -S qemu virt-manager dnsmasq bridge-utils ebtables --noconfirm" | arch-chroot /mnt /bin/bash -c "su '${USR}'"
+		echo -e "\n\n\n${Amarillo} Instalando QEMU${NoColor}\n\n"
+		sleep 2
+		$CHROOT pacman -S qemu virt-manager dnsmasq bridge-utils ebtables --noconfirm
 		#clear
     
-		if [ "$WIFI" = "y" ]; then
 		echo -e "\n\n\n${Amarillo} Instalando herramientas WIFI${NoColor}\n"
-		sleep 2
+		if [ "$WIFI" = "y" ]; then
 		$CHROOT pacman -S wpa_supplicant wireless_tools --noconfirm
 		else
-		echo -e "\n\n\nNo tienes tarjeta WiFi.. No se instala soporte..\n\n"
+		echo -e " No tienes tarjeta WiFi.. No se instala soporte.."
 		fi
+		sleep 2
+		clear
     
 		echo -e "\n\n\n${Amarillo} Instalando LightDM${NoColor}\n"
 		sleep 2
@@ -505,8 +532,10 @@ EOL
 		$CHROOT pacman -S xfce4 --noconfirm
 		clear
 		fi
-    
-########## AUR
+		
+#----------------------------------------
+#          AUR Packages
+#----------------------------------------
 
 		if [ "${YAYH}" == "Si" ]; then
 		echo -e "\n\n\n${Amarillo} Instalando yay y apps que yo uso${NoColor}\n\n"
@@ -538,11 +567,13 @@ EOL
 		echo "cd && yay -S stacer nerd-fonts-jetbrains-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 		clear
 		fi
-    
-########## SERVICIOS
+
+#----------------------------------------
+#          Enable Services
+#----------------------------------------
 
 		echo -e "\n\n\n${Amarillo} Activando Servicios${NoColor}\n"
-		$CHROOT systemctl enable ${esys} lightdm cpupower systemd-oomd.service systemd-timesyncd.service
+		$CHROOT systemctl enable ${esys} lightdm cpupower systemd-timesyncd.service
 		$CHROOT systemctl enable zramswap
 		
 		cat >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf <<EOL
@@ -553,12 +584,18 @@ Section "InputClass"
 EndSection
 EOL
 
+#----------------------------------------
+#          Reverting SUDO Privileges
+#----------------------------------------
+
 		sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /mnt/etc/sudoers
 		echo -e "\n${Verde} OK...${NoColor}"
 		sleep 2
 		clear
-    
-########## DOTFILES
+
+#----------------------------------------
+#          My DOTFILES
+#----------------------------------------
 
 		if [ "${DOTS}" == "Si" ]; then
 		echo -e "\n\n\n${Amarillo} Creando archivos especificos de mi configuracion X0RG${NoColor}\n\n"
@@ -621,23 +658,24 @@ EOL
 		sleep 5
 		clear
 		fi
-    
-##########
+
+#----------------------------------------
+#          Cleaning Garbage
+#----------------------------------------
 
 		echo -e "\n\n\n${Amarillo} Limpiando sistema para su primer arranque..${NoColor}\n"
 		sleep 2
-		rm -vrf /mnt/home/"$USR"/.cache/yay/
-		rm -vrf /mnt/home/"$USR"/.cache/electron/
-		rm -vrf /mnt/home/"$USR"/.cache/go-build/
-		rm -vrf /mnt/home/"$USR"/.cargo/
-		rm -vrf /mnt/usr/lib/firmware/{amd,amdgpu,amd-ucode,mellanox,mwlwifi,netronome,nvidia,radeon,rtlwifi}
-		rm -vrf /mnt/usr/share/icons/{Qogir-manjaro,Qogir-manjaro-dark,Papirus-Light}
-		rm -vf /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop}
-		rm -vf /mnt/opt/whatsapp-nativefier/locales/{am.pak,ar.pak,bg.pak,bn.pak,ca.pak,cs.pak,da.pak,de.pak,el.pak,en-GB.pak,et.pak,fa.pak,fi.pak,fil.pak,fr.pak,gu.pak,he.pak,hi.pak,hr.pak,hu.pak,id.pak,it.pak,ja.pak,kn.pak,ko.pak,lt.pak,lv.pak,ml.pak,mr.pak,ms.pak,nb.pak,nl.pak,pl.pak,pt-BR.pak,pt-PT.pak,ro.pak,ru.pak,sk.pak,sl.pak,sr.pak,sv.pak,sw.pak,ta.pak,te.pak,th.pak,tr.pak,uk.pak,vi.pak,zh-CN.pak,zh-TW.pak}
-		rm -vf /mnt/usr/lib/firmware/{iwlwifi-100-5.ucode,iwlwifi-105-6.ucode,iwlwifi-135-6.ucode,iwlwifi-1000-3.ucode,iwlwifi-1000-5.ucode,iwlwifi-2000-6.ucode,iwlwifi-2030-6.ucode,iwlwifi-3160-7.ucode,iwlwifi-3160-8.ucode,iwlwifi-3160-9.ucode,iwlwifi-3160-10.ucode,iwlwifi-3160-12.ucode,iwlwifi-3160-13.ucode,iwlwifi-3160-16.ucode,iwlwifi-3160-17.ucode,iwlwifi-3168-21.ucode,iwlwifi-3168-22.ucode,iwlwifi-3168-27.ucode,iwlwifi-3168-29.ucode,iwlwifi-3945-2.ucode,iwlwifi-4965-2.ucode,iwlwifi-5000-1.ucode,iwlwifi-5000-2.ucode,iwlwifi-5000-5.ucode,iwlwifi-5150-2.ucode,iwlwifi-6000-4.ucode,iwlwifi-6000g2a-5.ucode,iwlwifi-6000g2a-6.ucode,iwlwifi-6000g2b-5.ucode,iwlwifi-6000g2b-6.ucode,iwlwifi-6050-4.ucode,iwlwifi-6050-5.ucode,iwlwifi-7260-7.ucode,iwlwifi-7260-8.ucode,iwlwifi-7260-9.ucode,iwlwifi-7260-10.ucode,iwlwifi-7260-12.ucode,iwlwifi-7260-13.ucode,iwlwifi-7260-16.ucode,iwlwifi-7260-17.ucode,iwlwifi-7265-8.ucode,iwlwifi-7265-9.ucode,iwlwifi-7265-10.ucode,iwlwifi-7265-12.ucode,iwlwifi-7265-13.ucode,iwlwifi-7265-16.ucode,iwlwifi-7265-17.ucode,iwlwifi-7265D-10.ucode,iwlwifi-7265D-12.ucode,iwlwifi-7265D-13.ucode,iwlwifi-7265D-16.ucode,iwlwifi-7265D-17.ucode,iwlwifi-7265D-21.ucode,iwlwifi-7265D-22.ucode,iwlwifi-7265D-27.ucode,iwlwifi-7265D-29.ucode,iwlwifi-8000C-13.ucode,iwlwifi-8000C-16.ucode,iwlwifi-8000C-21.ucode,iwlwifi-8000C-22.ucode,iwlwifi-8000C-27.ucode,iwlwifi-8000C-31.ucode,iwlwifi-8000C-34.ucode,iwlwifi-8000C-36.ucode,iwlwifi-8265-21.ucode,iwlwifi-8265-22.ucode,iwlwifi-8265-27.ucode,iwlwifi-8265-31.ucode,iwlwifi-8265-34.ucode,iwlwifi-8265-36.ucode,iwlwifi-9000-pu-b0-jf-b0-33.ucode,iwlwifi-9000-pu-b0-jf-b0-34.ucode,iwlwifi-9000-pu-b0-jf-b0-38.ucode,iwlwifi-9000-pu-b0-jf-b0-41.ucode,iwlwifi-9000-pu-b0-jf-b0-43.ucode,iwlwifi-9000-pu-b0-jf-b0-46.ucode,iwlwifi-9260-th-b0-jf-b0-33.ucode,iwlwifi-9260-th-b0-jf-b0-34.ucode,iwlwifi-9260-th-b0-jf-b0-38.ucode,iwlwifi-9260-th-b0-jf-b0-41.ucode,iwlwifi-9260-th-b0-jf-b0-43.ucode,iwlwifi-9260-th-b0-jf-b0-46.ucode,iwlwifi-cc-a0-46.ucode,iwlwifi-cc-a0-48.ucode,iwlwifi-cc-a0-50.ucode,iwlwifi-cc-a0-53.ucode,iwlwifi-cc-a0-55.ucode,iwlwifi-cc-a0-59.ucode,iwlwifi-cc-a0-62.ucode,iwlwifi-cc-a0-63.ucode,iwlwifi-Qu-b0-hr-b0-48.ucode,iwlwifi-Qu-b0-hr-b0-50.ucode,iwlwifi-Qu-b0-hr-b0-53.ucode,iwlwifi-Qu-b0-hr-b0-55.ucode,iwlwifi-Qu-b0-hr-b0-59.ucode,iwlwifi-Qu-b0-hr-b0-62.ucode,iwlwifi-Qu-b0-hr-b0-63.ucode,iwlwifi-Qu-b0-jf-b0-48.ucode,iwlwifi-Qu-b0-jf-b0-50.ucode,iwlwifi-Qu-b0-jf-b0-53.ucode,iwlwifi-Qu-b0-jf-b0-55.ucode,iwlwifi-Qu-b0-jf-b0-59.ucode,iwlwifi-Qu-b0-jf-b0-62.ucode,iwlwifi-Qu-b0-jf-b0-63.ucode,iwlwifi-Qu-c0-hr-b0-48.ucode,iwlwifi-Qu-c0-hr-b0-50.ucode,iwlwifi-Qu-c0-hr-b0-53.ucode,iwlwifi-Qu-c0-hr-b0-55.ucode,iwlwifi-Qu-c0-hr-b0-59.ucode,iwlwifi-Qu-c0-hr-b0-62.ucode,iwlwifi-Qu-c0-hr-b0-63.ucode,iwlwifi-Qu-c0-jf-b0-48.ucode,iwlwifi-Qu-c0-jf-b0-50.ucode,iwlwifi-Qu-c0-jf-b0-53.ucode,iwlwifi-Qu-c0-jf-b0-55.ucode,iwlwifi-Qu-c0-jf-b0-59.ucode,iwlwifi-Qu-c0-jf-b0-62.ucode,iwlwifi-Qu-c0-jf-b0-63.ucode,iwlwifi-QuZ-a0-hr-b0-48.ucode,iwlwifi-QuZ-a0-hr-b0-50.ucode,iwlwifi-QuZ-a0-hr-b0-53.ucode,iwlwifi-QuZ-a0-hr-b0-55.ucode,iwlwifi-QuZ-a0-hr-b0-59.ucode,iwlwifi-QuZ-a0-hr-b0-62.ucode,iwlwifi-QuZ-a0-hr-b0-63.ucode,iwlwifi-QuZ-a0-jf-b0-48.ucode,iwlwifi-QuZ-a0-jf-b0-50.ucode,iwlwifi-QuZ-a0-jf-b0-53.ucode,iwlwifi-QuZ-a0-jf-b0-55.ucode,iwlwifi-QuZ-a0-jf-b0-59.ucode,iwlwifi-QuZ-a0-jf-b0-62.ucode,iwlwifi-QuZ-a0-jf-b0-63.ucode,iwlwifi-so-a0-gf-a0.pnvm,iwlwifi-so-a0-gf-a0-64.ucode,iwlwifi-so-a0-hr-b0-64.ucode,iwlwifi-so-a0-jf-b0-64.ucode,iwlwifi-ty-a0-gf-a0.pnvm,iwlwifi-ty-a0-gf-a0-59.ucode,iwlwifi-ty-a0-gf-a0-62.ucode,iwlwifi-ty-a0-gf-a0-63.ucode,iwlwifi-ty-a0-gf-a0-66.ucode}
+		rm -rf /mnt/home/"$USR"/.cache/yay/
+		rm -rf /mnt/home/"$USR"/.cache/electron/
+		rm -rf /mnt/home/"$USR"/.cache/go-build/
+		rm -rf /mnt/home/"$USR"/.cargo/
+		rm -rf /mnt/usr/lib/firmware/{amd,amdgpu,amd-ucode,mellanox,mwlwifi,netronome,nvidia,radeon,rtlwifi}
+		rm -rf /mnt/usr/share/icons/{Qogir-manjaro,Qogir-manjaro-dark,Papirus-Light}
+		rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop}
+		rm -f /mnt/opt/whatsapp-nativefier/locales/{am.pak,ar.pak,bg.pak,bn.pak,ca.pak,cs.pak,da.pak,de.pak,el.pak,en-GB.pak,et.pak,fa.pak,fi.pak,fil.pak,fr.pak,gu.pak,he.pak,hi.pak,hr.pak,hu.pak,id.pak,it.pak,ja.pak,kn.pak,ko.pak,lt.pak,lv.pak,ml.pak,mr.pak,ms.pak,nb.pak,nl.pak,pl.pak,pt-BR.pak,pt-PT.pak,ro.pak,ru.pak,sk.pak,sl.pak,sr.pak,sv.pak,sw.pak,ta.pak,te.pak,th.pak,tr.pak,uk.pak,vi.pak,zh-CN.pak,zh-TW.pak}
+		rm -f /mnt/usr/lib/firmware/{iwlwifi-100-5.ucode,iwlwifi-105-6.ucode,iwlwifi-135-6.ucode,iwlwifi-1000-3.ucode,iwlwifi-1000-5.ucode,iwlwifi-2000-6.ucode,iwlwifi-2030-6.ucode,iwlwifi-3160-7.ucode,iwlwifi-3160-8.ucode,iwlwifi-3160-9.ucode,iwlwifi-3160-10.ucode,iwlwifi-3160-12.ucode,iwlwifi-3160-13.ucode,iwlwifi-3160-16.ucode,iwlwifi-3160-17.ucode,iwlwifi-3168-21.ucode,iwlwifi-3168-22.ucode,iwlwifi-3168-27.ucode,iwlwifi-3168-29.ucode,iwlwifi-3945-2.ucode,iwlwifi-4965-2.ucode,iwlwifi-5000-1.ucode,iwlwifi-5000-2.ucode,iwlwifi-5000-5.ucode,iwlwifi-5150-2.ucode,iwlwifi-6000-4.ucode,iwlwifi-6000g2a-5.ucode,iwlwifi-6000g2a-6.ucode,iwlwifi-6000g2b-5.ucode,iwlwifi-6000g2b-6.ucode,iwlwifi-6050-4.ucode,iwlwifi-6050-5.ucode,iwlwifi-7260-7.ucode,iwlwifi-7260-8.ucode,iwlwifi-7260-9.ucode,iwlwifi-7260-10.ucode,iwlwifi-7260-12.ucode,iwlwifi-7260-13.ucode,iwlwifi-7260-16.ucode,iwlwifi-7260-17.ucode,iwlwifi-7265-8.ucode,iwlwifi-7265-9.ucode,iwlwifi-7265-10.ucode,iwlwifi-7265-12.ucode,iwlwifi-7265-13.ucode,iwlwifi-7265-16.ucode,iwlwifi-7265-17.ucode,iwlwifi-7265D-10.ucode,iwlwifi-7265D-12.ucode,iwlwifi-7265D-13.ucode,iwlwifi-7265D-16.ucode,iwlwifi-7265D-17.ucode,iwlwifi-7265D-21.ucode,iwlwifi-7265D-22.ucode,iwlwifi-7265D-27.ucode,iwlwifi-7265D-29.ucode,iwlwifi-8000C-13.ucode,iwlwifi-8000C-16.ucode,iwlwifi-8000C-21.ucode,iwlwifi-8000C-22.ucode,iwlwifi-8000C-27.ucode,iwlwifi-8000C-31.ucode,iwlwifi-8000C-34.ucode,iwlwifi-8000C-36.ucode,iwlwifi-8265-21.ucode,iwlwifi-8265-22.ucode,iwlwifi-8265-27.ucode,iwlwifi-8265-31.ucode,iwlwifi-8265-34.ucode,iwlwifi-8265-36.ucode,iwlwifi-9000-pu-b0-jf-b0-33.ucode,iwlwifi-9000-pu-b0-jf-b0-34.ucode,iwlwifi-9000-pu-b0-jf-b0-38.ucode,iwlwifi-9000-pu-b0-jf-b0-41.ucode,iwlwifi-9000-pu-b0-jf-b0-43.ucode,iwlwifi-9000-pu-b0-jf-b0-46.ucode,iwlwifi-9260-th-b0-jf-b0-33.ucode,iwlwifi-9260-th-b0-jf-b0-34.ucode,iwlwifi-9260-th-b0-jf-b0-38.ucode,iwlwifi-9260-th-b0-jf-b0-41.ucode,iwlwifi-9260-th-b0-jf-b0-43.ucode,iwlwifi-9260-th-b0-jf-b0-46.ucode,iwlwifi-cc-a0-46.ucode,iwlwifi-cc-a0-48.ucode,iwlwifi-cc-a0-50.ucode,iwlwifi-cc-a0-53.ucode,iwlwifi-cc-a0-55.ucode,iwlwifi-cc-a0-59.ucode,iwlwifi-cc-a0-62.ucode,iwlwifi-cc-a0-63.ucode,iwlwifi-Qu-b0-hr-b0-48.ucode,iwlwifi-Qu-b0-hr-b0-50.ucode,iwlwifi-Qu-b0-hr-b0-53.ucode,iwlwifi-Qu-b0-hr-b0-55.ucode,iwlwifi-Qu-b0-hr-b0-59.ucode,iwlwifi-Qu-b0-hr-b0-62.ucode,iwlwifi-Qu-b0-hr-b0-63.ucode,iwlwifi-Qu-b0-jf-b0-48.ucode,iwlwifi-Qu-b0-jf-b0-50.ucode,iwlwifi-Qu-b0-jf-b0-53.ucode,iwlwifi-Qu-b0-jf-b0-55.ucode,iwlwifi-Qu-b0-jf-b0-59.ucode,iwlwifi-Qu-b0-jf-b0-62.ucode,iwlwifi-Qu-b0-jf-b0-63.ucode,iwlwifi-Qu-c0-hr-b0-48.ucode,iwlwifi-Qu-c0-hr-b0-50.ucode,iwlwifi-Qu-c0-hr-b0-53.ucode,iwlwifi-Qu-c0-hr-b0-55.ucode,iwlwifi-Qu-c0-hr-b0-59.ucode,iwlwifi-Qu-c0-hr-b0-62.ucode,iwlwifi-Qu-c0-hr-b0-63.ucode,iwlwifi-Qu-c0-jf-b0-48.ucode,iwlwifi-Qu-c0-jf-b0-50.ucode,iwlwifi-Qu-c0-jf-b0-53.ucode,iwlwifi-Qu-c0-jf-b0-55.ucode,iwlwifi-Qu-c0-jf-b0-59.ucode,iwlwifi-Qu-c0-jf-b0-62.ucode,iwlwifi-Qu-c0-jf-b0-63.ucode,iwlwifi-QuZ-a0-hr-b0-48.ucode,iwlwifi-QuZ-a0-hr-b0-50.ucode,iwlwifi-QuZ-a0-hr-b0-53.ucode,iwlwifi-QuZ-a0-hr-b0-55.ucode,iwlwifi-QuZ-a0-hr-b0-59.ucode,iwlwifi-QuZ-a0-hr-b0-62.ucode,iwlwifi-QuZ-a0-hr-b0-63.ucode,iwlwifi-QuZ-a0-jf-b0-48.ucode,iwlwifi-QuZ-a0-jf-b0-50.ucode,iwlwifi-QuZ-a0-jf-b0-53.ucode,iwlwifi-QuZ-a0-jf-b0-55.ucode,iwlwifi-QuZ-a0-jf-b0-59.ucode,iwlwifi-QuZ-a0-jf-b0-62.ucode,iwlwifi-QuZ-a0-jf-b0-63.ucode,iwlwifi-so-a0-gf-a0.pnvm,iwlwifi-so-a0-gf-a0-64.ucode,iwlwifi-so-a0-hr-b0-64.ucode,iwlwifi-so-a0-jf-b0-64.ucode,iwlwifi-ty-a0-gf-a0.pnvm,iwlwifi-ty-a0-gf-a0-59.ucode,iwlwifi-ty-a0-gf-a0-62.ucode,iwlwifi-ty-a0-gf-a0-63.ucode,iwlwifi-ty-a0-gf-a0-66.ucode}
 
 		echo
-		$CHROOT pacman -Scc
 		$CHROOT pacman -Rns go
 		$CHROOT pacman -Rns "$(pacman -Qtdq)"
 		$CHROOT fstrim -av
@@ -645,10 +683,19 @@ EOL
 		sleep 2
 		clear
 
-#############################################
-#                   Bye                     #
-#############################################
+#----------------------------------------
+#                Bye
+#----------------------------------------
 
 		$CHROOT /usr/bin/zfetch
-		echo -e "\n\n\n\n\n\n${Verde}  Ya quedo!!${NoColor}"
-		sleep 10
+		echo -e "\n\n${Verde} Sistema instalado!!.${NoColor}"
+		
+while true;
+	do
+		read -rp " Deseas reiniciar? [s/N]: " sn
+    case $sn in
+        [Ss]* ) reboot;;
+        [Nn]* ) exit;;
+        * ) echo " Eres estupido o que, solo tienes que escribir 's' o 'n'";;
+    esac
+done
