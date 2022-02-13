@@ -108,6 +108,24 @@ center()
 	#center "Example text" "~"
 	#center "Example text" "=" 6
 	
+function spinner() {
+		local info="$1"
+		local pid=$!
+		local delay=0.20
+		local spinstr='/-\|'
+    while kill -0 $pid 2> /dev/null; do
+			local temp=${spinstr#?}
+			printf " [%c]  $info" "$spinstr"
+			local spinstr=$temp${spinstr%"$temp"}
+			sleep $delay
+			local reset="\b\b\b\b\b\b"
+        for ((i=1; i<=$(echo $info | wc -c); i++)); do
+            reset+="\b"
+        done
+			printf $reset
+	done
+		printf "    \b\b\b\b"
+}
 #----------------------------------------
 #          Check Internet
 #----------------------------------------
@@ -519,7 +537,7 @@ EOL
 clear
 	
 #----------------------------------------
-#          Installing Packages
+#          Refreshing Mirrors
 #----------------------------------------
 
 center "Refreshing mirrors"
@@ -529,59 +547,28 @@ center "Refreshing mirrors"
 	echo -e "${Ok}"
 	sleep 2
 clear
-    
+
+#----------------------------------------
+#          Installing Packages
+#----------------------------------------
+
 center "Installing Packages.."
 	sleep 2
 	
-	$CHROOT pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm >/dev/null &
-	PID=$!
-	echo -e "Installing Xorg, Audio & Video Drivers\n"
-	printf "["
-    while kill -0 $PID 2> /dev/null; do 
-    printf  "▉"
-    sleep 1
-	done
-	printf "] ${Verde}done!${NoColor}\n\n"
+	($CHROOT pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm >/dev/null) &
+	spinner "Installing Xorg, Audio & Video Drivers"
+		
+	($CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm >/dev/null) &
+	spinner "Installing Multimedia Codecs And Archiver Utilities"
 	
-	$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm >/dev/null &
-	PID=$!
-	echo -e "Installing Multimedia Codecs And Archiver Utilities"
-	printf "["
-	while kill -0 $PID 2> /dev/null; do 
-    printf  "▉"
-    sleep 1
-	done
-	printf "] ${Verde}done!${NoColor}\n\n"
+	($CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs ntfs-3g gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm >/dev/null) &
+	spinner "Installing support for mounting volumes and removable media devices"
 	
-	$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs ntfs-3g gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm >/dev/null &
-	PID=$!
-	echo -e "Installing support for mounting volumes and removable media devices"
-	printf "["
-    while kill -0 $PID 2> /dev/null; do 
-    printf  "▉"
-    sleep 1
-	done
-	printf "] ${Verde}done!${NoColor}\n\n"
+	($CHROOT pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 geany gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync git --noconfirm >/dev/null) &
+	spinner "Installing Apps i use"
 	
-	$CHROOT pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior geany yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync minidlna git --noconfirm >/dev/null &
-	PID=$!
-	echo -e "Installing Apps i use"
-	printf "["
-	while kill -0 $PID 2> /dev/null; do 
-    printf  "▉"
-    sleep 1
-	done
-	printf "] ${Verde}done!${NoColor}\n\n"
-	
-	$CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm >/dev/null &
-	PID=$!
-	echo -e "Installing LightDM & Greeter"
-	printf "["
-	while kill -0 $PID 2> /dev/null; do 
-    printf  "▉"
-    sleep 1
-	done
-	printf "] ${Verde}done!${NoColor}\n\n"
+	($CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm >/dev/null) &
+	spinner "Installing LightDM & Greeter"
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
@@ -599,15 +586,8 @@ EOL
 clear
     
     if [ "$DEXFCE" = "Si" ]; then
-		$CHROOT pacman -S xfce4 --noconfirm >/dev/null &
-		PID=$!
-		echo -e "Installing XFCE"
-		printf "["
-		while kill -0 $PID 2> /dev/null; do 
-		printf  "▉"
-		sleep 1
-		done
-		printf "] ${Verde}done!${NoColor}\n\n"
+		($CHROOT pacman -S xfce4 --noconfirm >/dev/null) &
+		spinner "Installing XFCE"
 		clear
 	fi
 	
@@ -654,7 +634,7 @@ clear
 		fi
 
 #----------------------------------------
-#          Enable Services
+#          Enable Services & other stuff
 #----------------------------------------
 
 center "Enabling Services"
@@ -775,14 +755,5 @@ clear
 center "You are now usin Arch Linux BTW...."
 	$CHROOT /usr/bin/zfetch
 		
-while true;
-	do
-		read -rp "Do you want to reboot? [y/N]: " yn
-    case $yn in
-        [Yy]* ) reboot;;
-        [Nn]* ) exit;;
-        * ) echo "Error: you only need to type 'y' or 'n'";;
-    esac
-done
-
-clear
+echo -e " \n\nInstallation done!! Type exit and then type reboot"
+sleep 10
