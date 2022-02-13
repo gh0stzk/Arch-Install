@@ -16,7 +16,7 @@ Verde='\033[0;32m'
 Azul='\033[0;94m'
 NoColor='\033[0m'
 CHROOT="arch-chroot /mnt"
-OK='\n\n\033[0;32m OK...\033[0m'
+OK='\n\033[0;32m OK...\033[0m'
 
 #----------------------------------------
 #          Logo z0mbi3              
@@ -459,31 +459,31 @@ center "Making some Speedups And Optimizations"
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "${Amarillo}Tunning ext4 file system for SSD and SpeedUp${NoColor}"
+	echo -e "\n${Amarillo}Tunning ext4 file system for SSD and SpeedUp${NoColor}"
 	sed -i 's/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
 	$CHROOT tune2fs -O fast_commit "$partroot" >/dev/null
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "${Amarillo}Optimizing make flags for speedup compiling times${NoColor}\n"
+	echo -e "\n${Amarillo}Optimizing make flags for speedup compiling times${NoColor}\n"
 	echo -e "You have ${Azul}$(nproc)${NoColor} cores."
 	sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "${Amarillo}Configuring CPU to performance mode${NoColor}"
+	echo -e "\n${Amarillo}Configuring CPU to performance mode${NoColor}"
 	sed -i "s/#governor='ondemand'/governor='performance'/" /mnt/etc/default/cpupower
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "${Amarillo}Changing kernel scheduler to mq-deadline${NoColor}"
+	echo -e "\n${Amarillo}Changing kernel scheduler to mq-deadline${NoColor}"
 	cat >> /mnt/etc/udev/rules.d/60-ssd.rules <<EOL
 ACTION=="add|change", KERNEL=="sd[a-z]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
 EOL
 	echo -e "${OK}"
 	sleep 2
 
-	echo -e "${Amarillo}Changing swappiness${NoColor}"
+	echo -e "\n${Amarillo}Changing swappiness${NoColor}"
 	cat >> /mnt/etc/sysctl.d/99-swappiness.conf <<EOL
 vm.swappiness=1
 vm.vfs_cache_pressure=50
@@ -491,12 +491,12 @@ EOL
 	echo -e "${OK}"
 	sleep 2
 
-	echo -e "${Amarillo}Disabling Journal logs..${NoColor}"
+	echo -e "\n${Amarillo}Disabling Journal logs..${NoColor}"
 	sed -i 's/#Storage=auto/Storage=none/' /mnt/etc/systemd/journald.conf
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "${Amarillo}Disabling innecessary kernel modules${NoColor}"
+	echo -e "\n${Amarillo}Disabling innecessary kernel modules${NoColor}"
 	cat >> /mnt/etc/modprobe.d/blacklist.conf <<EOL
 blacklist iTCO_wdt
 blacklist mousedev
@@ -506,12 +506,12 @@ EOL
 	echo -e "${OK}"
 	sleep 2
 		
-	echo -e "${Amarillo}Disabling innecessary services${NoColor}\n"
+	echo -e "\n${Amarillo}Disabling innecessary services${NoColor}\n"
 	$CHROOT systemctl mask lvm2-monitor.service systemd-random-seed.service
 	echo -e "${OK}"
 	sleep 2
 		
-	echo -e "${Amarillo}Speedup Networking with Cloudflare's DNS${NoColor}"
+	echo -e "\n${Amarillo}Speedup Networking with Cloudflare's DNS${NoColor}"
 	if $CHROOT pacman -Qi dhcpcd > /dev/null ; then
 	echo "noarp" >> /mnt/etc/dhcpcd.conf
 	echo "static domain_name_servers=1.1.1.1 1.0.0.1" >> /mnt/etc/dhcpcd.conf
@@ -523,7 +523,7 @@ EOL
 	sleep 2
     
 	if [ "${MPW}" == "Si" ]; then
-	echo -e "${Amarillo}Mounting my personal storage${NoColor}\n"
+	echo -e "\n${Amarillo}Mounting my personal storage${NoColor}\n"
 	cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
 UUID=01D3AE59075CA1F0		/run/media/$USR/windows	ntfs-3g		auto,rw,users,hide_hid_files,noatime,umask=000 0 0
@@ -557,7 +557,9 @@ center "Installing Packages.."
 	
 	($CHROOT pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm >/dev/null) &
 	spinner "Installing Xorg, Audio & Video Drivers"
-		
+	clear
+	
+center "Installing Packages.."
 	($CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm >/dev/null) &
 	spinner "Installing Multimedia Codecs And Archiver Utilities"
 	
@@ -586,6 +588,7 @@ EOL
 clear
     
     if [ "$DEXFCE" = "Si" ]; then
+center "Installing Packages.."
 		($CHROOT pacman -S xfce4 --noconfirm >/dev/null) &
 		spinner "Installing XFCE"
 		clear
