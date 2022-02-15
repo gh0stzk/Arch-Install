@@ -10,11 +10,11 @@ loadkeys la-latin1
 setfont ter-v18b
 export LANG=es_MX.UTF-8
     
-Rojo='\033[0;31m'
-Amarillo='\033[0;33m'
-Verde='\033[0;32m'
-Azul='\033[0;94m'
-NoColor='\033[0m'
+CRE='\033[0;31m'
+CYE='\033[0;33m'
+CGR='\033[0;32m'
+CBL='\033[0;94m'
+CNC='\033[0m'
 CHROOT="arch-chroot /mnt"
 OK='\n\033[0;32m OK...\033[0m'
 
@@ -42,7 +42,7 @@ OK='\n\033[0;32m OK...\033[0m'
     echo "                  &&//@@@**              "
     echo "                    ..***                "
     echo "                         z0mbi3 Script   "
-    echo -e "${Verde}\n\n\n   Cargando...${NoColor}"
+    echo -e "${CGR}\n\n\n   Loading...${CNC}"
     sleep 5
     clear
     
@@ -103,7 +103,7 @@ center()
     done
 
     # displays the text in the center of the screen, surrounded by borders.
-    printf "${left_border}${spacing}${Amarillo}${text}${NoColor}${spacing}${right_border}\n\n"
+    printf "${left_border}${spacing}${CYE}${text}${CNC}${spacing}${right_border}\n\n"
 }
 	#center "Example text" "~"
 	#center "Example text" "=" 6
@@ -132,11 +132,11 @@ function spinner() {
 	
 center "Test Internet Connection"
 	if ping archlinux.org -c 1 >/dev/null 2>&1; then
-			echo -e "Espera.... ${Verde}OK..${NoColor}"
+			echo -e "Wait.... ${CGR}OK..${CNC}"
 			sleep 2
 		else
-			echo "Error: Tal parece que no tienes internet.."
-			echo "saliendo...."
+			echo "Error: Looks like you are not connected to internet.."
+			echo "Leaving now...."
 		exit
 	fi
 clear
@@ -149,48 +149,48 @@ clear
 center "Get Relevant Info"    	
 	while true
 		do 
-			read -rp "Ingresa tu nombre de usuario: " USR
+			read -rp "Enter your username: " USR
 			if [[ "${USR}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
 			then 
 				break
 			fi 
-			echo -e "Incorrecto!! Solo se permiten minusculas.\n"
+			echo -e "Incorrect!! Only lowercase letters are allowed.\n"
 		done  
 	
 	while
 			echo
-			read -rsp "Ingresa tu password: " PASSWD
+			read -rsp "Enter your password: " PASSWD
 			echo
-			read -rsp "Confirma tu password: " CONF_PASSWD
+			read -rsp "Confirm your password: " CONF_PASSWD
 			echo
 			[ "$PASSWD" != "$CONF_PASSWD" ]
 		do 
-			echo "Los passwords no coinciden!!"; 
+			echo "Passwords do not match!!"; 
 		done
-			echo "Password correcto"
+			echo "Correct password"
 		
 	while        
 			echo
-			read -rsp "Ingresa el password para ROOT: " PASSWDR
+			read -rsp "Enter password for ROOT: " PASSWDR
 			echo
-			read -rsp "Confirma tu password: " CONF_PASSWDR
+			read -rsp "Confirm your password: " CONF_PASSWDR
 			echo
 			[ "$PASSWDR" != "$CONF_PASSWDR" ]
 		do 
-			echo "Los passwords no coinciden!!"; 
+			echo "Passwords do not match!!"; 
 		done
-			echo "Password correcto"
+			echo "Correct password"
 		
 		
 			echo		
 	while true
 		do 
-			read -rp "Ingresa el nombre de tu maquina: " HNAME
+			read -rp "Enter the name of your machine: " HNAME
 			if [[ "${HNAME}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
 			then 
 				break 
 			fi
-			echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
+			echo -e "Incorrect!! Cannot include capital letters or special symbols\n"
 		done	    
     
   
@@ -199,7 +199,7 @@ center "Get Relevant Info"
 			lsblk -d -e 7,11 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
 			echo "------------------------------"
 			echo
-			PS3="Escoge el disco donde se instalara Arch Linux: "
+			PS3="Choose the DISK (NOT partition) where Arch Linux will be installed: "
 		select drive in $(lsblk -nd -e 7,11 -o NAME) 
 		do
 			if [ "$drive" ]; then
@@ -211,66 +211,66 @@ clear
 center "Get Relevant Info"
    
 		platopts=("Intel" "AMD" "VM")
-		PS3="Selecciona tu CPU (1, 2 o 3): "
+		PS3="Choose your CPU (1, 2 o 3): "
 	select opt in "${platopts[@]}"; do 
 		case "$REPLY" in
 			1) plattitle='Intel';packa='intel-ucode';gp='intel_agp i915';break;;
 			2) plattitle='AMD';packa='amd-ucode';gp='amdgpu';break;;
 			3) plattitle='VM';packa='qemu-guest-agent';gp='vmwgfx';break;;
-			*) echo "Opcion invalida!! trata de nuevo.";continue;;
+			*) echo "Invalid option!! try again.";continue;;
 		esac
 	done
 
 		echo
 		kernel_options=("Linux" "Linux LTS" "Linux Zen")
-		PS3="Selecciona el Kernel (1, 2 o 3): "
+		PS3="Choose your Kernel (1, 2 o 3): "
 	select opt in "${kernel_options[@]}"; do
 		case "$REPLY" in
 			1) kerneltitle='Linux (Arch Default)';kernelpack='linux';break;;
 			2) kerneltitle='Linux LTS';kernelpack='linux-lts';break;;
 			3) kerneltitle='Linux Zen';kernelpack='linux-zen';break;;
-			*) echo "Opcion invalida!! trata de nuevo.";continue;;
+			*) echo "Invalid option!! try again.";continue;;
 		esac
 	done
 
 		echo
 		graf_options=("Intel" "AMD" "NVIDIA" "VM")
-		PS3="Selecciona tus graficos (1, 2, 3 o 4): "
+		PS3="Choose Graphic Driver (1, 2, 3 o 4): "
 	select opt in "${graf_options[@]}"; do
 		case "$REPLY" in
 			1) graftitle='Intel';grafpack='xf86-video-intel vulkan-intel';break;;
 			2) graftitle='AMD';grafpack='xf86-video-amdgpu';break;;
 			3) graftitle='NVIDIA';grafpack='nvidia';break;;
 			4) graftitle='Maquina Virtual';grafpack='xf86-video-vmware';break;;
-			*) echo "Opcion invalida!! trata de nuevo.";continue;;
+			*) echo "Invalid option!! try again.";continue;;
 		esac
 	done
 
 		echo
 		red_options=("DHCPCD" "NetworkManager")
-		PS3="Selecciona el cliente para manejar Internet (1 o 2): "
+		PS3="Select the client to manage the Internet (1 o 2): "
 	select opt in "${red_options[@]}"; do
 		case "$REPLY" in
 			1) redtitle='DHCPCD';redpack='dhcpcd';esys='dhcpcd.service';break;;
 			2) redtitle='NetworkManager';redpack='networkmanager';esys='NetworkManager';break;;
-			*) echo "Opcion invalida!! trata de nuevo.";continue;;
+			*) echo "Invalid option!! try again.";continue;;
 		esac
 	done	
 
 		echo
 		audioopts=("PipeWire" "PulseAudio")
-		PS3="Selecciona el audio (1 o 2): "
+		PS3="Select the sound (1 o 2): "
 	select opt in "${audioopts[@]}"; do
 		case "$REPLY" in
 			1) audiotitle='PipeWire';audiopack='pipewire pipewire-pulse';break;;
 			2) audiotitle='PulseAudio';audiopack='pulseaudio';break;;
-			*) echo "Opcion invalida!! trata de nuevo.";continue;;
+			*) echo "Invalid option!! try again.";continue;;
 		esac
 	done
 
 		echo
-		PS3="Quieres instalar YAY como AUR Helper?: "
-	select YAYH in "Si" "No"
+		PS3="You want to install YAY as AUR Helper?: "
+	select YAYH in "Yes" "No"
 		do
 			if [ $YAYH ]; then
 				break
@@ -278,8 +278,8 @@ center "Get Relevant Info"
 		done
     
 		echo
-		PS3="Restaurar dotfiles?: "
-	select DOTS in "Si" "No"
+		PS3="Restore dotfiles?: "
+	select DOTS in "Yes" "No"
 		do
 			if [ $DOTS ]; then
 				break
@@ -287,8 +287,8 @@ center "Get Relevant Info"
 		done
 		
 		echo
-		PS3="Montar almacenamiento personal?: "
-	select MPW in "Si" "No"
+		PS3="Mount my personal NTFS Windows storage?: "
+	select MPW in "Yes" "No"
 		do
 			if [ $MPW ]; then
 				break
@@ -296,8 +296,8 @@ center "Get Relevant Info"
 		done
 		
 		echo
-		PS3="Instalar entorno XFCE?: "
-	select DEXFCE in "Si" "No"
+		PS3="Install XFCE desktop?: "
+	select DEXFCE in "Yes" "No"
 		do
 			if [ $DEXFCE ]; then
 				break
@@ -315,40 +315,40 @@ clear
 		echo -e "\n --------------------"
 		echo
 		
-		echo -e " Usuario:   ${Azul}$USR${NoColor}"
-		echo -e " Hostname:  ${Azul}$HNAME${NoColor}"
-		echo -e " CPU:       ${Azul}$plattitle${NoColor}"
-		echo -e " Kernel:    ${Azul}$kerneltitle${NoColor}"
-		echo -e " Graficos:  ${Azul}$graftitle${NoColor}"
-		echo -e " Internet:  ${Azul}$redtitle${NoColor}"
-		echo -e " Sonido:    ${Azul}$audiotitle${NoColor}"
+		echo -e " User:      ${CBL}$USR${CNC}"
+		echo -e " Hostname:  ${CBL}$HNAME${CNC}"
+		echo -e " CPU:       ${CBL}$plattitle${CNC}"
+		echo -e " Kernel:    ${CBL}$kerneltitle${CNC}"
+		echo -e " Graphics:  ${CBL}$graftitle${CNC}"
+		echo -e " Internet:  ${CBL}$redtitle${CNC}"
+		echo -e " Souns:     ${CBL}$audiotitle${CNC}"
     
-		if [ "${YAYH}" = "Si" ]; then
-			echo -e " Yay:       ${Verde}Si${NoColor}"
+		if [ "${YAYH}" = "Yes" ]; then
+			echo -e " Yay:       ${CGR}Si${CNC}"
 		else
-			echo -e " Yay:       ${Rojo}No${NoColor}"
+			echo -e " Yay:       ${CRE}No${CNC}"
 		fi
 		
-		if [ "${DOTS}" = "Si" ]; then
-			echo -e " Dotfiles:  ${Verde}Si${NoColor}"
+		if [ "${DOTS}" = "Yes" ]; then
+			echo -e " Dotfiles:  ${CGR}Si${CNC}"
 		else
-			echo -e " Dotfiles:  ${Rojo}No${NoColor}"
+			echo -e " Dotfiles:  ${CRE}No${CNC}"
 		fi
 		
-		if [ "${DEXFCE}" = "Si" ]; then
-			echo -e " Xfce:      ${Verde}Si${NoColor}"
+		if [ "${DEXFCE}" = "Yes" ]; then
+			echo -e " Xfce:      ${CGR}Si${CNC}"
 		else
-			echo -e " Xfce:      ${Rojo}No${NoColor}"
+			echo -e " Xfce:      ${CRE}No${CNC}"
 		fi
 		
-		if [ "${MPW}" = "Si" ]; then
-			echo -e " Montar Storage:  ${Verde}Si${NoColor}"
+		if [ "${MPW}" = "Yes" ]; then
+			echo -e " Personal storage:  ${CGR}Si${CNC}"
 		else
-			echo -e " Montar Storage:  ${Rojo}No${NoColor}"
+			echo -e " Personal storage:  ${CRE}No${CNC}"
 		fi
 		
 		echo		
-		echo -e " Arch Linux se instalara en el disco ${Amarillo}[${NoColor}${Rojo}$drive${NoColor}${Amarillo}]${NoColor} en la particion ${partroot}"
+		echo -e " Arch Linux will be installed on the disk ${CYE}[${CNC}${CRE}$drive${CNC}${CYE}]${CNC} in the partition ${CYE}[${CNC}${CBL}${partroot}${CNC}${CYE}]${CNC}"
     	echo
 		echo
 		
@@ -428,7 +428,7 @@ center "Users And Passwords"
 	echo "$USR:$PASSWD" | $CHROOT chpasswd
 	sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 	echo "Defaults insults" >> /mnt/etc/sudoers
-	echo -e " ${Azul}root${NoColor} : ${Rojo}$PASSWDR${NoColor}\n ${Amarillo}$USR${NoColor} : ${Rojo}$PASSWD${NoColor}"
+	echo -e " ${CBL}root${CNC} : ${CRE}$PASSWDR${CNC}\n ${CYE}$USR${CNC} : ${CRE}$PASSWD${CNC}"
 	echo -e "${OK}"
 	sleep 5
 clear
@@ -454,36 +454,36 @@ clear
 
 center "Making some Speedups And Optimizations"
 
-	echo -e "${Amarillo}Pimp my pacman${NoColor}"
+	echo -e "${CYE}Pimp my pacman${CNC}"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 10/; /^ParallelDownloads =/a ILoveCandy' /mnt/etc/pacman.conf
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "\n${Amarillo}Tunning ext4 file system for SSD and SpeedUp${NoColor}"
+	echo -e "\n${CYE}Tunning ext4 file system for SSD and SpeedUp${CNC}"
 	sed -i 's/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
 	$CHROOT tune2fs -O fast_commit "$partroot" >/dev/null
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "\n${Amarillo}Optimizing make flags for speedup compiling times${NoColor}\n"
-	echo -e "You have ${Azul}$(nproc)${NoColor} cores."
+	echo -e "\n${CYE}Optimizing make flags for speedup compiling times${CNC}\n"
+	echo -e "You have ${CBL}$(nproc)${CNC} cores."
 	sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "\n${Amarillo}Configuring CPU to performance mode${NoColor}"
+	echo -e "\n${CYE}Configuring CPU to performance mode${CNC}"
 	sed -i "s/#governor='ondemand'/governor='performance'/" /mnt/etc/default/cpupower
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "\n${Amarillo}Changing kernel scheduler to mq-deadline${NoColor}"
+	echo -e "\n${CYE}Changing kernel scheduler to mq-deadline${CNC}"
 	cat >> /mnt/etc/udev/rules.d/60-ssd.rules <<EOL
 ACTION=="add|change", KERNEL=="sd[a-z]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
 EOL
 	echo -e "${OK}"
 	sleep 2
 
-	echo -e "\n${Amarillo}Changing swappiness${NoColor}"
+	echo -e "\n${CYE}Changing swappiness${CNC}"
 	cat >> /mnt/etc/sysctl.d/99-swappiness.conf <<EOL
 vm.swappiness=1
 vm.vfs_cache_pressure=50
@@ -491,12 +491,12 @@ EOL
 	echo -e "${OK}"
 	sleep 2
 
-	echo -e "\n${Amarillo}Disabling Journal logs..${NoColor}"
+	echo -e "\n${CYE}Disabling Journal logs..${CNC}"
 	sed -i 's/#Storage=auto/Storage=none/' /mnt/etc/systemd/journald.conf
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "\n${Amarillo}Disabling innecessary kernel modules${NoColor}"
+	echo -e "\n${CYE}Disabling innecessary kernel modules${CNC}"
 	cat >> /mnt/etc/modprobe.d/blacklist.conf <<EOL
 blacklist iTCO_wdt
 blacklist mousedev
@@ -506,12 +506,12 @@ EOL
 	echo -e "${OK}"
 	sleep 2
 		
-	echo -e "\n${Amarillo}Disabling innecessary services${NoColor}\n"
+	echo -e "\n${CYE}Disabling innecessary services${CNC}\n"
 	$CHROOT systemctl mask lvm2-monitor.service systemd-random-seed.service
 	echo -e "${OK}"
 	sleep 2
 		
-	echo -e "\n${Amarillo}Speedup Networking with Cloudflare's DNS${NoColor}"
+	echo -e "\n${CYE}Speedup Networking with Cloudflare's DNS${CNC}"
 	if $CHROOT pacman -Qi dhcpcd > /dev/null ; then
 	echo "noarp" >> /mnt/etc/dhcpcd.conf
 	echo "static domain_name_servers=1.1.1.1 1.0.0.1" >> /mnt/etc/dhcpcd.conf
@@ -522,8 +522,8 @@ EOL
 	echo -e "${OK}"
 	sleep 2
     
-	if [ "${MPW}" == "Si" ]; then
-	echo -e "\n${Amarillo}Mounting my personal storage${NoColor}\n"
+	if [ "${MPW}" == "Yes" ]; then
+	echo -e "\n${CYE}Mounting my personal storage${CNC}\n"
 	cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
 UUID=01D3AE59075CA1F0		/run/media/$USR/windows	ntfs-3g		auto,rw,users,hide_hid_files,noatime,umask=000 0 0
@@ -544,7 +544,7 @@ center "Refreshing mirrors"
 	$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
 	echo
 	$CHROOT pacman -Syy
-	echo -e "${Ok}"
+	echo -e "${OK}"
 	sleep 2
 clear
 
@@ -555,8 +555,8 @@ clear
 center "Installing Packages.."
 	sleep 2
 	
-	($CHROOT pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm >/dev/null) &
-	spinner "Installing Xorg, Audio & Video Drivers"
+	($CHROOT pacman -S xorg-server mesa xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm >/dev/null) &
+	spinner "Installing Audio & Video"
 	clear
 	
 center "Installing Packages.."
@@ -587,7 +587,7 @@ font-name = Terminus 10
 EOL
 clear
     
-    if [ "$DEXFCE" = "Si" ]; then
+    if [ "$DEXFCE" = "Yes" ]; then
 center "Installing Packages.."
 		($CHROOT pacman -S xfce4 --noconfirm >/dev/null) &
 		spinner "Installing XFCE"
@@ -607,7 +607,7 @@ clear
 #          AUR Packages
 #----------------------------------------
 
-		if [ "${YAYH}" == "Si" ]; then
+		if [ "${YAYH}" == "Yes" ]; then
 		
 center "Installing YAY.. And AUR Packages"
 	sleep 2
@@ -654,7 +654,7 @@ EOL
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
 	
 #----------------------------------------
-#          Reverting SUDO Privileges
+#          Reverting No Pasword Privileges
 #----------------------------------------
 
 	sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /mnt/etc/sudoers
@@ -666,7 +666,7 @@ clear
 #          My DOTFILES
 #----------------------------------------
 
-	if [ "${DOTS}" == "Si" ]; then
+	if [ "${DOTS}" == "Yes" ]; then
 	
 center "Generating my XORG config files"
 	sleep 2
@@ -679,7 +679,7 @@ Section "Device"
 	Option		"TearFree"	"true"
 EndSection
 EOL
-	echo -e "${Verde}20-intel.conf${NoColor} generated in --> /etc/X11/xorg.conf.d\n"
+	echo -e "${CGR}20-intel.conf${CNC} generated in --> /etc/X11/xorg.conf.d\n"
 		  
 	cat >> /mnt/etc/X11/xorg.conf.d/10-monitor.conf <<EOL
 Section "Monitor"
@@ -698,7 +698,7 @@ Section "ServerLayout"
 	Identifier	"ServerLayout0"
 EndSection
 EOL
-	echo -e "${Verde}10-monitor.conf${NoColor} generated in --> /etc/X11/xorg.conf.d\n"
+	echo -e "${CGR}10-monitor.conf${CNC} generated in --> /etc/X11/xorg.conf.d\n"
 		
 	cat >> /mnt/etc/drirc <<EOL
 <driconf>
@@ -712,7 +712,7 @@ EOL
 	
 </driconf>
 EOL
-	echo -e "${Verde}drirc${NoColor} generated in --> /etc"
+	echo -e "${CGR}drirc${CNC} generated in --> /etc"
 	sleep 2
 clear
 
@@ -756,7 +756,16 @@ clear
 #----------------------------------------
 
 center "You are now usin Arch Linux BTW...."
-	$CHROOT /usr/bin/zfetch
+
+		$CHROOT /usr/bin/zfetch
 		
-echo -e " \n\nInstallation done!! Type exit and then type reboot"
-sleep 10
+		echo
+		echo
+while true; do
+		read -rp "Do you want to reboot? [y/N]: " yn
+		case $yn in
+			[Yy]* ) reboot;;
+			[Nn]* ) exit;;
+			* ) echo "Error: you only need to type 'y' or 'n'";;
+		esac
+	done
