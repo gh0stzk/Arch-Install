@@ -108,24 +108,6 @@ center()
 	#center "Example text" "~"
 	#center "Example text" "=" 6
 	
-function spinner() {
-		local info="$1"
-		local pid=$!
-		local delay=0.20
-		local spinstr='/-\|'
-    while kill -0 $pid 2> /dev/null; do
-			local temp=${spinstr#?}
-			printf " [%c]  $info" "$spinstr"
-			local spinstr=$temp${spinstr%"$temp"}
-			sleep $delay
-			local reset="\b\b\b\b\b\b"
-        for ((i=1; i<=$(echo $info | wc -c); i++)); do
-            reset+="\b"
-        done
-			printf $reset
-	done
-		printf "    \b\b\b\b"
-}
 #----------------------------------------
 #          Check Internet
 #----------------------------------------
@@ -353,11 +335,11 @@ clear
 		echo
 		
 	while true; do
-		read -rp "Do you wish to continue with installation? [y/N]: " yn
+		read -rp " Do you wish to continue with installation? [y/N]: " yn
 		case $yn in
 			[Yy]* ) break;;
 			[Nn]* ) exit;;
-			* ) echo "Error: you only need to type 'y' or 'n'";;
+			* ) echo " Error: you only need to type 'y' or 'n'";;
 		esac
 	done
 clear
@@ -552,25 +534,25 @@ clear
 #          Installing Packages
 #----------------------------------------
 
-center "Installing Packages.."
-	sleep 2
-	
-	($CHROOT pacman -S xorg-server mesa xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm >/dev/null) &
-	spinner "Installing Audio & Video"
+center "Installing Audio & Video"
+	sleep 2	
+	($CHROOT pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm
 	clear
 	
-center "Installing Packages.."
-	($CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm >/dev/null) &
-	spinner "Installing Multimedia Codecs And Archiver Utilities"
+center "Installing Multimedia Codecs And Archiver Utilities"
+	($CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm
+	clear
 	
-	($CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs ntfs-3g gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm >/dev/null) &
-	spinner "Installing support for mounting volumes and removable media devices"
+center "Installing support for mounting volumes and removable media devices"
+	($CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs ntfs-3g gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
+	clear
 	
+center "Installing Apps i use"
 	($CHROOT pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 geany gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync git --noconfirm >/dev/null) &
-	spinner "Installing Apps i use"
+	clear
 	
+center "Installing LightDM & Greeter"
 	($CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm >/dev/null) &
-	spinner "Installing LightDM & Greeter"
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
@@ -588,9 +570,8 @@ EOL
 clear
     
     if [ "$DEXFCE" = "Yes" ]; then
-center "Installing Packages.."
-		($CHROOT pacman -S xfce4 --noconfirm >/dev/null) &
-		spinner "Installing XFCE"
+center "Installing XFCE.."
+		($CHROOT pacman -S xfce4 --noconfirm
 		clear
 	fi
 	
