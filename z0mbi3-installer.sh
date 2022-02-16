@@ -565,7 +565,7 @@ indicators = ~host;~spacer;~clock;~spacer;~session;~power
 position = 50%,center 80%,center
 screensaver-timeout = 0
 theme-name = Dracula
-font-name = Terminus 10
+font-name = UbuntuMono Nerd Font 11
 EOL
 clear
     
@@ -613,7 +613,7 @@ clear
 
 center "Iconos fonts & stacer"
 	sleep 2
-	echo "cd && yay -S stacer nerd-fonts-jetbrains-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S stacer nerd-fonts-jetbrains-mono nerd-fonts-ubuntu-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 clear
 		fi
 
