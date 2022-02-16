@@ -536,23 +536,23 @@ clear
 
 center "Installing Audio & Video"
 	sleep 2	
-	($CHROOT pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm
+	$CHROOT pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm
 	clear
 	
 center "Installing Multimedia Codecs And Archiver Utilities"
-	($CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm
+	$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm
 	clear
 	
 center "Installing support for mounting volumes and removable media devices"
-	($CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs ntfs-3g gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
+	$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs ntfs-3g gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
 	clear
 	
 center "Installing Apps i use"
-	($CHROOT pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 geany gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync git --noconfirm >/dev/null) &
+	$CHROOT pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 geany gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync git --noconfirm
 	clear
 	
 center "Installing LightDM & Greeter"
-	($CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm >/dev/null) &
+	$CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
@@ -571,7 +571,7 @@ clear
     
     if [ "$DEXFCE" = "Yes" ]; then
 center "Installing XFCE.."
-		($CHROOT pacman -S xfce4 --noconfirm
+		$CHROOT pacman -S xfce4 --noconfirm
 		clear
 	fi
 	
