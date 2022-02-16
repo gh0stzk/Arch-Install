@@ -8,8 +8,13 @@
 clear
 loadkeys la-latin1
 setfont ter-v18b
+TIZO=$(curl https://ipapi.co/timezone)
+IDIOMA=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
+sed -i 's/#'"${IDIOMA}"'/'"${IDIOMA}"'/' /etc/locale.gen
+$CHROOT locale-gen
+echo "LANG=$IDIOMA" >> /etc/locale.conf
 export LANG=es_MX.UTF-8
-    
+
 CRE='\033[0;31m'
 CYE='\033[0;33m'
 CGR='\033[0;32m'
@@ -22,6 +27,7 @@ OK='\n\033[0;32m OK...\033[0m'
 #          Logo z0mbi3              
 #----------------------------------------
 
+    clear
 	echo
 	echo
 	echo 
@@ -372,8 +378,6 @@ clear
 #----------------------------------------
 	
 center "Configuring Timezone And Locales"
-	TIZO=$(curl https://ipapi.co/timezone)
-	IDIOMA=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
 	$CHROOT ln -sf /usr/share/zoneinfo/"$TIZO" /etc/localtime
 	$CHROOT hwclock --systohc
 	echo
