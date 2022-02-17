@@ -8,13 +8,9 @@
 clear
 loadkeys la-latin1
 setfont ter-v18b
+
 TIZO=$(curl https://ipapi.co/timezone)
 IDIOMA=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
-sed -i 's/#'"${IDIOMA}"'/'"${IDIOMA}"'/' /etc/locale.gen
-$CHROOT locale-gen
-echo "LANG=$IDIOMA" >> /etc/locale.conf
-export LANG=es_MX.UTF-8
-
 CRE='\033[0;31m'
 CYE='\033[0;33m'
 CGR='\033[0;32m'
@@ -562,11 +558,11 @@ center "Installing LightDM & Greeter"
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
 [greeter]
 icon-theme-name = Qogir-ubuntu
-background = /run/media/$USR/windows/Imagenes/Wallpapers/external-content.duckduckgo.com.jpg
+background = /run/media/$USR/windows/Imagenes/Wallpapers/hb5qhio1hjk71.jpg
 user-background = false
 default-user-image = /run/media/$USR/windows/Imagenes/Som3shiT/Dzndj8HUt7EcgEBD.png
 indicators = ~host;~spacer;~clock;~spacer;~session;~power
-position = 50%,center 80%,center
+position = 50%,center 83%,center
 screensaver-timeout = 0
 theme-name = Dracula
 font-name = UbuntuMono Nerd Font 11
@@ -701,11 +697,12 @@ EOL
 	sleep 2
 clear
 
-center "Restauring my dotfiles"
+center "Restoring my dotfiles"
 	mkdir /mnt/dots
 	mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
 	echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
 	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
+	$CHROOT rm -rf /home/"$USR"/.themes
 	$CHROOT cp /dots/stuff/zfetch /usr/bin/
 	echo -e "${OK}"
 	sleep 5
@@ -742,7 +739,20 @@ clear
 
 center "You are now usin Arch Linux BTW...."
 
-		$CHROOT /usr/bin/zfetch
+distro="$(source /mnt/etc/os-release && echo "${PRETTY_NAME}")"
+kernel="$(arch-chroot /mnt uname -r)"
+pkgs="$(arch-chroot /mnt pacman -Q | wc -l)"
+memory="$(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/'"${space}"'\2 MB/p')"
+usage="$(df -h / | grep "/" | awk '{print $3}')"
+
+echo -e "                            "
+echo -e "         / \                "
+echo -e "        /   \          os       ${distro}"     
+echo -e "       /^.   \         Kernel   ${kernel}"    
+echo -e "      /  .-.  \        pkgs     ${pkgs}"   
+echo -e "     /  (   ) _\       ram      ${memory}"
+echo -e "    / _.~   ~._^\      Disk     ${usage}"
+echo -e "   /.^         ^.\          "
 		
 		echo
 		echo
