@@ -180,7 +180,7 @@ center "Get Relevant Info"
   
 			partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
 			echo
-			lsblk -d -e 7,11 -o NAME,SIZE,MOUNTPOINTS
+			lsblk -o NAME,SIZE | grep '^[sn][a-z0-9]*'
 			echo "------------------------------"
 			echo
 			PS3="Choose the DISK (NOT partition) where Arch Linux will be installed: "
@@ -739,20 +739,14 @@ clear
 
 center "You are now usin Arch Linux BTW...."
 
-distro="$(source /mnt/etc/os-release && echo "${PRETTY_NAME}")"
-kernel="$(arch-chroot /mnt uname -r)"
-pkgs="$(arch-chroot /mnt pacman -Q | wc -l)"
-memory="$(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/'"${space}"'\2 MB/p')"
-usage="$(df -h / | grep "/" | awk '{print $3}')"
-
-echo -e "                            "
-echo -e "         / \                "
-echo -e "        /   \          os       ${distro}"     
-echo -e "       /^.   \         Kernel   ${kernel}"    
-echo -e "      /  .-.  \        pkgs     ${pkgs}"   
-echo -e "     /  (   ) _\       ram      ${memory}"
-echo -e "    / _.~   ~._^\      Disk     ${usage}"
-echo -e "   /.^         ^.\          "
+echo -e "                       "
+echo -e "         / \           You use Arch Linux BTW.."
+echo -e "        /   \          ==========================="     
+echo -e "       /^.   \         os       $(source /mnt/etc/os-release && echo "${PRETTY_NAME}")"    
+echo -e "      /  .-.  \        Kernel   $(arch-chroot /mnt uname -r)"   
+echo -e "     /  (   ) _\       pkgs     $(arch-chroot /mnt pacman -Q | wc -l)"
+echo -e "    / _.~   ~._^\      ram      $(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/'"${space}"'\2 MB/p')"
+echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}')"
 		
 		echo
 		echo
