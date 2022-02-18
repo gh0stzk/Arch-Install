@@ -180,7 +180,7 @@ center "Get Relevant Info"
   
 			partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
 			echo
-			lsblk -d -e 7,11 -o NAME,FSTYPE,FSAVAIL,MOUNTPOINTS
+			lsblk -d -e 7,11 -o NAME,SIZE,MOUNTPOINTS
 			echo "------------------------------"
 			echo
 			PS3="Choose the DISK (NOT partition) where Arch Linux will be installed: "
@@ -354,7 +354,7 @@ center "Installing Base System"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 10/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
 	echo
-	pacstrap /mnt base base-devel $kernelpack linux-firmware $packa $redpack reflector cpupower grub os-prober zsh
+	pacstrap /mnt base base-devel $kernelpack linux-firmware $packa $redpack reflector cpupower grub os-prober ntfs-3g zsh
 	echo -e "${OK}"
 	sleep 2
 clear
@@ -544,7 +544,7 @@ center "Installing Multimedia Codecs And Archiver Utilities"
 	clear
 	
 center "Installing support for mounting volumes and removable media devices"
-	$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs ntfs-3g gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
+	$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
 	clear
 	
 center "Installing Apps i use"
