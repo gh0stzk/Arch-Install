@@ -180,7 +180,7 @@ center "Get Relevant Info"
   
 			partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
 			echo
-			lsblk -I 8 -d -o NAME,SIZE,TYPE | grep -E 'sd|HD|vd|nvme|mmcblk'
+			lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
 			#lsblk -d -e 7,11 -o NAME,SIZE,MOUNTPOINTS
 			echo "------------------------------"
 			echo
@@ -382,6 +382,7 @@ center "Configuring Timezone And Locales"
 	$CHROOT locale-gen
 	echo "LANG=$IDIOMA" >> /mnt/etc/locale.conf
 	echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
+	export LANG=$IDIOMA
 	echo -e "${OK}"
 	sleep 2
 clear
@@ -435,7 +436,7 @@ center "Installing GRUB"
 	$CHROOT pacman -S grub os-prober ntfs-3g --noconfirm >/dev/null
 	$CHROOT grub-install --target=i386-pc /dev/"$drive"
 	echo
-	sed -i 's/quiet/noibrs noibpb nopti nospectre_v2 nospectre_v1 l1tf=off nospec_store_bypass_disable no_stf_barrier mds=off tsx=on tsx_async_abort=off mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
+	sed -i 's/quiet/zswap.enabled=0 mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
 	sed -i "s/MODULES=()/MODULES=(${gp})/" /mnt/etc/mkinitcpio.conf
 	echo
 	$CHROOT grub-mkconfig -o /boot/grub/grub.cfg
@@ -739,13 +740,13 @@ clear
 #                Bye
 #----------------------------------------
 
-center "You are now usin Arch Linux BTW...."
+center "Installation Finished"
 
 echo -e "                       "
 echo -e "         / \           You use Arch Linux BTW.."
 echo -e "        /   \          ==========================="     
 echo -e "       /^.   \         os       $(source /mnt/etc/os-release && echo "${PRETTY_NAME}")"    
-echo -e "      /  .-.  \        Kernel   $(arch-chroot /mnt uname -r)"   
+echo -e "      /  .-.  \        Kernel   $(arch-chroot /mnt /bin/bash -c "uname -r")"   
 echo -e "     /  (   ) _\       pkgs     $(arch-chroot /mnt pacman -Q | wc -l)"
 echo -e "    / _.~   ~._^\      ram      $(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/'"${space}"'\2 MB/p')"
 echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}')"
