@@ -180,7 +180,8 @@ center "Get Relevant Info"
   
 			partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
 			echo
-			lsblk -o NAME,SIZE | grep '^[sn][a-z0-9]*'
+			lsblk -I 8 -d -o NAME,SIZE,TYPE | grep -E 'sd|HD|vd|nvme|mmcblk'
+			#lsblk -d -e 7,11 -o NAME,SIZE,MOUNTPOINTS
 			echo "------------------------------"
 			echo
 			PS3="Choose the DISK (NOT partition) where Arch Linux will be installed: "
@@ -354,7 +355,7 @@ center "Installing Base System"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 10/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
 	echo
-	pacstrap /mnt base base-devel $kernelpack linux-firmware $packa $redpack reflector cpupower grub os-prober ntfs-3g zsh
+	pacstrap /mnt base base-devel $kernelpack linux-firmware $packa $redpack reflector zsh
 	echo -e "${OK}"
 	sleep 2
 clear
@@ -416,10 +417,22 @@ center "Users And Passwords"
 clear
 
 #----------------------------------------
+#          Refreshing Mirrors
+#----------------------------------------
+
+center "Refreshing mirrors"
+	$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
+	$CHROOT pacman -Syy >/dev/null
+	echo -e "${OK}"
+	sleep 2
+clear
+
+#----------------------------------------
 #          Install GRUB
 #----------------------------------------
 
 center "Installing GRUB"
+	$CHROOT pacman -S grub os-prober ntfs-3g --noconfirm >/dev/null
 	$CHROOT grub-install --target=i386-pc /dev/"$drive"
 	echo
 	sed -i 's/quiet/noibrs noibpb nopti nospectre_v2 nospectre_v1 l1tf=off nospec_store_bypass_disable no_stf_barrier mds=off tsx=on tsx_async_abort=off mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
@@ -454,6 +467,7 @@ center "Making some Speedups And Optimizations"
 	sleep 2
     
 	echo -e "\n${CYE}Configuring CPU to performance mode${CNC}"
+	$CHROOT pacman -S cpupower --noconfirm >/dev/null
 	sed -i "s/#governor='ondemand'/governor='performance'/" /mnt/etc/default/cpupower
 	echo -e "${OK}"
 	sleep 2
@@ -517,18 +531,6 @@ EOL
 	fi
 	
 clear
-	
-#----------------------------------------
-#          Refreshing Mirrors
-#----------------------------------------
-
-center "Refreshing mirrors"
-	$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
-	echo
-	$CHROOT pacman -Syy
-	echo -e "${OK}"
-	sleep 2
-clear
 
 #----------------------------------------
 #          Installing Packages
@@ -536,7 +538,7 @@ clear
 
 center "Installing Audio & Video"
 	sleep 2	
-	$CHROOT pacman -S xorg-server xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm
+	$CHROOT pacman -S xorg-server mesa xorg-xinput xorg-xsetroot $grafpack $audiopack --noconfirm
 	clear
 	
 center "Installing Multimedia Codecs And Archiver Utilities"
