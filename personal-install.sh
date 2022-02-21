@@ -100,6 +100,7 @@ center()
 #----------------------------------------
 
 center "Creando Formatenado y Montando Particiones"
+	echo
 	lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
 	echo "------------------------------"
 	echo
@@ -112,9 +113,9 @@ select drive in $(lsblk -nd -e 7,11 -o NAME)
 	done
 	
 	cfdisk /dev/"${drive}"
-	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
-	mkfs.ext4 -L Arch "${partroot}"
-	mount "${partroot}" /mnt
+	partroot="$(findmnt -Dn -M / -o SOURCE)"
+	mkfs.ext4 -L Arch ${partroot}
+	mount ${partroot} /mnt
 	sleep 3
 	echo
 
