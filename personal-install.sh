@@ -455,7 +455,7 @@ EOL
 	echo -e "\n${CYE}Mounting my personal storage${CNC}\n"
 	cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
-UUID=01D3AE59075CA1F0		/run/media/$USR/windows	ntfs-3g		auto,rw,users,hide_hid_files,noatime,umask=000 0 0
+UUID=01D3AE59075CA1F0		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
 EOL
 	cat /mnt/etc/fstab
 	sleep 5
@@ -475,7 +475,7 @@ center "Installing Audio & Video"
 	clear
 	
 center "Installing Multimedia Codecs And Archiver Utilities"
-	$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm
+	$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp webp-pixbuf-loader unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm
 	clear
 	
 center "Installing support for mounting volumes and removable media devices"
