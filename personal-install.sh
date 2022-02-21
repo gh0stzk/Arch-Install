@@ -113,9 +113,13 @@ select drive in $(lsblk -nd -e 7,11 -o NAME)
 	done
 	
 	cfdisk /dev/"${drive}"
-	partroot="$(findmnt -Dn -M / -o SOURCE)"
-	mkfs.ext4 -L Arch ${partroot}
-	mount ${partroot} /mnt
+	echo
+	lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
+	echo
+	read -rp "Escribe el NUMERO de la particion RAIZ "/"" partraiz
+	mkfs.ext4 -L Arch /dev/"${drive}"${partraiz}
+	mount /dev/"${drive}"${partraiz} /mnt
+	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
 	sleep 3
 	echo
 
