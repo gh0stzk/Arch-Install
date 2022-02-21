@@ -116,7 +116,7 @@ select drive in $(lsblk -nd -e 7,11 -o NAME)
 	echo
 	lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
 	echo
-	read -rp "Escribe el NUMERO de la particion RAIZ "/"" partraiz
+	read -rp "Escribe el NUMERO de la particion RAIZ /dev/${drive}/" partraiz
 	mkfs.ext4 -L Arch /dev/"${drive}"${partraiz}
 	mount /dev/"${drive}"${partraiz} /mnt
 	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
@@ -139,14 +139,14 @@ select drive in $(lsblk -nd -e 7,11 -o NAME)
 	
 center "Probando conexion a internet"
 	if ping archlinux.org -c 1 >/dev/null 2>&1; then
-			echo -e "Espera...."
+			echo -e " Espera....\n"
 			sleep 3
 			echo -e "${CGR} Si hay Internet!!${CNC}"
 			sleep 2
 			clear
 		else
-			echo "Error: Parace que no hay internet.."
-			echo "Saliendo...."
+			echo " Error: Parace que no hay internet.."
+			echo " Saliendo...."
 		exit
 	fi
 		
@@ -290,7 +290,7 @@ clear
 
 center "Instalando sistema base"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
-	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null
+	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 	pacman -Syy >/dev/null
 	pacstrap /mnt base base-devel linux-zen linux-firmware dhcpcd intel-ucode reflector zsh
 	echo -e "${OK}"
@@ -471,15 +471,15 @@ clear
 
 center "Installing Audio & Video"
 	sleep 2	
-	$CHROOT pacman -S xorg-server mesa xf86-video-intel xorg-xinput xorg-xsetroot pipewire pipewire-pulse --noconfirm --noprogressbar
+	$CHROOT pacman -S xorg-server mesa xf86-video-intel xorg-xinput xorg-xsetroot pipewire pipewire-pulse --noconfirm
 	clear
 	
 center "Installing Multimedia Codecs And Archiver Utilities"
-	$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm --noprogressbar
+	$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm
 	clear
 	
 center "Installing support for mounting volumes and removable media devices"
-	$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm --noprogressbar
+	$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
 	clear
 	
 center "Installing Apps i use"
@@ -487,7 +487,7 @@ center "Installing Apps i use"
 	clear
 	
 center "Installing LightDM & Greeter"
-	$CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm --noprogressbar
+	$CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
