@@ -96,35 +96,61 @@ center()
 	#center "Example text" "=" 6
 	
 #----------------------------------------
-#          Creating Swap File
+#          Creating Partitions
 #----------------------------------------
 
-		fallocate -l 512M /mnt/swapfile
-		chmod 600 /mnt/swapfile
-		mkswap -L Swap /mnt/swapfile
-		swapon /mnt/swapfile
+center "Creando Formatenado y Montando Particiones"
+	lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
+	echo "------------------------------"
+	echo
+	PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
+select drive in $(lsblk -nd -e 7,11 -o NAME) 
+	do
+		if [ "$drive" ]; then
+			break
+		fi
+	done
+	
+	cfdisk /dev/"${drive}"
+	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
+	mkfs.ext4 -L Arch "${partroot}"
+	mount "${partroot}" /mnt
+	sleep 3
+	echo
+
+	echo " Creando archivo swap, espera.."
+	sleep 2
+	fallocate -l 512M /mnt/swapfile
+	chmod 600 /mnt/swapfile
+	mkswap /mnt/swapfile >/dev/null
+	swapon /mnt/swapfile
+	echo -e "${OK}"
+	sleep 2
+	clear
 	
 #----------------------------------------
 #          Check Internet
 #----------------------------------------
 	
-center "Test Internet Connection"
+center "Probando conexion a internet"
 	if ping archlinux.org -c 1 >/dev/null 2>&1; then
-			echo -e "Espera.... ${CGR}OK..${CNC}"
+			echo -e "Espera...."
+			sleep 3
+			echo -e "${CGR} Si hay Internet!!${CNC}"
 			sleep 2
+			clear
 		else
 			echo "Error: Parace que no hay internet.."
 			echo "Saliendo...."
 		exit
 	fi
-clear
 		
 #----------------------------------------
 #          Getting Information   
 #----------------------------------------
 
 
-center "Get Relevant Info"    	
+center "Ingresa la informacion Necesaria"    	
 	while true
 		do 
 			read -rp "Ingresa tu usuario: " USR
@@ -159,7 +185,6 @@ center "Get Relevant Info"
 		done
 			echo "Password correcto"
 		
-		
 			echo		
 	while true
 		do 
@@ -170,25 +195,24 @@ center "Get Relevant Info"
 			fi
 			echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 		done	    
-    
   
-			partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
-			echo
-			lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
+			#partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
+			#echo
+			#lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
 			#lsblk -d -e 7,11 -o NAME,SIZE,MOUNTPOINTS
-			echo "------------------------------"
-			echo
-			PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
-		select drive in $(lsblk -nd -e 7,11 -o NAME) 
-		do
-			if [ "$drive" ]; then
-				break
-			fi
-		done	
+			#echo "------------------------------"
+			#echo
+			#PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
+		#select drive in $(lsblk -nd -e 7,11 -o NAME) 
+		#do
+		#	if [ "$drive" ]; then
+		#		break
+		#	fi
+		#done	
 
 		echo
-		PS3="You want to install YAY as AUR Helper?: "
-	select YAYH in "Yes" "No"
+		PS3="Quieres instalar YAY como AUR Helper?: "
+	select YAYH in "Si" "No"
 		do
 			if [ $YAYH ]; then
 				break
@@ -196,8 +220,8 @@ center "Get Relevant Info"
 		done
     
 		echo
-		PS3="Restore dotfiles?: "
-	select DOTS in "Yes" "No"
+		PS3="Rstaurar mis dotfiles?: "
+	select DOTS in "Si" "No"
 		do
 			if [ $DOTS ]; then
 				break
@@ -205,8 +229,8 @@ center "Get Relevant Info"
 		done
 		
 		echo
-		PS3="Mount my personal NTFS Windows storage?: "
-	select MPW in "Yes" "No"
+		PS3="Montar mi almacenamiento personal?: "
+	select MPW in "Si" "No"
 		do
 			if [ $MPW ]; then
 				break
@@ -222,22 +246,22 @@ clear
 		echo -e " User:      ${CBL}$USR${CNC}"
 		echo -e " Hostname:  ${CBL}$HNAME${CNC}"
     
-		if [ "${YAYH}" = "Yes" ]; then
+		if [ "${YAYH}" = "Si" ]; then
 			echo -e " Yay:       ${CGR}Si${CNC}"
 		else
 			echo -e " Yay:       ${CRE}No${CNC}"
 		fi
 		
-		if [ "${DOTS}" = "Yes" ]; then
+		if [ "${DOTS}" = "Si" ]; then
 			echo -e " Dotfiles:  ${CGR}Si${CNC}"
 		else
 			echo -e " Dotfiles:  ${CRE}No${CNC}"
 		fi
 		
-		if [ "${MPW}" = "Yes" ]; then
-			echo -e " Personal storage:  ${CGR}Si${CNC}"
+		if [ "${MPW}" = "Si" ]; then
+			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC}"
 		else
-			echo -e " Personal storage:  ${CRE}No${CNC}"
+			echo -e " Almacenamiento Personal:  ${CRE}No${CNC}"
 		fi
 		
 		echo		
@@ -246,11 +270,11 @@ clear
 		echo
 		
 	while true; do
-		read -rp " Deseas continuar? [y/N]: " yn
-		case $yn in
-			[Yy]* ) break;;
+		read -rp " Deseas continuar? [s/N]: " sn
+		case $sn in
+			[Ss]* ) break;;
 			[Nn]* ) exit;;
-			* ) echo " Error: solo necesitas escribir 'y' o 'n'";;
+			* ) echo " Error: solo necesitas escribir 's' o 'n'";;
 		esac
 	done
 clear
@@ -261,8 +285,8 @@ clear
 
 center "Instalando sistema base"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
-	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
-	echo
+	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null
+	pacman -Syy >/dev/null
 	pacstrap /mnt base base-devel linux-zen linux-firmware dhcpcd intel-ucode reflector zsh
 	echo -e "${OK}"
 	sleep 2
@@ -331,7 +355,7 @@ clear
 
 center "Refrescando mirros en la nueva Instalacion"
 	$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
-	$CHROOT pacman -Syy >/dev/null
+	$CHROOT pacman -Syy
 	echo -e "${OK}"
 	sleep 2
 clear
@@ -422,7 +446,7 @@ EOL
 	echo -e "${OK}"
 	sleep 2
     
-	if [ "${MPW}" == "Yes" ]; then
+	if [ "${MPW}" == "Si" ]; then
 	echo -e "\n${CYE}Mounting my personal storage${CNC}\n"
 	cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
@@ -442,15 +466,15 @@ clear
 
 center "Installing Audio & Video"
 	sleep 2	
-	$CHROOT pacman -S xorg-server mesa xf86-video-intel xorg-xinput xorg-xsetroot pipewire pipewire-pulse --noconfirm
+	$CHROOT pacman -S xorg-server mesa xf86-video-intel xorg-xinput xorg-xsetroot pipewire pipewire-pulse --noconfirm --noprogressbar
 	clear
 	
 center "Installing Multimedia Codecs And Archiver Utilities"
-	$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm
+	$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm --noprogressbar
 	clear
 	
 center "Installing support for mounting volumes and removable media devices"
-	$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
+	$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm --noprogressbar
 	clear
 	
 center "Installing Apps i use"
@@ -458,7 +482,7 @@ center "Installing Apps i use"
 	clear
 	
 center "Installing LightDM & Greeter"
-	$CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm
+	$CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm --noprogressbar
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
@@ -479,7 +503,7 @@ clear
 #          AUR Packages
 #----------------------------------------
 
-		if [ "${YAYH}" == "Yes" ]; then
+		if [ "${YAYH}" == "Si" ]; then
 		
 center "Installing YAY.. And AUR Packages"
 	sleep 2
@@ -538,7 +562,7 @@ clear
 #          My DOTFILES
 #----------------------------------------
 
-	if [ "${DOTS}" == "Yes" ]; then
+	if [ "${DOTS}" == "Si" ]; then
 	
 center "Generating my XORG config files"
 	sleep 2
@@ -588,7 +612,7 @@ EOL
 	sleep 2
 clear
 
-center "Restoring my dotfiles"
+center "Restaurando mis dotfiles"
 	mkdir /mnt/dots
 	mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
 	echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
@@ -604,7 +628,7 @@ clear
 #          Cleaning Garbage
 #----------------------------------------
 
-center "Cleaning system for first start"
+center "Limpiando sistema para su primer arranque"
 	sleep 2
 	rm -rf /mnt/home/"$USR"/.cache/yay/
 	rm -rf /mnt/home/"$USR"/.cache/electron/
@@ -628,10 +652,10 @@ clear
 #                Bye
 #----------------------------------------
 
-center "Installation Finished"
+center "Instalacion Finalizada"
 
 echo -e "                       "
-echo -e "         / \           You use Arch Linux BTW.."
+echo -e "         / \           I use Arch Linux BTW.."
 echo -e "        /   \          ==========================="     
 echo -e "       /^.   \         os       $(source /mnt/etc/os-release && echo "${PRETTY_NAME}")"    
 echo -e "      /  .-.  \        Kernel   $(arch-chroot /mnt /bin/bash -c "uname -r")"   
@@ -642,10 +666,10 @@ echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}'
 		echo
 		echo
 while true; do
-		read -rp "Quieres reiniciar ahora? [y/N]: " yn
-		case $yn in
-			[Yy]* ) reboot;;
+		read -rp "Quieres reiniciar ahora? [s/N]: " sn
+		case $sn in
+			[Ss]* ) reboot;;
 			[Nn]* ) exit;;
-			* ) echo "Error: solo escribe 'y' o 'n'";;
+			* ) echo "Error: solo escribe 's' o 'n'";;
 		esac
 	done
