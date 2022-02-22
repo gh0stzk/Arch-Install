@@ -493,9 +493,9 @@ center "Installing LightDM & Greeter"
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
 [greeter]
 icon-theme-name = Qogir-ubuntu
-background = /run/media/$USR/windows/Imagenes/Wallpapers/hb5qhio1hjk71.jpg
+background = /usr/share/pixmaps/arch.png
 user-background = false
-default-user-image = /run/media/$USR/windows/Imagenes/Som3shiT/Dzndj8HUt7EcgEBD.png
+default-user-image = /usr/share/pixmaps/gh0st.png
 indicators = ~host;~spacer;~clock;~spacer;~session;~power
 position = 50%,center 83%,center
 screensaver-timeout = 0
@@ -624,6 +624,7 @@ center "Restaurando mis dotfiles"
 	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
 	$CHROOT rm -rf /home/"$USR"/.themes
 	$CHROOT cp /dots/stuff/zfetch /usr/bin/
+	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
 	echo -e "${OK}"
 	sleep 5
 clear
@@ -663,7 +664,7 @@ echo -e "                       "
 echo -e "         / \           I use Arch Linux BTW.."
 echo -e "        /   \          ==========================="     
 echo -e "       /^.   \         os       $(source /mnt/etc/os-release && echo "${PRETTY_NAME}")"    
-echo -e "      /  .-.  \        Kernel   $(arch-chroot /mnt /bin/bash -c "uname -r")"   
+echo -e "      /  .-.  \        Kernel   $(uname -r)"   
 echo -e "     /  (   ) _\       pkgs     $(arch-chroot /mnt pacman -Q | wc -l)"
 echo -e "    / _.~   ~._^\      ram      $(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/'"${space}"'\2 MB/p')"
 echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}')"
