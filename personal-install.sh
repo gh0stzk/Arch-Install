@@ -419,8 +419,8 @@ EOL
 
 	echo -e "\n${CYE}Changing swappiness${CNC}"
 	cat >> /mnt/etc/sysctl.d/99-swappiness.conf <<EOL
-vm.swappiness=10
-vm.vfs_cache_pressure=50
+vm.swappiness=100
+vm.vfs_cache_pressure=80
 EOL
 	echo -e "${OK}"
 	sleep 2
