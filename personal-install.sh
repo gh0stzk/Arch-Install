@@ -46,7 +46,35 @@ OK='\n\033[0;32m OK...\033[0m'
     sleep 5
     clear
     
-    
+#----------------------------------------
+#          Check Internet & BIOS
+#----------------------------------------
+
+	while true
+	do
+	    if [ -d /sys/firmware/efi/efivars ]; then
+        echo "This script only works with BIOS/MBR.."
+        sleep 2
+			exit
+		else
+			break
+		fi
+	done
+	
+center "Probando conexion a internet"
+	if ping archlinux.org -c 1 >/dev/null 2>&1; then
+			echo -e " Espera....\n"
+			sleep 3
+			echo -e "${CGR} Si hay Internet!!${CNC}"
+			sleep 2
+			clear
+		else
+			echo " Error: Parace que no hay internet.."
+			echo " Saliendo...."
+		exit
+	fi
+	
+#---------
 	
 center()
 {
@@ -132,23 +160,6 @@ select drive in $(lsblk -nd -e 7,11 -o NAME)
 	echo -e "${OK}"
 	sleep 2
 	clear
-	
-#----------------------------------------
-#          Check Internet
-#----------------------------------------
-	
-center "Probando conexion a internet"
-	if ping archlinux.org -c 1 >/dev/null 2>&1; then
-			echo -e " Espera....\n"
-			sleep 3
-			echo -e "${CGR} Si hay Internet!!${CNC}"
-			sleep 2
-			clear
-		else
-			echo " Error: Parace que no hay internet.."
-			echo " Saliendo...."
-		exit
-	fi
 		
 #----------------------------------------
 #          Getting Information   
