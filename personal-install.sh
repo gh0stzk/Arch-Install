@@ -7,7 +7,7 @@
 
 clear
 loadkeys la-latin1
-setfont ter-v18b
+setfont ter-v18n
 
 CRE='\033[0;31m'
 CYE='\033[0;33m'
