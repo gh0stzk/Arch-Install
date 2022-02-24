@@ -148,7 +148,17 @@ select drive in $(lsblk -nd -e 7,11 -o NAME)
 	echo
 	lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
 	echo
-	read -rp "Escribe el NUMERO de la particion RAIZ /dev/${drive}/" partraiz
+	
+	while true
+		do 
+			read -rp "Escribe el NUMERO de la particion RAIZ /dev/sda/" partraiz
+			if [[ "${partraiz}" =~ ^[0-9]$ ]]
+			then 
+				break
+			fi 
+			echo -e "Incorrecto, solo escribe el numero e.g. 1\n"
+		done
+		  
 	mkfs.ext4 -L Arch /dev/"${drive}"${partraiz}
 	mount /dev/"${drive}"${partraiz} /mnt
 	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
@@ -306,7 +316,6 @@ clear
 center "Instalando sistema base"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
-	#pacman -Syy >/dev/null
 	pacstrap /mnt base base-devel linux-zen linux-firmware dhcpcd intel-ucode reflector zsh
 	echo -e "${OK}"
 	sleep 2
