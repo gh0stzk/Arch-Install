@@ -45,7 +45,8 @@ OK='\n\033[0;32m OK...\033[0m'
     echo -e "${CGR}\n\n\n   Cargando...${CNC}"
     sleep 5
     clear
-    
+    set -e
+set -x
 #----------------------------------------
 #          Check Internet & BIOS
 #----------------------------------------
@@ -225,20 +226,6 @@ center "Ingresa la informacion Necesaria"
 			fi
 			echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 		done	    
-  
-			#partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
-			#echo
-			#lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
-			#lsblk -d -e 7,11 -o NAME,SIZE,MOUNTPOINTS
-			#echo "------------------------------"
-			#echo
-			#PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
-		#select drive in $(lsblk -nd -e 7,11 -o NAME) 
-		#do
-		#	if [ "$drive" ]; then
-		#		break
-		#	fi
-		#done	
 
 		echo
 		PS3="Quieres instalar YAY como AUR Helper?: "
@@ -316,7 +303,15 @@ clear
 center "Instalando sistema base"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
-	pacstrap /mnt base base-devel linux-zen linux-firmware dhcpcd intel-ucode reflector zsh
+	pacstrap /mnt \
+	         base \
+	         base-devel \
+	         linux-zen \
+	         linux-firmware \
+	         dhcpcd \
+	         intel-ucode \
+	         reflector \
+	         zsh
 	echo -e "${OK}"
 	sleep 2
 clear
