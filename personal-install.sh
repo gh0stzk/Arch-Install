@@ -45,8 +45,7 @@ OK='\n\033[0;32m OK...\033[0m'
     echo -e "${CGR}\n\n\n   Cargando...${CNC}"
     sleep 5
     clear
-    set -e
-set -x
+
 #----------------------------------------
 #          Check Internet & BIOS
 #----------------------------------------
