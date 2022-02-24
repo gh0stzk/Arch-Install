@@ -61,19 +61,6 @@ OK='\n\033[0;32m OK...\033[0m'
 		fi
 	done
 	
-center "Probando conexion a internet"
-	if ping archlinux.org -c 1 >/dev/null 2>&1; then
-			echo -e " Espera....\n"
-			sleep 3
-			echo -e "${CGR} Si hay Internet!!${CNC}"
-			sleep 2
-			clear
-		else
-			echo " Error: Parace que no hay internet.."
-			echo " Saliendo...."
-		exit
-	fi
-	
 #---------
 	
 center()
@@ -122,6 +109,23 @@ center()
 }
 	#center "Example text" "~"
 	#center "Example text" "=" 6
+	
+#----------------------------------------
+#          Testing Internet
+#----------------------------------------
+
+center "Probando conexion a internet"
+	if ping archlinux.org -c 1 >/dev/null 2>&1; then
+			echo -e " Espera....\n"
+			sleep 3
+			echo -e "${CGR} Si hay Internet!!${CNC}"
+			sleep 2
+			clear
+		else
+			echo " Error: Parace que no hay internet.."
+			echo " Saliendo...."
+		exit
+	fi
 	
 #----------------------------------------
 #          Creating Partitions
@@ -302,7 +306,7 @@ clear
 center "Instalando sistema base"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
-	pacman -Syy >/dev/null
+	#pacman -Syy >/dev/null
 	pacstrap /mnt base base-devel linux-zen linux-firmware dhcpcd intel-ucode reflector zsh
 	echo -e "${OK}"
 	sleep 2
