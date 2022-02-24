@@ -151,7 +151,7 @@ select drive in $(lsblk -nd -e 7,11 -o NAME)
 	
 	while true
 		do 
-			read -rp "Escribe el NUMERO de la particion RAIZ /dev/sda/" partraiz
+			read -rp "Escribe el NUMERO de la particion RAIZ /dev/${drive}/" partraiz
 			if [[ "${partraiz}" =~ ^[0-9]$ ]]
 			then 
 				break
