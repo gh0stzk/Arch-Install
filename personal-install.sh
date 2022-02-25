@@ -265,13 +265,17 @@ center "Ingresa la informacion Necesaria"
 			fi
 		done
 		
+		 
 	if [ "${MPW}" == "Si" ]; then
+			echo
+			echo
 			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
+			echo "------------------------------"
+			echo
 			PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
 		select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
 			do
 				if [ "$ntfspart" ]; then
-				ntfsuuid=$(blkid -o value -s UUID /dev/${ntfsdrive}) 
 					break
 				fi
 			done
@@ -512,6 +516,7 @@ EOL
     
 	if [ "${MPW}" == "Si" ]; then
 	echo -e "\n${CYE}Mounting my personal storage${CNC}\n"
+	ntfsuuid=$(blkid -o value -s UUID /dev/${ntfspart}) 
 	cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
 UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
