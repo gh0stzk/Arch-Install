@@ -224,8 +224,19 @@ center "Ingresa la informacion Necesaria"
 				break 
 			fi
 			echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
-		done	    
-
+		done
+			    
+		kernel_opts=("Linux (Default)" "Linux LTS" "Linux-Zen")
+		PS3="Escoge el Kernel que usaras (1, 2 o 3): "
+	select opt in "${kernel_opts[@]}"; do
+		case "$REPLY" in
+			1) kernel='linux';break;;
+			2) kernel='linux-lts';break;;
+			3) kernel='linux-zen';break;;
+			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+		esac
+	done
+	
 		echo
 		PS3="Quieres instalar YAY como AUR Helper?: "
 	select YAYH in "Si" "No"
@@ -245,13 +256,38 @@ center "Ingresa la informacion Necesaria"
 		done
 		
 		echo
-		PS3="Montar mi almacenamiento personal?: "
+		PS3="Montar almacenamiento compartido con WINDOWS?: "
 	select MPW in "Si" "No"
 		do
 			if [ $MPW ]; then
 				break
 			fi
 		done
+		
+		if [ "${MPW}" == "Si" ]; then
+		lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
+		PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
+	select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
+		do
+			if [ "$ntfspart" ]; then
+			ntfsuuid=$(blkid -o value -s UUID /dev/${ntfsdrive}) 
+				break
+			fi
+		done
+		
+		
+		
+		
+		     # Check CPU model
+		if lscpu | grep -q 'GenuineIntel'; then
+			cpu_name="Intel"
+			cpu_model="intel-ucode"
+			cpu_atkm="intel_agp i915"
+	else
+			cpu_name="AMD"
+			cpu_model="amd-ucode"
+			cpu_atkm="amdgpu"
+		fi
 		
 clear
 	
@@ -261,6 +297,8 @@ clear
 		
 		echo -e " User:      ${CBL}$USR${CNC}"
 		echo -e " Hostname:  ${CBL}$HNAME${CNC}"
+		echo -e " CPU:       ${CBL}$cpu_name${CNC}"
+		echo -e " Kernel:    ${CBL}$kernel${CNC}"
     
 		if [ "${YAYH}" = "Si" ]; then
 			echo -e " Yay:       ${CGR}Si${CNC}"
@@ -275,7 +313,7 @@ clear
 		fi
 		
 		if [ "${MPW}" = "Si" ]; then
-			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC}"
+			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${ntfspart}${CNC}${CYE}]${CNC}"
 		else
 			echo -e " Almacenamiento Personal:  ${CRE}No${CNC}"
 		fi
@@ -305,10 +343,10 @@ center "Instalando sistema base"
 	pacstrap /mnt \
 	         base \
 	         base-devel \
-	         linux-zen \
+	         "$kernel" \
 	         linux-firmware \
 	         dhcpcd \
-	         intel-ucode \
+	         "$cpu_model" \
 	         reflector \
 	         zsh
 	echo -e "${OK}"
@@ -392,7 +430,7 @@ center "Instalando GRUB"
 	$CHROOT grub-install --target=i386-pc /dev/"$drive"
 	echo
 	sed -i 's/quiet/zswap.enabled=0 mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
-	sed -i "s/MODULES=()/MODULES=(intel_agp i915)/" /mnt/etc/mkinitcpio.conf
+	sed -i "s/MODULES=()/MODULES=(${cpu_atkm})/" /mnt/etc/mkinitcpio.conf
 	echo
 	$CHROOT grub-mkconfig -o /boot/grub/grub.cfg
 	echo -e "${OK}"
@@ -469,11 +507,13 @@ EOL
 	echo -e "${OK}"
 	sleep 2
     
+    
+    
 	if [ "${MPW}" == "Si" ]; then
 	echo -e "\n${CYE}Mounting my personal storage${CNC}\n"
 	cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
-UUID=01D3AE59075CA1F0		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
+UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
 EOL
 	cat /mnt/etc/fstab
 	sleep 5
