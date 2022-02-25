@@ -225,7 +225,8 @@ center "Ingresa la informacion Necesaria"
 			fi
 			echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 		done
-			    
+			
+		echo    
 		kernel_opts=("Linux (Default)" "Linux LTS" "Linux-Zen")
 		PS3="Escoge el Kernel que usaras (1, 2 o 3): "
 	select opt in "${kernel_opts[@]}"; do
@@ -264,17 +265,17 @@ center "Ingresa la informacion Necesaria"
 			fi
 		done
 		
-		if [ "${MPW}" == "Si" ]; then
-		lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
-		PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
-	select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
-		do
-			if [ "$ntfspart" ]; then
-			ntfsuuid=$(blkid -o value -s UUID /dev/${ntfsdrive}) 
-				break
-			fi
-		done
-		
+	if [ "${MPW}" == "Si" ]; then
+			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
+			PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
+		select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
+			do
+				if [ "$ntfspart" ]; then
+				ntfsuuid=$(blkid -o value -s UUID /dev/${ntfsdrive}) 
+					break
+				fi
+			done
+	fi
 		
 		
 		
