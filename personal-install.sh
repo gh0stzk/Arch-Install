@@ -285,9 +285,10 @@ center "Creando Formatenado y Montando Particiones"
 			do
 				if [ "$ntfspart" ]; then
 					break
+					echo "jejejej"
 				fi
+				echo -e "Escoge la particion donde guardas archivos, puede ser o no compartida con Windows, aunque generalmente es la particion donde tienes windows instalado y son del tipo ntfs, escoge con cuidado. esta se montara automaticamente cada que inices Arch Linux."
 			done
-			echo -e "Escoge la particion donde guardas archivos, puede ser o no compartida con Windows, aunque generalmente es la particion donde tienes windows instalado y son del tipo ntfs, escoge con cuidado. esta se montara automaticamente cada que inices Arch Linux."
 	fi			
 		
 		
