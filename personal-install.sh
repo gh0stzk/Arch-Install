@@ -216,7 +216,7 @@ center "Ingresa la informacion Necesaria"
 				break
 			fi
 		done
-		
+		clear
 #----------------------------------------
 #          Select DISK
 #----------------------------------------
@@ -249,7 +249,7 @@ center "Creando Formatenado y Montando Particiones"
 	
 	while true
 		do 
-			read -rp "Escribe el NUMERO de la particion RAIZ /dev/${drive}/" partraiz
+			read -rp "Escribe el NUMERO de la particion RAIZ (donde instalaras arch) /dev/${drive}/" partraiz
 			if [[ "${partraiz}" =~ ^[0-9]$ ]]
 			then 
 				break
@@ -268,6 +268,7 @@ center "Creando Formatenado y Montando Particiones"
 	fallocate -l 512M /mnt/swapfile
 	chmod 600 /mnt/swapfile
 	mkswap /mnt/swapfile >/dev/null
+	echo " Montando Swap, espera.."
 	swapon /mnt/swapfile
 	echo -e "${OK}"
 	sleep 2
@@ -280,14 +281,14 @@ center "Creando Formatenado y Montando Particiones"
 			echo "------------------------------"
 			echo
 			PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
+			echo -e "Escoge la particion donde guardas archivos, puede ser o no compartida con Windows, aunque generalmente es la particion donde tienes windows instalado y son del tipo ntfs, escoge con cuidado. esta se montara automaticamente cada que inices Arch Linux."
 		select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
 			do
 				if [ "$ntfspart" ]; then
 					break
 				fi
 			done
-	fi
-		
+	fi			
 		
 		
 		     # Check CPU model
