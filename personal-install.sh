@@ -128,7 +128,7 @@ center "Probando conexion a internet"
 	fi
 	
 #----------------------------------------
-#          Creating Partitions
+#          Select DISK
 #----------------------------------------
 
 center "Creando Formatenado y Montando Particiones"
@@ -143,42 +143,11 @@ select drive in $(lsblk -nd -e 7,11 -o NAME)
 			break
 		fi
 	done
-	
-	cfdisk /dev/"${drive}"
-	echo
-	lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
-	echo
-	
-	while true
-		do 
-			read -rp "Escribe el NUMERO de la particion RAIZ /dev/${drive}/" partraiz
-			if [[ "${partraiz}" =~ ^[0-9]$ ]]
-			then 
-				break
-			fi 
-			echo -e "Incorrecto, solo escribe el numero e.g. 1\n"
-		done
-		  
-	mkfs.ext4 -L Arch /dev/"${drive}"${partraiz}
-	mount /dev/"${drive}"${partraiz} /mnt
-	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
-	sleep 3
-	echo
-
-	echo " Creando archivo swap, espera.."
-	sleep 2
-	fallocate -l 512M /mnt/swapfile
-	chmod 600 /mnt/swapfile
-	mkswap /mnt/swapfile >/dev/null
-	swapon /mnt/swapfile
-	echo -e "${OK}"
-	sleep 2
 	clear
 		
 #----------------------------------------
 #          Getting Information   
 #----------------------------------------
-
 
 center "Ingresa la informacion Necesaria"    	
 	while true
@@ -339,13 +308,49 @@ clear
 clear
 
 #----------------------------------------
+#          Creating Partitions
+#----------------------------------------
+
+center "Creando Formatenado y Montando Particiones"
+	cfdisk /dev/"${drive}"
+	echo
+	lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
+	echo
+	
+	while true
+		do 
+			read -rp "Escribe el NUMERO de la particion RAIZ /dev/${drive}/" partraiz
+			if [[ "${partraiz}" =~ ^[0-9]$ ]]
+			then 
+				break
+			fi 
+			echo -e "Incorrecto, solo escribe el numero e.g. 1\n"
+		done
+		  
+	mkfs.ext4 -L Arch /dev/"${drive}"${partraiz}
+	mount /dev/"${drive}"${partraiz} /mnt
+	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
+	sleep 3
+	echo
+
+	echo " Creando archivo swap, espera.."
+	sleep 2
+	fallocate -l 512M /mnt/swapfile
+	chmod 600 /mnt/swapfile
+	mkswap /mnt/swapfile >/dev/null
+	swapon /mnt/swapfile
+	echo -e "${OK}"
+	sleep 2
+	clear
+
+#----------------------------------------
 #          Pacstrap base system
 #----------------------------------------
 
 center "Instalando sistema base"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
-	pacstrap /mnt \
+	pacstrap -i /mnt \
 	         base \
 	         base-devel \
 	         "$kernel" \
