@@ -132,7 +132,9 @@ center "Probando conexion a internet"
 #----------------------------------------
 
 center "Creando Formatenado y Montando Particiones"
-	echo
+	echo -ne "
+	
+	"
 	lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
 	echo "------------------------------"
 	echo
@@ -264,6 +266,46 @@ center "Ingresa la informacion Necesaria"
 		fi
 		
 clear
+
+#----------------------------------------
+#          Creating Partitions
+#----------------------------------------
+
+center "Creando Formatenado y Montando Particiones"
+	cfdisk /dev/"${drive}"
+	echo
+	lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
+	echo
+	
+	while true
+		do 
+			read -rp "Escribe el NUMERO de la particion RAIZ /dev/${drive}/" partraiz
+			if [[ "${partraiz}" =~ ^[0-9]$ ]]
+			then 
+				break
+			fi 
+			echo -e "Incorrecto, solo escribe el numero e.g. 1\n"
+		done
+		  
+	mkfs.ext4 -L Arch /dev/"${drive}"${partraiz}
+	mount /dev/"${drive}"${partraiz} /mnt
+	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
+	sleep 3
+	echo
+
+	echo " Creando archivo swap, espera.."
+	sleep 2
+	fallocate -l 512M /mnt/swapfile
+	chmod 600 /mnt/swapfile
+	mkswap /mnt/swapfile >/dev/null
+	swapon /mnt/swapfile
+	echo -e "${OK}"
+	sleep 2
+	clear
+	
+#----------------------------------------
+#          Info
+#----------------------------------------
 	
 		echo
 		echo -e "\n --------------------"
@@ -307,41 +349,6 @@ clear
 	done
 clear
 
-#----------------------------------------
-#          Creating Partitions
-#----------------------------------------
-
-center "Creando Formatenado y Montando Particiones"
-	cfdisk /dev/"${drive}"
-	echo
-	lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
-	echo
-	
-	while true
-		do 
-			read -rp "Escribe el NUMERO de la particion RAIZ /dev/${drive}/" partraiz
-			if [[ "${partraiz}" =~ ^[0-9]$ ]]
-			then 
-				break
-			fi 
-			echo -e "Incorrecto, solo escribe el numero e.g. 1\n"
-		done
-		  
-	mkfs.ext4 -L Arch /dev/"${drive}"${partraiz}
-	mount /dev/"${drive}"${partraiz} /mnt
-	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
-	sleep 3
-	echo
-
-	echo " Creando archivo swap, espera.."
-	sleep 2
-	fallocate -l 512M /mnt/swapfile
-	chmod 600 /mnt/swapfile
-	mkswap /mnt/swapfile >/dev/null
-	swapon /mnt/swapfile
-	echo -e "${OK}"
-	sleep 2
-	clear
 
 #----------------------------------------
 #          Pacstrap base system
