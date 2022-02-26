@@ -47,7 +47,7 @@ OK='\n\033[0;32m OK...\033[0m'
     clear
 
 #----------------------------------------
-#          Check Internet & BIOS
+#          Check  BIOS CPU And Graphics
 #----------------------------------------
 
 	while true
@@ -60,6 +60,17 @@ OK='\n\033[0;32m OK...\033[0m'
 			break
 		fi
 	done
+	
+	# Check CPU model
+		if lscpu | grep -q 'GenuineIntel'; then
+			cpu_name="Intel"
+			cpu_model="intel-ucode"
+			cpu_atkm="intel_agp i915"
+	else
+			cpu_name="AMD"
+			cpu_model="amd-ucode"
+			cpu_atkm="amdgpu"
+		fi
 	
 #---------
 	
@@ -177,7 +188,9 @@ center "Ingresa la informacion Necesaria"
 			fi
 			echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 		done
-			
+		clear
+		
+center "Ingresa la informacion Necesaria"
 		echo    
 		kernel_opts=("Linux (Default)" "Linux LTS" "Linux-Zen")
 		PS3="Escoge el Kernel que usaras (1, 2 o 3): "
@@ -200,6 +213,8 @@ center "Ingresa la informacion Necesaria"
 		done
     
 		echo
+		echo -e "Restaura mis archivos de configuraciones montando una particion en otro SSD que tengo y las restaura con rsync."
+		echo
 		PS3="Rstaurar mis dotfiles?: "
 	select DOTS in "Si" "No"
 		do
@@ -207,16 +222,8 @@ center "Ingresa la informacion Necesaria"
 				break
 			fi
 		done
-		
-		echo
-		PS3="Montar almacenamiento compartido con WINDOWS?: "
-	select MPW in "Si" "No"
-		do
-			if [ $MPW ]; then
-				break
-			fi
-		done
 		clear
+		
 #----------------------------------------
 #          Select DISK
 #----------------------------------------
@@ -273,8 +280,12 @@ center "Creando Formatenado y Montando Particiones"
 	echo -e "${OK}"
 	sleep 2
 	clear
-		 
-	if [ "${MPW}" == "Si" ]; then
+	
+	echo
+		PS3="Montar almacenamiento compartido con WINDOWS?: "
+	select MPW in "Si" "No"
+		do
+			if [ $MPW ]; then
 			echo
 			echo
 			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
@@ -286,25 +297,12 @@ center "Creando Formatenado y Montando Particiones"
 		select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
 			do
 				if [ "$ntfspart" ]; then
-					break
-					echo "jejejej"
+					break					
 				fi				
 			done
-	fi			
-		
-		
-		     # Check CPU model
-		if lscpu | grep -q 'GenuineIntel'; then
-			cpu_name="Intel"
-			cpu_model="intel-ucode"
-			cpu_atkm="intel_agp i915"
-	else
-			cpu_name="AMD"
-			cpu_model="amd-ucode"
-			cpu_atkm="amdgpu"
-		fi
-		
-clear
+			fi
+		done
+		clear
 	
 #----------------------------------------
 #          Info
