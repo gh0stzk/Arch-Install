@@ -357,7 +357,7 @@ clear
 center "Instalando sistema base"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
-	pacstrap -i /mnt \
+	pacstrap /mnt \
 	         base \
 	         base-devel \
 	         "$kernel" \
