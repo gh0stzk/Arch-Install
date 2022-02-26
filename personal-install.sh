@@ -280,14 +280,15 @@ center "Creando Formatenado y Montando Particiones"
 			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
 			echo "------------------------------"
 			echo
+			echo -e "Escoge la particion donde guardas archivos, puede ser o no compartida con Windows, aunque generalmente es la particion donde tienes windows instalado y son del tipo ntfs, escoge con cuidado. esta se montara automaticamente cada que inices Arch Linux."
+			echo
 			PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
 		select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
 			do
 				if [ "$ntfspart" ]; then
 					break
 					echo "jejejej"
-				fi
-				echo -e "Escoge la particion donde guardas archivos, puede ser o no compartida con Windows, aunque generalmente es la particion donde tienes windows instalado y son del tipo ntfs, escoge con cuidado. esta se montara automaticamente cada que inices Arch Linux."
+				fi				
 			done
 	fi			
 		
