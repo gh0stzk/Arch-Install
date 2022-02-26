@@ -279,12 +279,17 @@ center "Creando Formatenado y Montando Particiones"
 	sleep 2
 	clear
 	
-	center "Ingresa la informacion Necesaria"
+center "Ingresa la informacion Necesaria"
 	echo
 		PS3="Montar almacenamiento compartido con WINDOWS?: "
 	select MPW in "Si" "No"
 		do
 			if [ $MPW ]; then
+				break
+			fi
+		done
+		
+		if [ "${MPW}" == "Si" ]; then
 			echo
 			echo
 			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
@@ -299,9 +304,7 @@ center "Creando Formatenado y Montando Particiones"
 					break					
 				fi				
 			done
-					break
-			fi
-		done
+		fi
 		clear
 	
 #----------------------------------------
