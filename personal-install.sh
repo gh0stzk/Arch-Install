@@ -127,25 +127,6 @@ center "Probando conexion a internet"
 		exit
 	fi
 	
-#----------------------------------------
-#          Select DISK
-#----------------------------------------
-
-center "Creando Formatenado y Montando Particiones"
-	echo -ne "
-	
-	"
-	lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
-	echo "------------------------------"
-	echo
-	PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
-select drive in $(lsblk -nd -e 7,11 -o NAME) 
-	do
-		if [ "$drive" ]; then
-			break
-		fi
-	done
-	clear
 		
 #----------------------------------------
 #          Getting Information   
@@ -236,36 +217,25 @@ center "Ingresa la informacion Necesaria"
 			fi
 		done
 		
-		 
-	if [ "${MPW}" == "Si" ]; then
-			echo
-			echo
-			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
-			echo "------------------------------"
-			echo
-			PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
-		select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
-			do
-				if [ "$ntfspart" ]; then
-					break
-				fi
-			done
-	fi
-		
-		
-		
-		     # Check CPU model
-		if lscpu | grep -q 'GenuineIntel'; then
-			cpu_name="Intel"
-			cpu_model="intel-ucode"
-			cpu_atkm="intel_agp i915"
-	else
-			cpu_name="AMD"
-			cpu_model="amd-ucode"
-			cpu_atkm="amdgpu"
+#----------------------------------------
+#          Select DISK
+#----------------------------------------
+
+center "Creando Formatenado y Montando Particiones"
+	echo -ne "
+	
+	"
+	lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
+	echo "------------------------------"
+	echo
+	PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
+select drive in $(lsblk -nd -e 7,11 -o NAME) 
+	do
+		if [ "$drive" ]; then
+			break
 		fi
-		
-clear
+	done
+	clear
 
 #----------------------------------------
 #          Creating Partitions
@@ -302,6 +272,36 @@ center "Creando Formatenado y Montando Particiones"
 	echo -e "${OK}"
 	sleep 2
 	clear
+		 
+	if [ "${MPW}" == "Si" ]; then
+			echo
+			echo
+			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
+			echo "------------------------------"
+			echo
+			PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
+		select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
+			do
+				if [ "$ntfspart" ]; then
+					break
+				fi
+			done
+	fi
+		
+		
+		
+		     # Check CPU model
+		if lscpu | grep -q 'GenuineIntel'; then
+			cpu_name="Intel"
+			cpu_model="intel-ucode"
+			cpu_atkm="intel_agp i915"
+	else
+			cpu_name="AMD"
+			cpu_model="amd-ucode"
+			cpu_atkm="amdgpu"
+		fi
+		
+clear
 	
 #----------------------------------------
 #          Info
@@ -492,8 +492,8 @@ EOL
 
 	echo -e "\n${CYE}Changing swappiness${CNC}"
 	cat >> /mnt/etc/sysctl.d/99-swappiness.conf <<EOL
-vm.swappiness=100
-vm.vfs_cache_pressure=80
+vm.swappiness=10
+vm.vfs_cache_pressure=50
 EOL
 	echo -e "${OK}"
 	sleep 2
