@@ -213,8 +213,6 @@ center "Ingresa la informacion Necesaria"
 		done
     
 		echo
-		echo -e "Restaura mis archivos de configuraciones montando una particion en otro SSD que tengo y las restaura con rsync."
-		echo
 		PS3="Rstaurar mis dotfiles?: "
 	select DOTS in "Si" "No"
 		do
@@ -281,6 +279,7 @@ center "Creando Formatenado y Montando Particiones"
 	sleep 2
 	clear
 	
+	center "Ingresa la informacion Necesaria"
 	echo
 		PS3="Montar almacenamiento compartido con WINDOWS?: "
 	select MPW in "Si" "No"
@@ -300,6 +299,7 @@ center "Creando Formatenado y Montando Particiones"
 					break					
 				fi				
 			done
+					break
 			fi
 		done
 		clear
