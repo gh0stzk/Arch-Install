@@ -593,11 +593,10 @@ clear
 #          Installing Packages
 #----------------------------------------
 
-center "Instalando Audio & Video"
-	sleep 2	
+center "Instalando Audio & Video"	
 	$CHROOT pacman -S \
-	                  xorg-server xorg-xinput xorg-xsetroot \
-	                  xf86-video-intel mesa \
+	                  xorg-server xf86-video-intel \
+	                  xorg-xinput xorg-xsetroot \
 	                  "$audiopack" \
 	                  --noconfirm
 	clear
