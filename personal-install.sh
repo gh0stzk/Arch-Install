@@ -203,6 +203,22 @@ center "Ingresa la informacion Necesaria"
 		esac
 	done
 	
+		echo    
+		de_opts=("Bspwm" "Gnome Minimal" "Mate Minimal" "OpenBox" "Plasma Minimal" "XFCE" "Ninguno")
+		PS3="Escoge el entorno de escritorio que deseas instalar (1, 2, 3, 4, 5, 6 o 7): "
+	select opt in "${de_opts[@]}"; do
+		case "$REPLY" in
+			1) DEN='Bspwm';DE='bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';aurbspwm='picom-jonaburg-git polybar xtitle';break;;
+			2) DEN='Gnome Minimal';DE='gnome';DM='gdm';SDM='gdm.service';break;;
+			3) DEN='Mate Minimal';DE='mate';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
+			4) DEN='OpenBox';DE='openbox ttf-dejavu';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
+			5) DEN='Plasma Minimal';DE='plasma-desktop';DM='sddm';SDM='sddm';break;;
+			6) DEN='XFCE';DE='xfce4 xfce4-goodies';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
+			7) DEN='Ninguno';break;;
+			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+		esac
+	done
+	
 		echo
 		PS3="Quieres instalar YAY como AUR Helper?: "
 	select YAYH in "Si" "No"
@@ -307,24 +323,6 @@ center "Ingresa la informacion Necesaria"
 		fi
 		clear
 	
-center "Entorno de Escritorio?"
-		echo    
-		de_opts=("Bspwm" "Gnome Minimal" "Mate Minimal" "OpenBox" "Plasma Minimal" "XFCE" "Ninguno")
-		PS3="Escoge el entorno de escritorio que deseas instalar (1, 2, 3, 4, 5, 6 o 7): "
-	select opt in "${de_opts[@]}"; do
-		case "$REPLY" in
-			1) DEN='Bspwm';DE='bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';aurbspwm='picom-jonaburg-git polybar xtitle';break;;
-			2) DEN='Gnome Minimal';DE='gnome';DM='gdm';SDM='gdm.service';break;;
-			3) DEN='Mate Minimal';DE='mate';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
-			4) DEN='OpenBox';DE='openbox ttf-dejavu';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
-			5) DEN='Plasma Minimal';DE='plasma-desktop';DM='sddm';SDM='sddm';break;;
-			6) DEN='XFCE';DE='xfce4 xfce4-goodies';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
-			7) DEN='Ninguno';break;;
-			*) echo "Opcion invalida, intenta de nuevo.";continue;;
-		esac
-	done
-	clear
-	
 #----------------------------------------
 #          Info
 #----------------------------------------
@@ -342,7 +340,7 @@ center "Entorno de Escritorio?"
 		if [ "${YAYH}" = "Si" ]; then
 			echo -e " Yay:       ${CGR}Si${CNC}"
 		else
-			echo -e " Yay:       ${CRE}No${CNC} Lo necesitaras si escogiste BSPWM. Aun puedes cancelar y reiniciar el script"
+			echo -e " Yay:       ${CRE}No${CNC}"
 		fi
 		
 		if [ "${DOTS}" = "Si" ]; then
@@ -588,7 +586,7 @@ center "Installing Apps i use"
 center "Instalando Entorno de Escritorio"
 	$CHROOT pacman -S $DE $DM --noconfirm
 	
-	if $CHROOT pacman -Qi lightdm > /dev/null ; then
+	if $CHROOT pacman -Qi lightdm >/dev/null 2>&1; then
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
@@ -611,30 +609,35 @@ clear
 #          AUR Packages
 #----------------------------------------
 
-	if [ "$DEN" == "Bspwm" ] && [ "${YAYH}" == "Si" ]; then
+	if [ "${YAYH}" == "Si" ]; then
+
 		center "Instalando YAY"
 			sleep 2
 				echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 			clear
-		center "Complementando BSPWM"
-			sleep 2
+	fi
+	
+	if [ "$DEN" == "Bspwm" ]; then
+	
+		if $CHROOT pacman -Qi yay >/dev/null 2>&1; then
+			center "Complementando BSPWM"
 				echo "cd && yay -S $aurbspwm --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
-	elif [ "$DEN" == "Bspwm" ] && [ "${YAYH}" == "No" ]; then
-		center "Complementando BSPWM"
+		else
+			center "Necesitas YAY para complemetar BSPWM"
 				echo -e "\n Para instalar Polybar y Picom es necesario YAY.."
-				echo -e" Instalando YAY.."
+				echo -e " Instalando YAY.."
 			sleep 2
 				echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 			clear
 		center "Complementando BSPWM"
 				echo "cd && yay -S $aurbspwm --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
-	elif [ "$DEN" != "Bspwm" ] && [ "${YAYH}" == "Si" ]; then
-		center "Instalando YAY"
-			sleep 2
-				echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
-			clear
+		fi
+	fi
+		
+	if [ "${YAYH}" == "Si" ]; then
+
 		center "zramswap termite"
 			sleep 2
 				echo "cd && yay -S zramswap termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
@@ -650,11 +653,8 @@ clear
 		center "Iconos, fuentes & stacer"
 			sleep 2
 				echo "cd && yay -S stacer nerd-fonts-jetbrains-mono nerd-fonts-ubuntu-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-			clear	
-	elif [ "$DEN" != "Bspwm" ] && [ "${YAYH}" != "Si" ]; then
-			break
-fi
-
+			clear
+		fi
 
 #----------------------------------------
 #          Enable Services & other stuff
