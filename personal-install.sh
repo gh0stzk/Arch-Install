@@ -203,6 +203,28 @@ center "Ingresa la informacion Necesaria"
 		esac
 	done
 	
+		echo
+		red_options=("DHCPCD" "NetworkManager")
+		PS3="Selecciona cliente para manejar Internet (1 o 2): "
+	select opt in "${red_options[@]}"; do
+		case "$REPLY" in
+			1) redtitle='DHCPCD';redpack='dhcpcd';esys='dhcpcd.service';break;;
+			2) redtitle='NetworkManager';redpack='networkmanager';esys='NetworkManager';break;;
+			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+		esac
+	done	
+
+		echo
+		audioopts=("PipeWire" "PulseAudio")
+		PS3="Selecciona servidor de Audio (1 o 2): "
+	select opt in "${audioopts[@]}"; do
+		case "$REPLY" in
+			1) audiotitle='PipeWire';audiopack='pipewire pipewire-pulse pipewire-alsa pipewire-jack';break;;
+			2) audiotitle='PulseAudio';audiopack='pulseaudio';break;;
+			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+		esac
+	done
+	
 		echo    
 		de_opts=("Bspwm" "Gnome Minimal" "Mate Minimal" "OpenBox" "Plasma Minimal" "XFCE" "Ninguno")
 		PS3="Escoge el entorno de escritorio que deseas instalar (1, 2, 3, 4, 5, 6 o 7): "
@@ -335,6 +357,8 @@ center "Ingresa la informacion Necesaria"
 		echo -e " Hostname:  ${CBL}$HNAME${CNC}"
 		echo -e " CPU:       ${CBL}$cpu_name${CNC}"
 		echo -e " Kernel:    ${CBL}$kernel${CNC}"
+		echo -e " Internet:  ${CBL}$redtitle${CNC}"
+		echo -e " Audio:     ${CBL}$audiotitle${CNC}"
 		echo -e " Desktop:   ${CBL}$DEN${CNC}"
     
 		if [ "${YAYH}" = "Si" ]; then
@@ -383,7 +407,7 @@ center "Instalando sistema base"
 	         base-devel \
 	         "$kernel" \
 	         linux-firmware \
-	         dhcpcd \
+	         "$redpack" \
 	         "$cpu_model" \
 	         reflector \
 	         zsh
@@ -487,31 +511,31 @@ center "Aplicando optmizaciones.."
 	sleep 2
     
 	echo -e "\n${CYE}Tunning ext4 file system for SSD and SpeedUp${CNC}"
-	sed -i 's/relatime/noatime,commit=120/' /mnt/etc/fstab
+	sed -i 's/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
 	$CHROOT tune2fs -O fast_commit "$partroot" >/dev/null
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "\n${CYE}Optimizing make flags for speedup compiling times${CNC}\n"
-	echo -e "You have ${CBL}$(nproc)${CNC} cores."
+	echo -e "\n${CYE}Optimizando las make flags para acelerar tiempos de compilado${CNC}\n"
+	echo -e "Tienes ${CBL}$(nproc)${CNC} cores."
 	sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "\n${CYE}Configuring CPU to performance mode${CNC}"
+	echo -e "\n${CYE}Configurando CPU a modo performance${CNC}"
 	$CHROOT pacman -S cpupower --noconfirm >/dev/null
 	sed -i "s/#governor='ondemand'/governor='performance'/" /mnt/etc/default/cpupower
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "\n${CYE}Changing kernel scheduler to mq-deadline${CNC}"
+	echo -e "\n${CYE}Cambiando el scheduler del kernel a mq-deadline${CNC}"
 	cat >> /mnt/etc/udev/rules.d/60-ssd.rules <<EOL
 ACTION=="add|change", KERNEL=="sd[a-z]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
 EOL
 	echo -e "${OK}"
 	sleep 2
 
-	echo -e "\n${CYE}Changing swappiness${CNC}"
+	echo -e "\n${CYE}Configurando swappiness${CNC}"
 	cat >> /mnt/etc/sysctl.d/99-swappiness.conf <<EOL
 vm.swappiness=10
 vm.vfs_cache_pressure=50
@@ -519,12 +543,12 @@ EOL
 	echo -e "${OK}"
 	sleep 2
 
-	echo -e "\n${CYE}Disabling Journal logs..${CNC}"
+	echo -e "\n${CYE}Deshabilitando Journal logs..${CNC}"
 	sed -i 's/#Storage=auto/Storage=none/' /mnt/etc/systemd/journald.conf
 	echo -e "${OK}"
 	sleep 2
     
-	echo -e "\n${CYE}Disabling innecessary kernel modules${CNC}"
+	echo -e "\n${CYE}Desabilitando modulos del kernel innecesarios${CNC}"
 	cat >> /mnt/etc/modprobe.d/blacklist.conf <<EOL
 blacklist iTCO_wdt
 blacklist mousedev
@@ -534,21 +558,24 @@ EOL
 	echo -e "${OK}"
 	sleep 2
 		
-	echo -e "\n${CYE}Disabling innecessary services${CNC}\n"
+	echo -e "\n${CYE}Deshabilitando servicios innecesarios${CNC}\n"
 	$CHROOT systemctl mask lvm2-monitor.service systemd-random-seed.service
 	echo -e "${OK}"
 	sleep 2
 		
-	echo -e "\n${CYE}Speedup Networking with Cloudflare's DNS${CNC}"
+	echo -e "\n${CYE}Acelerando internet con los DNS de Cloudflare${CNC}"
+	if $CHROOT pacman -Qi dhcpcd > /dev/null ; then
 	echo "noarp" >> /mnt/etc/dhcpcd.conf
 	echo "static domain_name_servers=1.1.1.1 1.0.0.1" >> /mnt/etc/dhcpcd.conf
+	else
+	echo "[global-dns-domain-*]" >> /mnt/etc/NetworkManager/conf.d/dns-servers.conf
+	echo "servers=1.1.1.1,1.0.0.1" >> /mnt/etc/NetworkManager/conf.d/dns-servers.conf
+	fi
 	echo -e "${OK}"
 	sleep 2
     
-    
-    
 	if [ "${MPW}" == "Si" ]; then
-	echo -e "\n${CYE}Mounting my personal storage${CNC}\n"
+	echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
 	ntfsuuid=$(blkid -o value -s UUID /dev/${ntfspart}) 
 	cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
@@ -566,20 +593,32 @@ clear
 #          Installing Packages
 #----------------------------------------
 
-center "Installing Audio & Video"
+center "Instalando Audio & Video"
 	sleep 2	
-	$CHROOT pacman -S xorg-server mesa xf86-video-intel xorg-xinput xorg-xsetroot pipewire pipewire-pulse --noconfirm
+	$CHROOT pacman -S \
+	                  xorg-server xorg-xinput xorg-xsetroot \
+	                  xf86-video-intel mesa \
+	                  "$audiopack" \
+	                  --noconfirm
 	clear
 	
-center "Installing Multimedia Codecs And Archiver Utilities"
-	$CHROOT pacman -S ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl jasper openjpeg2 libwebp webp-pixbuf-loader unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils --noconfirm
+center "Instalando codecs multimedia y utilidades"
+	$CHROOT pacman -S \
+                      ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl \
+                      jasper openjpeg2 libwebp webp-pixbuf-loader \
+                      unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils \
+                      --noconfirm
 	clear
 	
-center "Installing support for mounting volumes and removable media devices"
-	$CHROOT pacman -S libmtp gvfs-nfs dosfstools usbutils gvfs gvfs-mtp net-tools xdg-user-dirs gtk-engine-murrine --noconfirm
+center "Instalando soporte para montar volumenes y dispositivos multimedia extraibles"
+	$CHROOT pacman -S \
+					  libmtp gvfs-nfs gvfs gvfs-mtp \
+					  dosfstools usbutils net-tools \
+					  xdg-user-dirs gtk-engine-murrine \
+					  --noconfirm
 	clear
 	
-center "Installing Apps i use"
+center "Instalando apps que yo uso"
 	$CHROOT pacman -S android-file-transfer bleachbit cmatrix gimp gcolor3 geany gparted htop minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone pacman-contrib pass xclip firefox firefox-i18n-es-mx  playerctl xarchiver papirus-icon-theme ttf-joypixels terminus-font scrot grsync git --noconfirm
 	clear
 	
@@ -661,7 +700,7 @@ clear
 #----------------------------------------
 
 center "Actizando Servicios"
-	$CHROOT systemctl enable dhcpcd.service $SDM cpupower systemd-timesyncd.service
+	$CHROOT systemctl enable $esys $SDM cpupower systemd-timesyncd.service
 	$CHROOT systemctl enable zramswap
 		
 	cat >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf <<EOL
@@ -765,10 +804,9 @@ center "Limpiando sistema para su primer arranque"
 	rm -f /mnt/opt/whatsapp-nativefier/locales/{am.pak,ar.pak,bg.pak,bn.pak,ca.pak,cs.pak,da.pak,de.pak,el.pak,en-GB.pak,et.pak,fa.pak,fi.pak,fil.pak,fr.pak,gu.pak,he.pak,hi.pak,hr.pak,hu.pak,id.pak,it.pak,ja.pak,kn.pak,ko.pak,lt.pak,lv.pak,ml.pak,mr.pak,ms.pak,nb.pak,nl.pak,pl.pak,pt-BR.pak,pt-PT.pak,ro.pak,ru.pak,sk.pak,sl.pak,sr.pak,sv.pak,sw.pak,ta.pak,te.pak,th.pak,tr.pak,uk.pak,vi.pak,zh-CN.pak,zh-TW.pak}
 	rm -f /mnt/usr/lib/firmware/{iwlwifi-100-5.ucode,iwlwifi-105-6.ucode,iwlwifi-135-6.ucode,iwlwifi-1000-3.ucode,iwlwifi-1000-5.ucode,iwlwifi-2000-6.ucode,iwlwifi-2030-6.ucode,iwlwifi-3160-7.ucode,iwlwifi-3160-8.ucode,iwlwifi-3160-9.ucode,iwlwifi-3160-10.ucode,iwlwifi-3160-12.ucode,iwlwifi-3160-13.ucode,iwlwifi-3160-16.ucode,iwlwifi-3160-17.ucode,iwlwifi-3168-21.ucode,iwlwifi-3168-22.ucode,iwlwifi-3168-27.ucode,iwlwifi-3168-29.ucode,iwlwifi-3945-2.ucode,iwlwifi-4965-2.ucode,iwlwifi-5000-1.ucode,iwlwifi-5000-2.ucode,iwlwifi-5000-5.ucode,iwlwifi-5150-2.ucode,iwlwifi-6000-4.ucode,iwlwifi-6000g2a-5.ucode,iwlwifi-6000g2a-6.ucode,iwlwifi-6000g2b-5.ucode,iwlwifi-6000g2b-6.ucode,iwlwifi-6050-4.ucode,iwlwifi-6050-5.ucode,iwlwifi-7260-7.ucode,iwlwifi-7260-8.ucode,iwlwifi-7260-9.ucode,iwlwifi-7260-10.ucode,iwlwifi-7260-12.ucode,iwlwifi-7260-13.ucode,iwlwifi-7260-16.ucode,iwlwifi-7260-17.ucode,iwlwifi-7265-8.ucode,iwlwifi-7265-9.ucode,iwlwifi-7265-10.ucode,iwlwifi-7265-12.ucode,iwlwifi-7265-13.ucode,iwlwifi-7265-16.ucode,iwlwifi-7265-17.ucode,iwlwifi-7265D-10.ucode,iwlwifi-7265D-12.ucode,iwlwifi-7265D-13.ucode,iwlwifi-7265D-16.ucode,iwlwifi-7265D-17.ucode,iwlwifi-7265D-21.ucode,iwlwifi-7265D-22.ucode,iwlwifi-7265D-27.ucode,iwlwifi-7265D-29.ucode,iwlwifi-8000C-13.ucode,iwlwifi-8000C-16.ucode,iwlwifi-8000C-21.ucode,iwlwifi-8000C-22.ucode,iwlwifi-8000C-27.ucode,iwlwifi-8000C-31.ucode,iwlwifi-8000C-34.ucode,iwlwifi-8000C-36.ucode,iwlwifi-8265-21.ucode,iwlwifi-8265-22.ucode,iwlwifi-8265-27.ucode,iwlwifi-8265-31.ucode,iwlwifi-8265-34.ucode,iwlwifi-8265-36.ucode,iwlwifi-9000-pu-b0-jf-b0-33.ucode,iwlwifi-9000-pu-b0-jf-b0-34.ucode,iwlwifi-9000-pu-b0-jf-b0-38.ucode,iwlwifi-9000-pu-b0-jf-b0-41.ucode,iwlwifi-9000-pu-b0-jf-b0-43.ucode,iwlwifi-9000-pu-b0-jf-b0-46.ucode,iwlwifi-9260-th-b0-jf-b0-33.ucode,iwlwifi-9260-th-b0-jf-b0-34.ucode,iwlwifi-9260-th-b0-jf-b0-38.ucode,iwlwifi-9260-th-b0-jf-b0-41.ucode,iwlwifi-9260-th-b0-jf-b0-43.ucode,iwlwifi-9260-th-b0-jf-b0-46.ucode,iwlwifi-cc-a0-46.ucode,iwlwifi-cc-a0-48.ucode,iwlwifi-cc-a0-50.ucode,iwlwifi-cc-a0-53.ucode,iwlwifi-cc-a0-55.ucode,iwlwifi-cc-a0-59.ucode,iwlwifi-cc-a0-62.ucode,iwlwifi-cc-a0-63.ucode,iwlwifi-Qu-b0-hr-b0-48.ucode,iwlwifi-Qu-b0-hr-b0-50.ucode,iwlwifi-Qu-b0-hr-b0-53.ucode,iwlwifi-Qu-b0-hr-b0-55.ucode,iwlwifi-Qu-b0-hr-b0-59.ucode,iwlwifi-Qu-b0-hr-b0-62.ucode,iwlwifi-Qu-b0-hr-b0-63.ucode,iwlwifi-Qu-b0-jf-b0-48.ucode,iwlwifi-Qu-b0-jf-b0-50.ucode,iwlwifi-Qu-b0-jf-b0-53.ucode,iwlwifi-Qu-b0-jf-b0-55.ucode,iwlwifi-Qu-b0-jf-b0-59.ucode,iwlwifi-Qu-b0-jf-b0-62.ucode,iwlwifi-Qu-b0-jf-b0-63.ucode,iwlwifi-Qu-c0-hr-b0-48.ucode,iwlwifi-Qu-c0-hr-b0-50.ucode,iwlwifi-Qu-c0-hr-b0-53.ucode,iwlwifi-Qu-c0-hr-b0-55.ucode,iwlwifi-Qu-c0-hr-b0-59.ucode,iwlwifi-Qu-c0-hr-b0-62.ucode,iwlwifi-Qu-c0-hr-b0-63.ucode,iwlwifi-Qu-c0-jf-b0-48.ucode,iwlwifi-Qu-c0-jf-b0-50.ucode,iwlwifi-Qu-c0-jf-b0-53.ucode,iwlwifi-Qu-c0-jf-b0-55.ucode,iwlwifi-Qu-c0-jf-b0-59.ucode,iwlwifi-Qu-c0-jf-b0-62.ucode,iwlwifi-Qu-c0-jf-b0-63.ucode,iwlwifi-QuZ-a0-hr-b0-48.ucode,iwlwifi-QuZ-a0-hr-b0-50.ucode,iwlwifi-QuZ-a0-hr-b0-53.ucode,iwlwifi-QuZ-a0-hr-b0-55.ucode,iwlwifi-QuZ-a0-hr-b0-59.ucode,iwlwifi-QuZ-a0-hr-b0-62.ucode,iwlwifi-QuZ-a0-hr-b0-63.ucode,iwlwifi-QuZ-a0-jf-b0-48.ucode,iwlwifi-QuZ-a0-jf-b0-50.ucode,iwlwifi-QuZ-a0-jf-b0-53.ucode,iwlwifi-QuZ-a0-jf-b0-55.ucode,iwlwifi-QuZ-a0-jf-b0-59.ucode,iwlwifi-QuZ-a0-jf-b0-62.ucode,iwlwifi-QuZ-a0-jf-b0-63.ucode,iwlwifi-so-a0-gf-a0.pnvm,iwlwifi-so-a0-gf-a0-64.ucode,iwlwifi-so-a0-hr-b0-64.ucode,iwlwifi-so-a0-jf-b0-64.ucode,iwlwifi-ty-a0-gf-a0.pnvm,iwlwifi-ty-a0-gf-a0-59.ucode,iwlwifi-ty-a0-gf-a0-62.ucode,iwlwifi-ty-a0-gf-a0-63.ucode,iwlwifi-ty-a0-gf-a0-66.ucode}
 
-	echo
-	$CHROOT pacman -Rns go
-	$CHROOT pacman -Rns "$(pacman -Qtdq)"
-	$CHROOT fstrim -av
+	$CHROOT pacman -Scc --noconfirm >/dev/null
+	$CHROOT pacman -Rns "$(pacman -Qtdq)" --noconfirm >/dev/null
+	$CHROOT fstrim -av >/dev/null
 	echo -e "${OK}"
 	sleep 2
 clear
@@ -779,7 +817,7 @@ clear
 
 center "Instalacion Finalizada"
 
-echo -e "                       "
+echo -e "          .            "
 echo -e "         / \           I use Arch Linux BTW.."
 echo -e "        /   \          ==========================="     
 echo -e "       /^.   \         os       $(source /mnt/etc/os-release && echo "${PRETTY_NAME}")"    
