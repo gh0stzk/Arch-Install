@@ -563,28 +563,28 @@ EOL
 	echo -e "${OK}"
 	sleep 2
 		
-	echo -e "\n${CYE}Acelerando internet con los DNS de Cloudflare${CNC}"
+			echo -e "\n${CYE}Acelerando internet con los DNS de Cloudflare${CNC}"
 	if $CHROOT pacman -Qi dhcpcd > /dev/null ; then
-	echo "noarp" >> /mnt/etc/dhcpcd.conf
-	echo "static domain_name_servers=1.1.1.1 1.0.0.1" >> /mnt/etc/dhcpcd.conf
-	else
-	echo "[global-dns-domain-*]" >> /mnt/etc/NetworkManager/conf.d/dns-servers.conf
-	echo "servers=1.1.1.1,1.0.0.1" >> /mnt/etc/NetworkManager/conf.d/dns-servers.conf
+			echo "noarp" >> /mnt/etc/dhcpcd.conf
+			echo "static domain_name_servers=1.1.1.1 1.0.0.1" >> /mnt/etc/dhcpcd.conf
+		else
+			echo "[global-dns-domain-*]" >> /mnt/etc/NetworkManager/conf.d/dns-servers.conf
+			echo "servers=1.1.1.1,1.0.0.1" >> /mnt/etc/NetworkManager/conf.d/dns-servers.conf
 	fi
-	echo -e "${OK}"
-	sleep 2
+			echo -e "${OK}"
+			sleep 2
     
 	if [ "${MPW}" == "Si" ]; then
-	echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
-	ntfsuuid=$(blkid -o value -s UUID /dev/${ntfspart}) 
+			echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
+			ntfsuuid=$(blkid -o value -s UUID /dev/${ntfspart}) 
 	cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
 UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
 EOL
-	cat /mnt/etc/fstab
-	sleep 5
-	echo -e "${OK}"
-	sleep 2
+			cat /mnt/etc/fstab
+			sleep 5
+			echo -e "${OK}"
+			sleep 2
 	fi
 	
 clear
@@ -595,10 +595,10 @@ clear
 
 center "Instalando Audio & Video"	
 	$CHROOT pacman -S \
-	                  xorg-server xf86-video-intel \
-	                  xorg-xinput xorg-xsetroot \
-	                  "$audiopack" \
-	                  --noconfirm
+					  xorg-server xf86-video-intel mesa \
+					  xorg-xinput xorg-xsetroot \
+					  $audiopack \
+					  --noconfirm
 	clear
 	
 center "Instalando codecs multimedia y utilidades"
@@ -618,7 +618,15 @@ center "Instalando soporte para montar volumenes y dispositivos multimedia extra
 	clear
 	
 center "Instalando apps que yo uso"
-	$CHROOT pacman -S android-file-transfer bleachbit cmatrix gimp gcolor3 geany gparted htop minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone pacman-contrib pass xclip firefox firefox-i18n-es-mx  playerctl xarchiver papirus-icon-theme ttf-joypixels terminus-font scrot grsync git --noconfirm
+	$CHROOT pacman -S \
+					  android-file-transfer bleachbit gimp gcolor3 geany gparted simplescreenrecorder \
+					  thunar thunar-archive-plugin tumbler xarchiver \
+					  ranger htop scrot cmatrix ueberzug viewnior zathura zathura-pdf-poppler neovim \
+					  retroarch retroarch-assets-xmb retroarch-assets-ozone \
+					  pacman-contrib pass xclip playerctl yt-dlp minidlna \
+					  firefox firefox-i18n-es-mx transmission-gtk \
+					  papirus-icon-theme ttf-joypixels terminus-font grsync git \
+					  --noconfirm
 	clear
 	
 center "Instalando Entorno de Escritorio"
@@ -830,7 +838,7 @@ echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}'
 while true; do
 		read -rp "Quieres reiniciar ahora? [s/N]: " sn
 		case $sn in
-			[Ss]* ) reboot;;
+			[Ss]* ) umount -a >/dev/null && reboot;;
 			[Nn]* ) exit;;
 			* ) echo "Error: solo escribe 's' o 'n'";;
 		esac
