@@ -307,6 +307,24 @@ center "Ingresa la informacion Necesaria"
 		fi
 		clear
 	
+center "Entorno de Escritorio?"
+		echo    
+		de_opts=("Bspwm" "Gnome Minimal" "Mate Minimal" "OpenBox" "Plasma Minimal" "XFCE" "Ninguno")
+		PS3="Escoge el entorno de escritorio que deseas instalar (1, 2, 3, 4, 5, 6 o 7): "
+	select opt in "${de_opts[@]}"; do
+		case "$REPLY" in
+			1) DEN='Bspwm';DE='bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';aurbspwm='picom-jonaburg-git polybar xtitle';break;;
+			2) DEN='Gnome Minimal';DE='gnome';DM='gdm';SDM='gdm.service';break;;
+			3) DEN='Mate Minimal';DE='mate';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
+			4) DEN='OpenBox';DE='openbox ttf-dejavu';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
+			5) DEN='Plasma Minimal';DE='plasma-desktop';DM='sddm';SDM='sddm';break;;
+			6) DEN='XFCE';DE='xfce4 xfce4-goodies';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
+			7) DEN='Ninguno';break;;
+			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+		esac
+	done
+	clear
+	
 #----------------------------------------
 #          Info
 #----------------------------------------
@@ -319,11 +337,12 @@ center "Ingresa la informacion Necesaria"
 		echo -e " Hostname:  ${CBL}$HNAME${CNC}"
 		echo -e " CPU:       ${CBL}$cpu_name${CNC}"
 		echo -e " Kernel:    ${CBL}$kernel${CNC}"
+		echo -e " Desktop:   ${CBL}$DEN${CNC}"
     
 		if [ "${YAYH}" = "Si" ]; then
 			echo -e " Yay:       ${CGR}Si${CNC}"
 		else
-			echo -e " Yay:       ${CRE}No${CNC}"
+			echo -e " Yay:       ${CRE}No${CNC} Lo necesitaras si escogiste BSPWM. Aun puedes cancelar y reiniciar el script"
 		fi
 		
 		if [ "${DOTS}" = "Si" ]; then
@@ -563,11 +582,13 @@ center "Installing support for mounting volumes and removable media devices"
 	clear
 	
 center "Installing Apps i use"
-	$CHROOT pacman -S android-file-transfer bleachbit cmatrix dunst gimp gcolor3 geany gparted htop lxappearance minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone bspwm nitrogen pacman-contrib rofi sxhkd pass xclip firefox firefox-i18n-es-mx pavucontrol playerctl xarchiver numlockx polkit-gnome papirus-icon-theme ttf-joypixels terminus-font scrot grsync git --noconfirm
+	$CHROOT pacman -S android-file-transfer bleachbit cmatrix gimp gcolor3 geany gparted htop minidlna neovim thunar thunar-archive-plugin tumbler ranger simplescreenrecorder transmission-gtk ueberzug viewnior yt-dlp zathura zathura-pdf-poppler retroarch retroarch-assets-xmb retroarch-assets-ozone pacman-contrib pass xclip firefox firefox-i18n-es-mx  playerctl xarchiver papirus-icon-theme ttf-joypixels terminus-font scrot grsync git --noconfirm
 	clear
 	
-center "Installing LightDM & Greeter"
-	$CHROOT pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm
+center "Instalando Entorno de Escritorio"
+	$CHROOT pacman -S $DE $DM --noconfirm
+	
+	if $CHROOT pacman -Qi lightdm > /dev/null ; then
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
@@ -582,47 +603,65 @@ screensaver-timeout = 0
 theme-name = Dracula
 font-name = UbuntuMono Nerd Font 11
 EOL
+	fi
+	
 clear
 		
 #----------------------------------------
 #          AUR Packages
 #----------------------------------------
 
-		if [ "${YAYH}" == "Si" ]; then
-		
-center "Installing YAY.. And AUR Packages"
-	sleep 2
-	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
-clear
+	if [ "$DEN" == "Bspwm" ] && [ "${YAYH}" == "Si" ]; then
+		center "Instalando YAY"
+			sleep 2
+				echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
+			clear
+		center "Complementando BSPWM"
+			sleep 2
+				echo "cd && yay -S $aurbspwm --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+			clear
+	elif [ "$DEN" == "Bspwm" ] && [ "${YAYH}" == "No" ]; then
+		center "Complementando BSPWM"
+				echo -e "\n Para instalar Polybar y Picom es necesario YAY.."
+				echo -e" Instalando YAY.."
+			sleep 2
+				echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
+			clear
+		center "Complementando BSPWM"
+				echo "cd && yay -S $aurbspwm --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+			clear
+	elif [ "$DEN" != "Bspwm" ] && [ "${YAYH}" == "Si" ]; then
+		center "Instalando YAY"
+			sleep 2
+				echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
+			clear
+		center "zramswap termite"
+			sleep 2
+				echo "cd && yay -S zramswap termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+			clear
+		center "spotify spotify-adblock mpv popcorn-time"
+			sleep 2
+				echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+			clear
+		center "Whatsapp & Telegram"
+			sleep 2
+				echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+			clear
+		center "Iconos, fuentes & stacer"
+			sleep 2
+				echo "cd && yay -S stacer nerd-fonts-jetbrains-mono nerd-fonts-ubuntu-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+			clear	
+	elif [ "$DEN" != "Bspwm" ] && [ "${YAYH}" != "Si" ]; then
+			break
+fi
 
-
-center "zramswap checkupdates-aur picom-jonaburg-git polybar termite xtitle"
-	sleep 2
-	echo "cd && yay -S zramswap checkupdates-aur picom-jonaburg-git polybar termite xtitle --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-clear
-
-center "spotify spotify-adblock mpv popcorn-time"
-	sleep 2
-	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-clear
-
-center "Whatsapp & Telegram"
-	sleep 2
-	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-clear
-
-center "Iconos fonts & stacer"
-	sleep 2
-	echo "cd && yay -S stacer nerd-fonts-jetbrains-mono nerd-fonts-ubuntu-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-clear
-		fi
 
 #----------------------------------------
 #          Enable Services & other stuff
 #----------------------------------------
 
 center "Actizando Servicios"
-	$CHROOT systemctl enable dhcpcd.service lightdm cpupower systemd-timesyncd.service
+	$CHROOT systemctl enable dhcpcd.service $SDM cpupower systemd-timesyncd.service
 	$CHROOT systemctl enable zramswap
 		
 	cat >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf <<EOL
