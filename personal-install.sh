@@ -318,7 +318,7 @@ center "Creando Formatenado y Montando Particiones"
 	clear
 	
 center "Ingresa la informacion Necesaria"
-	echo
+		echo
 		PS3="Montar almacenamiento compartido con WINDOWS?: "
 	select MPW in "Si" "No"
 		do
@@ -838,7 +838,7 @@ echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}'
 while true; do
 		read -rp "Quieres reiniciar ahora? [s/N]: " sn
 		case $sn in
-			[Ss]* ) umount -a >/dev/null && reboot;;
+			[Ss]* ) umount -a >/dev/null;reboot;;
 			[Nn]* ) exit;;
 			* ) echo "Error: solo escribe 's' o 'n'";;
 		esac
