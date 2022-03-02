@@ -291,7 +291,7 @@ center "Creando Formatenado y Montando Particiones"
 	echo
 	
 	PS3="Escoge la particion raiz que acabas de crear donde Arch Linux se instalara: "
-select drive in $(fdisk -l /dev/"${drive}" | grep Linux | cut -d" " -f1) 
+select partroot in $(fdisk -l /dev/"${drive}" | grep Linux | cut -d" " -f1) 
 	do
 		if [ "$partroot" ]; then
 			break
