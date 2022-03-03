@@ -62,15 +62,16 @@ OK='\n\033[0;32m OK...\033[0m'
 	done
 	
 	# Check CPU model
-		if lscpu | grep -q 'GenuineIntel'; then
+	
+	if lscpu | grep -q 'GenuineIntel'; then
 			cpu_name="Intel"
 			cpu_model="intel-ucode"
 			cpu_atkm="intel_agp i915"
-	else
+		else
 			cpu_name="AMD"
 			cpu_model="amd-ucode"
 			cpu_atkm="amdgpu"
-		fi
+	fi
 	
 #---------
 	
@@ -135,7 +136,7 @@ center "Probando conexion a internet"
 		else
 			echo " Error: Parace que no hay internet.."
 			echo " Saliendo...."
-		exit
+			exit
 	fi
 	
 		
@@ -146,16 +147,16 @@ center "Probando conexion a internet"
 center "Ingresa la informacion Necesaria"    	
 	while true
 		do 
-			read -rp "Ingresa tu usuario: " USR
+				read -rp "Ingresa tu usuario: " USR
 			if [[ "${USR}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
-			then 
-				break
+				then 
+					break
 			fi 
 			echo -e "Incorrecto!! Solo se permiten minusculas.\n"
 		done  
-	
-	while
+		
 			echo
+	while
 			read -rsp "Ingresa tu password: " PASSWD
 			echo
 			read -rsp "Confirma tu password: " CONF_PASSWD
@@ -178,22 +179,23 @@ center "Ingresa la informacion Necesaria"
 		done
 			echo "Password correcto"
 		
-			echo		
+					
 	while true
-		do 
-			read -rp "Ingresa el nombre de tu maquina: " HNAME
+		do
+				echo
+				read -rp "Ingresa el nombre de tu maquina: " HNAME
 			if [[ "${HNAME}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
-			then 
-				break 
+				then 
+					break 
 			fi
 			echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 		done
 		clear
 		
 center "Ingresa la informacion Necesaria"
-		echo    
-		kernel_opts=("Linux (Default)" "Linux LTS" "Linux-Zen")
-		PS3="Escoge el Kernel que usaras (1, 2 o 3): "
+			echo    
+			kernel_opts=("Linux (Default)" "Linux LTS" "Linux-Zen")
+			PS3="Escoge el Kernel que usaras (1, 2 o 3): "
 	select opt in "${kernel_opts[@]}"; do
 		case "$REPLY" in
 			1) kernel='linux';break;;
@@ -203,9 +205,9 @@ center "Ingresa la informacion Necesaria"
 		esac
 	done
 	
-		echo
-		red_options=("DHCPCD" "NetworkManager")
-		PS3="Selecciona cliente para manejar Internet (1 o 2): "
+			echo
+			red_options=("DHCPCD" "NetworkManager")
+			PS3="Selecciona cliente para manejar Internet (1 o 2): "
 	select opt in "${red_options[@]}"; do
 		case "$REPLY" in
 			1) redtitle='DHCPCD';redpack='dhcpcd';esys='dhcpcd.service';break;;
@@ -214,9 +216,9 @@ center "Ingresa la informacion Necesaria"
 		esac
 	done	
 
-		echo
-		audioopts=("PipeWire" "PulseAudio")
-		PS3="Selecciona servidor de Audio (1 o 2): "
+			echo
+			audioopts=("PipeWire" "PulseAudio")
+			PS3="Selecciona servidor de Audio (1 o 2): "
 	select opt in "${audioopts[@]}"; do
 		case "$REPLY" in
 			1) audiotitle='PipeWire';audiopack='pipewire pipewire-pulse pipewire-alsa pipewire-jack';break;;
@@ -225,9 +227,9 @@ center "Ingresa la informacion Necesaria"
 		esac
 	done
 	
-		echo    
-		de_opts=("Bspwm" "Gnome Minimal" "Mate Minimal" "OpenBox" "Plasma Minimal" "XFCE" "Ninguno")
-		PS3="Escoge el entorno de escritorio que deseas instalar (1, 2, 3, 4, 5, 6 o 7): "
+			echo    
+			de_opts=("Bspwm" "Gnome Minimal" "Mate Minimal" "OpenBox" "Plasma Minimal" "XFCE" "Ninguno")
+			PS3="Escoge el entorno de escritorio que deseas instalar (1, 2, 3, 4, 5, 6 o 7): "
 	select opt in "${de_opts[@]}"; do
 		case "$REPLY" in
 			1) DEN='Bspwm';DE='bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';aurbspwm='picom-jonaburg-git polybar xtitle';break;;
@@ -241,8 +243,8 @@ center "Ingresa la informacion Necesaria"
 		esac
 	done
 	
-		echo
-		PS3="Quieres instalar YAY como AUR Helper?: "
+			echo
+			PS3="Quieres instalar YAY como AUR Helper?: "
 	select YAYH in "Si" "No"
 		do
 			if [ $YAYH ]; then
@@ -250,76 +252,72 @@ center "Ingresa la informacion Necesaria"
 			fi
 		done
     
-		echo
-		PS3="Rstaurar mis dotfiles?: "
+			echo
+			PS3="Rstaurar mis dotfiles?: "
 	select DOTS in "Si" "No"
 		do
 			if [ $DOTS ]; then
 				break
 			fi
 		done
-		clear
+			clear
 		
 #----------------------------------------
 #          Select DISK
 #----------------------------------------
 
 center "Creando Formatenado y Montando Particiones"
-	echo -ne "
-	
-	"
-	lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
-	echo "------------------------------"
-	echo
-	PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
-select drive in $(lsblk -nd -e 7,11 -o NAME) 
-	do
-		if [ "$drive" ]; then
-			break
-		fi
-	done
-	clear
+			echo
+			echo
+			lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
+			echo "------------------------------"
+			echo
+			PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
+	select drive in $(lsblk -nd -e 7,11 -o NAME) 
+		do
+			if [ "$drive" ]; then
+				break
+			fi
+		done
+			clear
 
 #----------------------------------------
 #          Creating Partitions
 #----------------------------------------
 
 center "Creando Formatenado y Montando Particiones"
-	cfdisk /dev/"${drive}"
-	echo
-	lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
-	echo
+			cfdisk /dev/"${drive}"
+			echo
+			lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
+			echo
 	
-	while true
-		do 
-			read -rp "Escribe el NUMERO de la particion RAIZ (donde instalaras arch) /dev/${drive}/" partraiz
-			if [[ "${partraiz}" =~ ^[0-9]$ ]]
-			then 
+			PS3="Escoge la particion raiz que acabas de crear donde Arch Linux se instalara: "
+	select partroot in $(fdisk -l /dev/"${drive}" | grep Linux | cut -d" " -f1) 
+		do
+			if [ "$partroot" ]; then
 				break
-			fi 
-			echo -e "Incorrecto, solo escribe el numero e.g. 1\n"
+			fi
 		done
 		  
-	mkfs.ext4 -L Arch /dev/"${drive}"${partraiz}
-	mount /dev/"${drive}"${partraiz} /mnt
-	partroot="$(findmnt -Dn -M /mnt -o SOURCE)"
-	sleep 3
-	echo
+			mkfs.ext4 -L Arch ${partroot}
+			mount ${partroot} /mnt
+			sleep 3
+			echo
 
-	echo " Creando archivo swap, espera.."
-	sleep 2
-	fallocate -l 512M /mnt/swapfile
-	chmod 600 /mnt/swapfile
-	mkswap /mnt/swapfile >/dev/null
-	echo " Montando Swap, espera.."
-	swapon /mnt/swapfile
-	echo -e "${OK}"
-	sleep 2
-	clear
+			echo " Creando archivo swap, espera.."
+			sleep 2
+			fallocate -l 512M /mnt/swapfile
+			chmod 600 /mnt/swapfile
+			mkswap /mnt/swapfile >/dev/null
+			echo " Montando Swap, espera.."
+			swapon /mnt/swapfile
+			echo -e "${OK}"
+			sleep 2
+			clear
 	
 center "Ingresa la informacion Necesaria"
-		echo
-		PS3="Montar almacenamiento compartido con WINDOWS?: "
+			echo
+			PS3="Montar almacenamiento compartido con WINDOWS?: "
 	select MPW in "Si" "No"
 		do
 			if [ $MPW ]; then
@@ -327,7 +325,7 @@ center "Ingresa la informacion Necesaria"
 			fi
 		done
 		
-		if [ "${MPW}" == "Si" ]; then
+	if [ "${MPW}" == "Si" ]; then
 			echo
 			echo
 			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
@@ -336,13 +334,13 @@ center "Ingresa la informacion Necesaria"
 			echo -e "Escoge la particion donde guardas archivos, puede ser o no compartida con Windows, aunque generalmente es la particion donde tienes windows instalado y son del tipo ntfs, escoge con cuidado. esta se montara automaticamente cada que inices Arch Linux."
 			echo
 			PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
-		select ntfspart in $(lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d' | cut -d " " -f 1 | cut -c7-) 
-			do
-				if [ "$ntfspart" ]; then
-					break					
-				fi				
-			done
-		fi
+	select ntfspart in $(fdisk -l | grep NTFS | cut -d" " -f1) 
+		do
+			if [ "$ntfspart" ]; then
+				break					
+			fi				
+		done
+	fi
 		clear
 	
 #----------------------------------------
@@ -361,38 +359,38 @@ center "Ingresa la informacion Necesaria"
 		echo -e " Audio:     ${CBL}$audiotitle${CNC}"
 		echo -e " Desktop:   ${CBL}$DEN${CNC}"
     
-		if [ "${YAYH}" = "Si" ]; then
+	if [ "${YAYH}" = "Si" ]; then
 			echo -e " Yay:       ${CGR}Si${CNC}"
 		else
 			echo -e " Yay:       ${CRE}No${CNC}"
-		fi
+	fi
 		
-		if [ "${DOTS}" = "Si" ]; then
+	if [ "${DOTS}" = "Si" ]; then
 			echo -e " Dotfiles:  ${CGR}Si${CNC}"
 		else
 			echo -e " Dotfiles:  ${CRE}No${CNC}"
-		fi
+	fi
 		
-		if [ "${MPW}" = "Si" ]; then
+	if [ "${MPW}" = "Si" ]; then
 			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${ntfspart}${CNC}${CYE}]${CNC}"
 		else
 			echo -e " Almacenamiento Personal:  ${CRE}No${CNC}"
-		fi
+	fi
 		
-		echo		
-		echo -e " Arch Linux se instalara en el disco ${CYE}[${CNC}${CRE}$drive${CNC}${CYE}]${CNC} en la particion ${CYE}[${CNC}${CBL}${partroot}${CNC}${CYE}]${CNC}"
-    	echo
-		echo
+			echo		
+			echo -e " Arch Linux se instalara en el disco ${CYE}[${CNC}${CRE}$drive${CNC}${CYE}]${CNC} en la particion ${CYE}[${CNC}${CBL}${partroot}${CNC}${CYE}]${CNC}"
+			echo
+			echo
 		
 	while true; do
-		read -rp " Deseas continuar? [s/N]: " sn
+			read -rp " Deseas continuar? [s/N]: " sn
 		case $sn in
 			[Ss]* ) break;;
 			[Nn]* ) exit;;
 			* ) echo " Error: solo necesitas escribir 's' o 'n'";;
 		esac
 	done
-clear
+			clear
 
 
 #----------------------------------------
@@ -413,33 +411,33 @@ center "Instalando sistema base"
 	         zsh
 	echo -e "${OK}"
 	sleep 2
-clear
+	clear
 
 #----------------------------------------
 #          Generating FSTAB
 #----------------------------------------
     
 center "Generando FSTAB"
-	genfstab -U /mnt >> /mnt/etc/fstab
-	echo -e "${OK}"
-	sleep 2
-clear
+		genfstab -U /mnt >> /mnt/etc/fstab
+		echo -e "${OK}"
+		sleep 2
+	clear
 
 #----------------------------------------
 #          Timezone, Lang & Keyboard
 #----------------------------------------
 	
 center "Configurando Timezone y Locales"
-	$CHROOT ln -sf /usr/share/zoneinfo/America/Mexico_City /etc/localtime
-	$CHROOT hwclock --systohc
-	echo
-	sed -i 's/#es_MX.UTF-8/es_MX.UTF-8/' /mnt/etc/locale.gen
-	$CHROOT locale-gen
-	echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
-	echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
-	export LANG=es_MX.UTF-8
-	echo -e "${OK}"
-	sleep 2
+		$CHROOT ln -sf /usr/share/zoneinfo/America/Mexico_City /etc/localtime
+		$CHROOT hwclock --systohc
+		echo
+		sed -i 's/#es_MX.UTF-8/es_MX.UTF-8/' /mnt/etc/locale.gen
+		$CHROOT locale-gen
+		echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
+		echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
+		export LANG=es_MX.UTF-8
+		echo -e "${OK}"
+		sleep 2
 clear
 
 #----------------------------------------
@@ -512,7 +510,7 @@ center "Aplicando optmizaciones.."
     
 	echo -e "\n${CYE}Tunning ext4 file system for SSD and SpeedUp${CNC}"
 	sed -i 's/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
-	$CHROOT tune2fs -O fast_commit "$partroot" >/dev/null
+	$CHROOT tune2fs -O fast_commit "${partroot}" >/dev/null
 	echo -e "${OK}"
 	sleep 2
     
@@ -576,7 +574,7 @@ EOL
     
 	if [ "${MPW}" == "Si" ]; then
 			echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
-			ntfsuuid=$(blkid -o value -s UUID /dev/${ntfspart}) 
+			ntfsuuid=$(blkid -o value -s UUID ${ntfspart}) 
 	cat >> /mnt/etc/fstab <<EOL		
 # My sTuFF
 UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
@@ -630,11 +628,11 @@ center "Instalando apps que yo uso"
 	clear
 	
 center "Instalando Entorno de Escritorio"
-	$CHROOT pacman -S $DE $DM --noconfirm
+		$CHROOT pacman -S $DE $DM --noconfirm
 	
 	if $CHROOT pacman -Qi lightdm >/dev/null 2>&1; then
-	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
-	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
+		sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
+		rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOL
 [greeter]
 icon-theme-name = Qogir-ubuntu
@@ -706,7 +704,7 @@ clear
 #          Enable Services & other stuff
 #----------------------------------------
 
-center "Actizando Servicios"
+center "Activando Servicios"
 	$CHROOT systemctl enable $esys $SDM cpupower systemd-timesyncd.service
 	$CHROOT systemctl enable zramswap
 		
@@ -726,7 +724,7 @@ EOL
 	sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /mnt/etc/sudoers
 	echo -e "${OK}"
 	sleep 2
-clear
+	clear
 
 #----------------------------------------
 #          My DOTFILES
@@ -735,7 +733,7 @@ clear
 	if [ "${DOTS}" == "Si" ]; then
 	
 center "Generating my XORG config files"
-	sleep 2
+		sleep 2
 	cat >> /mnt/etc/X11/xorg.conf.d/20-intel.conf <<EOL		
 Section "Device"
 	Identifier	"Intel Graphics"
@@ -745,7 +743,7 @@ Section "Device"
 	Option		"TearFree"	"true"
 EndSection
 EOL
-	echo -e "${CGR}20-intel.conf${CNC} generated in --> /etc/X11/xorg.conf.d\n"
+		echo -e "${CGR}20-intel.conf${CNC} generated in --> /etc/X11/xorg.conf.d\n"
 		  
 	cat >> /mnt/etc/X11/xorg.conf.d/10-monitor.conf <<EOL
 Section "Monitor"
@@ -764,7 +762,7 @@ Section "ServerLayout"
 	Identifier	"ServerLayout0"
 EndSection
 EOL
-	echo -e "${CGR}10-monitor.conf${CNC} generated in --> /etc/X11/xorg.conf.d\n"
+		echo -e "${CGR}10-monitor.conf${CNC} generated in --> /etc/X11/xorg.conf.d\n"
 		
 	cat >> /mnt/etc/drirc <<EOL
 <driconf>
@@ -778,21 +776,21 @@ EOL
 	
 </driconf>
 EOL
-	echo -e "${CGR}drirc${CNC} generated in --> /etc"
-	sleep 2
-clear
+		echo -e "${CGR}drirc${CNC} generated in --> /etc"
+		sleep 2
+	clear
 
 center "Restaurando mis dotfiles"
-	mkdir /mnt/dots
-	mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
-	echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
-	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
-	$CHROOT rm -rf /home/"$USR"/.themes
-	$CHROOT cp /dots/stuff/zfetch /usr/bin/
-	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
-	echo -e "${OK}"
-	sleep 5
-clear
+		mkdir /mnt/dots
+		mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
+		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
+		$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
+		$CHROOT rm -rf /home/"$USR"/.themes
+		$CHROOT cp /dots/stuff/zfetch /usr/bin/
+		$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
+		echo -e "${OK}"
+		sleep 5
+		clear
 	fi
 
 #----------------------------------------
@@ -835,8 +833,9 @@ echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}'
 		
 		echo
 		echo
-while true; do
-		read -rp "Quieres reiniciar ahora? [s/N]: " sn
+		
+	while true; do
+			read -rp "Quieres reiniciar ahora? [s/N]: " sn
 		case $sn in
 			[Ss]* ) umount -a >/dev/null;reboot;;
 			[Nn]* ) exit;;
