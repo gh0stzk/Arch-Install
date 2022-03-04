@@ -322,12 +322,12 @@ center "Ingresa la informacion Necesaria"
 			echo -e "Escoge la particion donde guardas archivos, puede ser o no compartida con Windows, aunque generalmente es la particion donde tienes windows instalado y son del tipo ntfs, escoge con cuidado. esta se montara automaticamente cada que inices Arch Linux."
 			echo
 			PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
-	select ntfspart in $(fdisk -l | grep NTFS | cut -d" " -f1) 
+	select ntfspart in $(fdisk -l | grep NTFS | cut -d" " -f1) "None"
 		do
-			if [ "$ntfspart" ]; then
+			if [ "$ntfspart" = "None" ]; then
 				break
 			else
-				break					
+				ntfspart="$ntfspart"					
 			fi				
 		done
 	fi
