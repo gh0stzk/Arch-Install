@@ -276,7 +276,7 @@ center "Creando Formatenado y Montando Particiones"
 center "Creando Formatenado y Montando Particiones"
 			cfdisk /dev/"${drive}"
 			echo
-			lsblk -I 8 -o NAME,SIZE,TYPE | grep "${drive}"
+			lsblk -I 8 -o NAME,SIZE,FSTYPE | grep "${drive}"
 			echo
 	
 			PS3="Escoge la particion raiz que acabas de crear donde Arch Linux se instalara: "
@@ -611,7 +611,9 @@ center "Aplicando optmizaciones.."
 	EOL
 	clear
 	cat /mnt/etc/fstab
-	echo "Tu particion compartida NTFS 'WINDOWS' Se cargara automaticamente en cada inicio para que puedas compartir archivos entre Linux y Windows."
+	echo
+	echo
+	echo "${CYE}Tu particion compartida NTFS 'WINDOWS' Se cargara automaticamente en cada inicio para que puedas compartir archivos entre Linux y Windows.${CNC}"
 	sleep 5
 	echo -e "${OK}"
 	sleep 2
@@ -685,7 +687,7 @@ center "Instalando soporte WIFI"
 			$CHROOT pacman -S iwd dialog wpa_supplicant wireless_tools --noconfirm
 		else
 			echo -e "No tienes tarjeta de red WIFI. No se instala.."
-			sleep 2
+			sleep 5
 	fi
 	clear
 		
