@@ -287,7 +287,7 @@ center "Creando Formatenado y Montando Particiones"
 			fi
 		done
 		
-			mkfs.ext4 -L Arch ${partroot}
+			mkfs.ext4 -L Arch "${partroot}"
 			mount ${partroot} /mnt
 			sleep 3
 			echo
@@ -307,6 +307,7 @@ center "Creando Formatenado y Montando Particiones"
 					swapon "${swappart}"
 					echo -e "${OK}"
 					sleep 2
+					break
 				fi
 			done
 		else
