@@ -309,6 +309,9 @@ center "Creando Formatenado y Montando Particiones"
 	
 	if fdisk -l | grep NTFS | cut -d" " -f1 >/dev/null 2>&1; then
 	
+			echo
+			echo
+			echo
 			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
 			echo "------------------------------"
 			echo
@@ -613,7 +616,7 @@ center "Aplicando optmizaciones.."
 	cat /mnt/etc/fstab
 	echo
 	echo
-	echo "${CYE}Tu particion compartida NTFS 'WINDOWS' Se cargara automaticamente en cada inicio para que puedas compartir archivos entre Linux y Windows.${CNC}"
+	echo -e "${CYE}Tu particion compartida NTFS 'WINDOWS' Se cargara automaticamente en cada inicio para que puedas compartir archivos entre Linux y Windows.${CNC}"
 	sleep 5
 	echo -e "${OK}"
 	sleep 2
