@@ -325,6 +325,8 @@ center "Ingresa la informacion Necesaria"
 	select ntfspart in $(fdisk -l | grep NTFS | cut -d" " -f1) 
 		do
 			if [ "$ntfspart" ]; then
+				break
+			else
 				break					
 			fi				
 		done
