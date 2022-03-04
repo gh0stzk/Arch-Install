@@ -427,6 +427,7 @@ center "Instalando sistema base"
 	         linux-firmware \
 	         "$redpack" \
 	         "$cpu_model" \
+	         mkinitcpio \
 	         reflector \
 	         zsh
 	echo -e "${OK}"
