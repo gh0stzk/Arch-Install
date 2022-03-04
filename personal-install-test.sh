@@ -361,6 +361,9 @@ center "Ingresa la informacion Necesaria"
 		elif lspci | grep -qE "Intel Corporation UHD"; then
 			gpu_name="Intel HD"
 			gpu_drivers="mesa libva-intel-driver libvdpau-va-gl vulkan-intel libva-intel-driver libva-utils"
+		elif lspci | grep -qE "Virtio"; then
+			gpu_name="Virtio - Qemu VM"
+			gpu_drivers="xf86-video-vmware"
     fi
 		clear
 	
