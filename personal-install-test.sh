@@ -270,7 +270,7 @@ center "Creando Formatenado y Montando Particiones"
 			clear
 
 #----------------------------------------
-#          Creating Partitions
+#          Creando y Montando particion raiz
 #----------------------------------------
 
 center "Creando Formatenado y Montando Particiones"
@@ -286,21 +286,54 @@ center "Creando Formatenado y Montando Particiones"
 				break
 			fi
 		done
-		  
+		
 			mkfs.ext4 -L Arch ${partroot}
 			mount ${partroot} /mnt
 			sleep 3
 			echo
-
-			echo " Creando archivo swap, espera.."
-			sleep 2
-			fallocate -l 512M /mnt/swapfile
-			chmod 600 /mnt/swapfile
-			mkswap /mnt/swapfile >/dev/null
-			echo " Montando Swap, espera.."
-			swapon /mnt/swapfile
-			echo -e "${OK}"
-			sleep 2
+		
+#----------------------------------------
+#          Creando y Montando SWAP
+#----------------------------------------
+		
+	if fdisk -l | grep -E "Linux swap" | cut -d" " -f1 >/dev/null 2>&1; then
+	
+		select swappart in $(fdisk -l | grep -E "Linux swap" | cut -d" " -f1)
+			do
+				if [ "$swappart" ]; then
+					echo
+					echo " Creando y montando Swap, espera.."
+					mkswap -L SWAP "${swappart}" >/dev/null 2>&1
+					swapon "${swappart}"
+					echo -e "${OK}"
+					sleep 2
+				fi
+			done
+		else
+	
+				echo
+				swap_options=("Swap File" "No Swap")
+				PS3="Al parecer no tienes una particion SWAP. En vez prefieres crear un archivo swap? (1 o 2): "
+		select opt in "${swap_options[@]}"; do
+			case "$REPLY" in
+				1) swapfile='Si';break;;
+				2) swapfile='No';break;;
+				*) echo "Opcion invalida, intenta de nuevo.";continue;;
+			esac
+		done
+	
+			if [ "${swapfile}" = Si ]; then
+					fallocate -l 512M /mnt/swapfile
+					chmod 600 /mnt/swapfile
+					mkswap -L SWAP /mnt/swapfile >/dev/null
+					echo " Montando Swap, espera.."
+					swapon /mnt/swapfile
+					echo -e "${OK}"
+					sleep 2
+				else
+					break
+			fi
+	fi
 			clear
 	
 #----------------------------------------
