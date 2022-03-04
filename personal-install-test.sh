@@ -303,41 +303,40 @@ center "Creando Formatenado y Montando Particiones"
 			sleep 2
 			clear
 	
-center "Ingresa la informacion Necesaria"
-			echo
-			PS3="Montar almacenamiento compartido con WINDOWS?: "
-	select MPW in "Si" "No"
-		do
-			if [ $MPW ]; then
-				break
-			fi
-		done
-		
-	if [ "${MPW}" == "Si" ]; then
-			echo
-			echo
+#----------------------------------------
+#          NTFS partition Select
+#----------------------------------------
+	
+	if fdisk -l | grep NTFS | cut -d" " -f1 >/dev/null 2>&1; then
+	
 			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
 			echo "------------------------------"
 			echo
-			echo -e "Escoge la particion donde guardas archivos, puede ser o no compartida con Windows, aunque generalmente es la particion donde tienes windows instalado y son del tipo ntfs, escoge con cuidado. esta se montara automaticamente cada que inices Arch Linux."
-			echo
-			PS3="Escoge la particion NTFS de tu almacenamiento en WINDOWS: "
-	select ntfspart in $(fdisk -l | grep NTFS | cut -d" " -f1) "None"
-		do
-			if [ "$ntfspart" = "None" ]; then
-				break
-			else
-				ntfspart="$ntfspart"					
-			fi				
-		done
+			PS3="Deseas montar una particion de almacenamiento compartida con WINDOWS, Escogela: "
+		select ntfspart in $(fdisk -l | grep NTFS | cut -d" " -f1) "Ninguna"
+			do
+				if [ "$ntfspart" = "Ninguna" ]; then
+					unset winstorage
+					break
+				else
+					winstorage="$ntfspart"
+					break	
+				fi				
+			done
+		else
+			break
 	fi
+	
+#----------------------------------------
+#          Detectando Hardware
+#----------------------------------------
 	
 	# Detectando tarjeta WiFi
 	if [ "$(lspci -d ::280)" ]; then
 		WIFI=y
 	fi
 	
-	# Check CPU model
+	# Detectando modelo CPU
 	if lscpu | grep -q 'GenuineIntel'; then
 			cpu_name="Intel"
 			cpu_model="intel-ucode"
@@ -349,6 +348,7 @@ center "Ingresa la informacion Necesaria"
 	fi
 	
 	# Detectando graficos
+	
 	if lspci | grep -qE "NVIDIA|GeForce"; then
 			gpu_name="NVIDIA"
 			gpu_drivers="nvidia nvidia-utils nvidia-settings"
@@ -361,8 +361,8 @@ center "Ingresa la informacion Necesaria"
 		elif lspci | grep -qE "Intel Corporation UHD"; then
 			gpu_name="Intel HD"
 			gpu_drivers="mesa libva-intel-driver libvdpau-va-gl vulkan-intel libva-intel-driver libva-utils"
-		elif lspci | grep -qE "Virtio"; then
-			gpu_name="Virtio - Qemu VM"
+		elif lspci | grep -qE "Virtio|VMware"; then
+			gpu_name="Maquina Virtual"
 			gpu_drivers="xf86-video-vmware"
     fi
 		clear
@@ -396,8 +396,8 @@ center "Ingresa la informacion Necesaria"
 			echo -e " Dotfiles:  ${CRE}No${CNC}"
 	fi
 		
-	if [ "${MPW}" = "Si" ]; then
-			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${ntfspart}${CNC}${CYE}]${CNC}"
+	if [ "${winstorage}" ]; then
+			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${winstorage}${CNC}${CYE}]${CNC}"
 		else
 			echo -e " Almacenamiento Personal:  ${CRE}No${CNC}"
 	fi
@@ -602,7 +602,7 @@ center "Aplicando optmizaciones.."
 	echo -e "${OK}"
 	sleep 2
     
-	if [ "${MPW}" == "Si" ]; then
+	if [ "${winstorage}" ]; then
 	echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
 	ntfsuuid=$(blkid -o value -s UUID ${ntfspart}) 
 	cat >> /mnt/etc/fstab <<- EOL		
