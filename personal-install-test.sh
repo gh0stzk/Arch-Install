@@ -295,15 +295,15 @@ center "Creando Formatenado y Montando Particiones"
 #          Creando y Montando SWAP
 #----------------------------------------
 		
-	if fdisk -l | grep -E "swap" | cut -d" " -f1 >/dev/null 2>&1; then
+	if [ fdisk -l | grep -E "swap" | cut -d" " -f1 == 0 ]>/dev/null 2>&1; then
 	
 			PS3="Escoge la particion SWAP: "
-		select swappart in $(fdisk -l | grep -E "Linux swap" | cut -d" " -f1)
+		select swappart in $(fdisk -l | grep -E "swap" | cut -d" " -f1)
 			do
 				if [ "$swappart" ]; then
 					echo
 					echo " Creando y montando Swap, espera.."
-					mkswap -L SWAP "${swappart}" >#/dev/null 2>&1
+					mkswap -L SWAP "${swappart}" #>/dev/null 2>&1
 					swapon "${swappart}"
 					echo -e "${OK}"
 					sleep 2
