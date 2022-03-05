@@ -284,7 +284,7 @@ center "Creando Formatenado y Montando Particiones"
 		do
 			if [ "$partroot" ]; then
 				mkfs.ext4 -L Arch "${partroot}"
-				mount ${partroot} /mnt
+				mount "${partroot}" /mnt
 				sleep 3
 				echo
 				break
@@ -332,21 +332,14 @@ center "Creando Formatenado y Montando Particiones"
 #          NTFS partition Select
 #----------------------------------------
 	
-			echo
-			echo
-			echo
-			lsblk -o +FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
+center "Particion NTFS de Windows para compartir almacenamiento"
+			lsblk -o NAME,SIZE,FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
 			echo "------------------------------"
 			echo
 			PS3="Deseas montar una particion de almacenamiento compartida con WINDOWS, Escogela: "
 		select ntfspart in $(fdisk -l | grep NTFS | cut -d" " -f1) "Ninguna"
 			do
 				if [ "$ntfspart" ]; then
-					winstorage="$ntfspart"
-					break	
-					
-				elif [ "$ntfspart" = "Ninguna" ]; then
-					unset winstorage
 					break	
 				fi				
 			done
@@ -631,10 +624,10 @@ center "Aplicando optmizaciones.."
 			
 	elif [ "${ntfspart}" ]; then
 		echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
-		ntfsuuid=$(blkid -o value -s UUID ${winstorage}) 
+		ntfsuuid=$(blkid -o value -s UUID "${ntfspart}") 
 		cat >> /mnt/etc/fstab <<- EOL		
 		# My sTuFF
-		UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
+		UUID="${ntfsuuid}"		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
 		EOL
 		clear
 		cat /mnt/etc/fstab
