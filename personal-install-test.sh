@@ -889,7 +889,7 @@ echo -e "        /   \          ==========================="
 echo -e "       /^.   \         os       $(source /mnt/etc/os-release && echo "${PRETTY_NAME}")"    
 echo -e "      /  .-.  \        Kernel   $(uname -r)"   
 echo -e "     /  (   ) _\       pkgs     $(arch-chroot /mnt pacman -Q | wc -l)"
-echo -e "    / _.~   ~._^\      ram      $(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/'"${space}"'\2 MB/p')"
+echo -e "    / _.~   ~._^\      ram      $(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/''\2 MB/p')"
 echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}')"
 		
 		echo
