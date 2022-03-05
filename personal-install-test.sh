@@ -295,7 +295,7 @@ center "Creando Formatenado y Montando Particiones"
 #          Creando y Montando SWAP
 #----------------------------------------
 		
-	if [ fdisk -l | grep -E "swap" | cut -d" " -f1 == 0 ]>/dev/null 2>&1; then
+	if fdisk -l | grep -E "swap" | cut -d" " -f1; then
 	
 			PS3="Escoge la particion SWAP: "
 		select swappart in $(fdisk -l | grep -E "swap" | cut -d" " -f1)
@@ -309,8 +309,7 @@ center "Creando Formatenado y Montando Particiones"
 					sleep 2
 				fi
 			done
-		elif
-	
+		elif	
 				echo
 				swap_options=("Swap File" "No Swap")
 				PS3="Al parecer no tienes una particion SWAP. En vez prefieres crear un archivo swap? (1 o 2): "
