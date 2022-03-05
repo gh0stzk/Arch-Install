@@ -303,13 +303,13 @@ center "Creando Formatenado y Montando Particiones"
 				if [ "$swappart" ]; then
 					echo
 					echo " Creando y montando Swap, espera.."
-					mkswap -L SWAP "${swappart}" >/dev/null 2>&1
+					mkswap -L SWAP "${swappart}" >#/dev/null 2>&1
 					swapon "${swappart}"
 					echo -e "${OK}"
 					sleep 2
 				fi
 			done
-		else
+		elif
 	
 				echo
 				swap_options=("Swap File" "No Swap")
