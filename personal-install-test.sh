@@ -313,7 +313,7 @@ center "Creando Formatenado y Montando Particiones"
 			done
 	fi
 	
-	if [ "$swappart" != "0" ]; then
+	if [ "$swappart" = "1" ]; then
 				echo
 				swap_options=("Swap File" "No Swap")
 				PS3="Al parecer no tienes una particion SWAP. En vez prefieres crear un archivo swap? (1 o 2): "
