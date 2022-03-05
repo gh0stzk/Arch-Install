@@ -283,20 +283,19 @@ center "Creando Formatenado y Montando Particiones"
 	select partroot in $(fdisk -l /dev/"${drive}" | grep Linux | cut -d" " -f1) 
 		do
 			if [ "$partroot" ]; then
+				mkfs.ext4 -L Arch "${partroot}"
+				mount ${partroot} /mnt
+				sleep 3
+				echo
 				break
 			fi
 		done
-		
-			mkfs.ext4 -L Arch "${partroot}"
-			mount ${partroot} /mnt
-			sleep 3
-			echo
 		
 #----------------------------------------
 #          Creando y Montando SWAP
 #----------------------------------------
 		
-	if fdisk -l | grep -E "Linux swap" | cut -d" " -f1 >/dev/null 2>&1; then
+	if fdisk -l | grep -E "swap" | cut -d" " -f1 >/dev/null 2>&1; then
 	
 		select swappart in $(fdisk -l | grep -E "Linux swap" | cut -d" " -f1)
 			do
