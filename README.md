@@ -72,7 +72,6 @@ Se agregan los parametros al kernel _noibrs noibpb nopti nospectre_v2 nospectre_
 Descarga y ejectuta el script:
 
 ```sh
-curl -L https://is.gd/archinstaller > installer
-chmod +x installer
-sh installer
+curl -LO https://is.gd/arch_gh0st
+sh arch_gh0st
 ```
