@@ -295,37 +295,11 @@ center "Creando Formatenado y Montando Particiones"
 #          Creando y Montando SWAP
 #----------------------------------------
 	
-	swappart="$(fdisk -l | grep -E "swap" | cut -d" " -f1)"
-	if [ "$swappart" = "0" ]; then
-	
 			PS3="Escoge la particion SWAP: "
-		select swappart in $(fdisk -l | grep -E "swap" | cut -d" " -f1)
+		select swappart in $(fdisk -l | grep -E "swap / Solaris" | cut -d" " -f1) "No quiero swap" "Crear archivo swap"
 			do
-				if [ "$swappart" ]; then
-					echo
-					echo " Creando y montando Swap, espera.."
-					mkswap -L SWAP "${swappart}" #>/dev/null 2>&1
-					swapon "${swappart}"
-					echo -e "${OK}"
-					sleep 2
-					break
-				fi
-			done
-	fi
-	
-	if [ "$swappart" = "1" ]; then
-				echo
-				swap_options=("Swap File" "No Swap")
-				PS3="Al parecer no tienes una particion SWAP. En vez prefieres crear un archivo swap? (1 o 2): "
-		select opt in "${swap_options[@]}"; do
-			case "$REPLY" in
-				1) swapfile='Si';break;;
-				2) swapfile='No';break;;
-				*) echo "Opcion invalida, intenta de nuevo.";continue;;
-			esac
-		done
-	
-			if [ "${swapfile}" = Si ]; then
+				if [ "$swappart" = "Crear archivo swap" ]; then
+				
 					echo "Creando archivo swap.."
 					fallocate -l 512M /mnt/swapfile
 					chmod 600 /mnt/swapfile
@@ -334,10 +308,24 @@ center "Creando Formatenado y Montando Particiones"
 					swapon /mnt/swapfile
 					echo -e "${OK}"
 					sleep 2
-				else
 					break
-			fi
-	fi
+					
+				elif [ "$swappart" = "No quiero swap" ]; then
+					
+					break
+					
+				elif [ "$swappart" ]; then
+				
+					echo
+					echo " Creando y montando Swap, espera.."
+					mkswap -L SWAP "${swappart}" >/dev/null 2>&1
+					swapon "${swappart}"
+					echo -e "${OK}"
+					sleep 2
+					break
+				fi
+			done
+	
 			clear
 	
 #----------------------------------------
