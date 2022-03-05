@@ -623,10 +623,10 @@ center "Aplicando optmizaciones.."
 	if [ "${ntfspart}" != "Ninguna" ]; then
 		echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
 		ntfsuuid=$(blkid -o value -s UUID "${ntfspart}") 
-		cat >> /mnt/etc/fstab <<- EOL		
-		# My sTuFF
-		UUID="${ntfsuuid}"		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
-		EOL
+		cat >> /mnt/etc/fstab <<EOL		
+# My sTuFF
+UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
+EOL
 		clear
 		cat /mnt/etc/fstab
 		echo
