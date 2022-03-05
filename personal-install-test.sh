@@ -619,10 +619,8 @@ center "Aplicando optmizaciones.."
 	echo -e "${OK}"
 	sleep 2
     
-	if [ "${ntfspart}" = "Ninguna" ]; then
-		break
 			
-	elif [ "${ntfspart}" ]; then
+	if [ "${ntfspart}" != "Ninguna" ]; then
 		echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
 		ntfsuuid=$(blkid -o value -s UUID "${ntfspart}") 
 		cat >> /mnt/etc/fstab <<- EOL		
