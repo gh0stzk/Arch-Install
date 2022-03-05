@@ -307,7 +307,6 @@ center "Creando Formatenado y Montando Particiones"
 					swapon "${swappart}"
 					echo -e "${OK}"
 					sleep 2
-					break
 				fi
 			done
 		else
