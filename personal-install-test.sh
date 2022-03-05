@@ -413,7 +413,7 @@ center "Particion NTFS de Windows para compartir almacenamiento"
 			echo -e " Dotfiles:  ${CRE}No${CNC}"
 	fi
 		
-	if [ "${winstorage}" ]; then
+	if [ "${ntfspart}" != "Ninguna" ]; then
 			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${winstorage}${CNC}${CYE}]${CNC}"
 		else
 			echo -e " Almacenamiento Personal:  ${CRE}No${CNC}"
