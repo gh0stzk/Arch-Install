@@ -632,7 +632,7 @@ center "Aplicando optmizaciones.."
     
 	if [ "${winstorage}" ]; then
 	echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
-	ntfsuuid=$(blkid -o value -s UUID ${ntfspart}) 
+	ntfsuuid=$(blkid -o value -s UUID ${winstorage}) 
 	cat >> /mnt/etc/fstab <<- EOL		
 		# My sTuFF
 		UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
