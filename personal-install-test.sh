@@ -309,7 +309,9 @@ center "Creando Formatenado y Montando Particiones"
 					sleep 2
 				fi
 			done
-		elif	
+	fi
+	
+	if [ "$(fdisk -l | grep -E "swap" | cut -d" " -f1)" = "1" ]; then
 				echo
 				swap_options=("Swap File" "No Swap")
 				PS3="Al parecer no tienes una particion SWAP. En vez prefieres crear un archivo swap? (1 o 2): "
@@ -322,6 +324,7 @@ center "Creando Formatenado y Montando Particiones"
 		done
 	
 			if [ "${swapfile}" = Si ]; then
+					echo "Creando archivo swap.."
 					fallocate -l 512M /mnt/swapfile
 					chmod 600 /mnt/swapfile
 					mkswap -L SWAP /mnt/swapfile >/dev/null
