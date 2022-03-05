@@ -297,6 +297,7 @@ center "Creando Formatenado y Montando Particiones"
 		
 	if fdisk -l | grep -E "swap" | cut -d" " -f1 >/dev/null 2>&1; then
 	
+			PS3="Escoge la particion SWAP: "
 		select swappart in $(fdisk -l | grep -E "Linux swap" | cut -d" " -f1)
 			do
 				if [ "$swappart" ]; then
