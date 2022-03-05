@@ -332,8 +332,6 @@ center "Creando Formatenado y Montando Particiones"
 #          NTFS partition Select
 #----------------------------------------
 	
-	if fdisk -l | grep NTFS | cut -d" " -f1 >/dev/null 2>&1; then
-	
 			echo
 			echo
 			echo
@@ -343,17 +341,15 @@ center "Creando Formatenado y Montando Particiones"
 			PS3="Deseas montar una particion de almacenamiento compartida con WINDOWS, Escogela: "
 		select ntfspart in $(fdisk -l | grep NTFS | cut -d" " -f1) "Ninguna"
 			do
-				if [ "$ntfspart" = "Ninguna" ]; then
-					unset winstorage
-					break
-				else
+				if [ "$ntfspart" ]; then
 					winstorage="$ntfspart"
+					break	
+					
+				elif [ "$ntfspart" = "Ninguna" ]; then
+					unset winstorage
 					break	
 				fi				
 			done
-		else
-			break
-	fi
 	
 #----------------------------------------
 #          Detectando Hardware
@@ -630,21 +626,24 @@ center "Aplicando optmizaciones.."
 	echo -e "${OK}"
 	sleep 2
     
-	if [ "${winstorage}" ]; then
-	echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
-	ntfsuuid=$(blkid -o value -s UUID ${winstorage}) 
-	cat >> /mnt/etc/fstab <<- EOL		
+	if [ "${ntfspart}" = "Ninguna" ]; then
+		break
+			
+	elif [ "${ntfspart}" ]; then
+		echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
+		ntfsuuid=$(blkid -o value -s UUID ${winstorage}) 
+		cat >> /mnt/etc/fstab <<- EOL		
 		# My sTuFF
 		UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
-	EOL
-	clear
-	cat /mnt/etc/fstab
-	echo
-	echo
-	echo -e "${CYE}Tu particion compartida NTFS 'WINDOWS' Se cargara automaticamente en cada inicio para que puedas compartir archivos entre Linux y Windows.${CNC}"
-	sleep 5
-	echo -e "${OK}"
-	sleep 2
+		EOL
+		clear
+		cat /mnt/etc/fstab
+		echo
+		echo
+		echo -e "${CYE}Tu particion compartida NTFS 'WINDOWS' Se cargara automaticamente en cada inicio para que puedas compartir archivos entre Linux y Windows.${CNC}"
+		sleep 5
+		echo -e "${OK}"
+		sleep 2
 	fi
 	
 	clear
