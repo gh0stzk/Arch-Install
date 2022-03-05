@@ -220,7 +220,7 @@ center "Ingresa la informacion Necesaria"
 			PS3="Escoge el entorno de escritorio que deseas instalar (1, 2, 3, 4, 5, 6 o 7): "
 	select opt in "${de_opts[@]}"; do
 		case "$REPLY" in
-			1) DEN='Bspwm';DE='bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';aurbspwm='picom-jonaburg-git polybar xtitle';break;;
+			1) DEN='Bspwm';DE='bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';aurbspwm='picom-jonaburg-fix polybar xtitle';break;;
 			2) DEN='Gnome Minimal';DE='gnome';DM='gdm';SDM='gdm.service';break;;
 			3) DEN='Mate Minimal';DE='mate';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
 			4) DEN='OpenBox';DE='openbox ttf-dejavu';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
