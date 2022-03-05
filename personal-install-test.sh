@@ -414,7 +414,7 @@ center "Particion NTFS de Windows para compartir almacenamiento"
 	fi
 		
 	if [ "${ntfspart}" != "Ninguna" ]; then
-			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${winstorage}${CNC}${CYE}]${CNC}"
+			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${ntfspart}${CNC}${CYE}]${CNC}"
 		else
 			echo -e " Almacenamiento Personal:  ${CRE}No${CNC}"
 	fi
