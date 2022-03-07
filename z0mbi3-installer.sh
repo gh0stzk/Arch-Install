@@ -127,6 +127,9 @@ center "Probando conexion a internet"
 			exit
 	fi
 	
+	TIZO=$(curl https://ipapi.co/timezone >/dev/null)
+	IDIOMA=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|" >/dev/null)
+
 		
 #----------------------------------------
 #          Getting Information   
@@ -301,7 +304,8 @@ center "Creando Formatenado y Montando Particiones"
 				if [ "$swappart" = "Crear archivo swap" ]; then
 				
 					echo "Creando archivo swap.."
-					fallocate -l 512M /mnt/swapfile
+					sleep 2
+					fallocate -l 2048M /mnt/swapfile
 					chmod 600 /mnt/swapfile
 					mkswap -L SWAP /mnt/swapfile >/dev/null
 					echo " Montando Swap, espera.."
@@ -317,7 +321,8 @@ center "Creando Formatenado y Montando Particiones"
 				elif [ "$swappart" ]; then
 				
 					echo
-					echo " Creando y montando Swap, espera.."
+					echo " Creando y montando particion swap, espera.."
+					sleep 2
 					mkswap -L SWAP "${swappart}" >/dev/null 2>&1
 					swapon "${swappart}"
 					echo -e "${OK}"
@@ -397,6 +402,8 @@ center "Particion NTFS de Windows para compartir almacenamiento"
 		echo -e " CPU:       ${CBL}$cpu_name${CNC}"
 		echo -e " Kernel:    ${CBL}$kernel${CNC}"
 		echo -e " Graficos:  ${CBL}$gpu_name${CNC}"
+		echo -e " Lenguaje:  ${CBL}$IDIOMA${CNC}"
+		echo -e " Timezone:  ${CBL}$TIZO${CNC}"
 		echo -e " Internet:  ${CBL}$redtitle${CNC}"
 		echo -e " Audio:     ${CBL}$audiotitle${CNC}"
 		echo -e " Desktop:   ${CBL}$DEN${CNC}"
@@ -411,6 +418,14 @@ center "Particion NTFS de Windows para compartir almacenamiento"
 			echo -e " Dotfiles:  ${CGR}Si${CNC}"
 		else
 			echo -e " Dotfiles:  ${CRE}No${CNC}"
+	fi
+	
+	if [ "$swappart" = "Crear archivo swap" ]; then
+			echo -e " Swap:      ${CGR}Si${CNC} se crea archivo swap de 2G"
+	elif [ "$swappart" = "No quiero swap" ]; then
+			echo -e " Swap:      ${CRE}No${CNC}"
+	elif [ "$swappart" ]; then
+			echo -e " Swap:      ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${swappart}${CNC}${CYE}]${CNC}"
 	fi
 		
 	if [ "${ntfspart}" != "Ninguna" ]; then
@@ -471,14 +486,14 @@ center "Generando FSTAB"
 #----------------------------------------
 	
 center "Configurando Timezone y Locales"
-		$CHROOT ln -sf /usr/share/zoneinfo/America/Mexico_City /etc/localtime
+		$CHROOT ln -sf /usr/share/zoneinfo/"$TIZO" /etc/localtime
 		$CHROOT hwclock --systohc
 		echo
-		sed -i 's/#es_MX.UTF-8/es_MX.UTF-8/' /mnt/etc/locale.gen
+		sed -i 's/#'"${IDIOMA}"'/'"${IDIOMA}"'/' /mnt/etc/locale.gen
 		$CHROOT locale-gen
-		echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
+		echo "LANG=$IDIOMA" >> /mnt/etc/locale.conf
 		echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
-		export LANG=es_MX.UTF-8
+		export LANG=$IDIOMA
 		echo -e "${OK}"
 		sleep 2
 clear
@@ -776,6 +791,7 @@ Section "InputClass"
 EndSection
 EOL
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
+	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
 	
 #----------------------------------------
 #          Reverting No Pasword Privileges
@@ -848,6 +864,9 @@ center "Restaurando mis dotfiles"
 		$CHROOT rm -rf /home/"$USR"/.themes
 		$CHROOT cp /dots/stuff/zfetch /usr/bin/
 		$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
+		$CHROOT cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/
+		$CHROOT cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/
+		
 		echo -e "${OK}"
 		sleep 5
 		clear
@@ -903,3 +922,8 @@ echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}'
 			* ) echo "Error: solo escribe 's' o 'n'";;
 		esac
 	done
+
+# Agregue info de la swap
+# Agregue comando para ejecutar firefox y generar el perfil y directorios.
+# copy firefox theme to new firefox default dirs created
+# Agregue zona horaria y lenguaje general
