@@ -301,7 +301,8 @@ center "Creando Formatenado y Montando Particiones"
 				if [ "$swappart" = "Crear archivo swap" ]; then
 				
 					echo "Creando archivo swap.."
-					fallocate -l 512M /mnt/swapfile
+					sleep 2
+					fallocate -l 2048M /mnt/swapfile
 					chmod 600 /mnt/swapfile
 					mkswap -L SWAP /mnt/swapfile >/dev/null
 					echo " Montando Swap, espera.."
@@ -317,7 +318,8 @@ center "Creando Formatenado y Montando Particiones"
 				elif [ "$swappart" ]; then
 				
 					echo
-					echo " Creando y montando Swap, espera.."
+					echo " Creando y montando particion swap, espera.."
+					sleep 2
 					mkswap -L SWAP "${swappart}" >/dev/null 2>&1
 					swapon "${swappart}"
 					echo -e "${OK}"
@@ -411,6 +413,14 @@ center "Particion NTFS de Windows para compartir almacenamiento"
 			echo -e " Dotfiles:  ${CGR}Si${CNC}"
 		else
 			echo -e " Dotfiles:  ${CRE}No${CNC}"
+	fi
+	
+	if [ "$swappart" = "Crear archivo swap" ]; then
+			echo -e " Swap:       ${CGR}Si${CNC}, se crea archivo swap de 2G"
+	elif [ "$swappart" = "No quiero swap" ]; then
+			echo -e " Swap:       ${CRE}No${CNC}"
+	elif [ "$swappart" ]; then
+			echo -e " Swap:       ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${swappart}${CNC}${CYE}]${CNC}"
 	fi
 		
 	if [ "${ntfspart}" != "Ninguna" ]; then
@@ -776,6 +786,7 @@ Section "InputClass"
 EndSection
 EOL
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
+	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
 	
 #----------------------------------------
 #          Reverting No Pasword Privileges
@@ -848,6 +859,9 @@ center "Restaurando mis dotfiles"
 		$CHROOT rm -rf /home/"$USR"/.themes
 		$CHROOT cp /dots/stuff/zfetch /usr/bin/
 		$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
+		$CHROOT cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/
+		$CHROOT cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/
+		
 		echo -e "${OK}"
 		sleep 5
 		clear
@@ -903,3 +917,7 @@ echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}'
 			* ) echo "Error: solo escribe 's' o 'n'";;
 		esac
 	done
+
+# Agregue info de la swap
+# Agregue comando para ejecutar firefox y generar el perfil y directorios.
+# copy firefox theme to new firefox default dirs created
