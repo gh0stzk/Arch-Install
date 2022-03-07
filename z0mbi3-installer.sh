@@ -127,8 +127,8 @@ center "Probando conexion a internet"
 			exit
 	fi
 	
-	TIZO=$(curl https://ipapi.co/timezone >/dev/null)
-	IDIOMA=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|" >/dev/null)
+TIZO=$(curl -s https://ipapi.co/timezone)
+IDIOMA=$(curl -s https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
 
 		
 #----------------------------------------
