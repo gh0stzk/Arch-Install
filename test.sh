@@ -7,6 +7,7 @@ pepito="yes"
 			sleep 2
 			clear
 		else
+			sleep 3
 			echo " Error: Parace que no hay internet.."
 				if [ $pepito = "yes" ]; then
 					read -p " Quieres intentar con una red WiFi? [s/n] " qwifi
@@ -19,7 +20,7 @@ pepito="yes"
 						echo
 						iwctl --passphrase "$wifipass" station "$device" connect "$ssid"
 						
-				elif [ $pepito != "yes" ]; then
+					elif echo "$qwifi" | grep -iqF n; then
 						echo -e "${CGR} Saliendo..!!${CNC}"
 						exit 0
 					fi
