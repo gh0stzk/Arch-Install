@@ -11,13 +11,14 @@ pepito="yes"
 				if [ $pepito = "yes" ]; then
 					read -p " Quieres intentar con una red WiFi? [s/n] " qwifi
 					if echo "$qwifi" | grep -iqF s; then
-                device=$(ip link | grep "wl"* | grep -o -P "(?= ).*(?=:)" | sed -e "s/^[[:space:]]*//" | cut -d$'\n' -f 1)
-                printf "\nUsando WiFi...\n"
-                read -p " SSID: " ssid
-                read -rsp " WiFi Password: " wifipass
-                iwctl --passphrase "$wifipass" station "$device" connect "$ssid"
+						rfkill unblock all
+						device=$(ip link | grep "wl"* | grep -o -P "(?= ).*(?=:)" | sed -e "s/^[[:space:]]*//" | cut -d$'\n' -f 1)
+						printf "\nUsando WiFi...\n"
+						read -p " SSID: " ssid
+						read -rsp " WiFi Password: " wifipass
+						iwctl --passphrase "$wifipass" station "$device" connect "$ssid"
 			else
-                echo -e "${CGR} Saliendo..!!${CNC}"
+						echo -e "${CGR} Saliendo..!!${CNC}"
                 exit 0
 					fi
 				fi
