@@ -14,12 +14,14 @@ pepito="yes"
 						rfkill unblock all
 						device=$(ip link | grep "wl"* | grep -o -P "(?= ).*(?=:)" | sed -e "s/^[[:space:]]*//" | cut -d$'\n' -f 1)
 						printf "\nUsando WiFi...\n"
-						read -p " SSID: " ssid
+						read -p " Nombre de tu red 'SSID': " ssid
 						read -rsp " WiFi Password: " wifipass
+						echo
 						iwctl --passphrase "$wifipass" station "$device" connect "$ssid"
-			else
+						
+				elif [ $pepito != "yes" ]; then
 						echo -e "${CGR} Saliendo..!!${CNC}"
-                exit 0
+						exit 0
 					fi
 				fi
 				
