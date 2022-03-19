@@ -124,13 +124,9 @@ center "Probando conexion a internet"
 		else
 			echo " Error: Parace que no hay internet.."
 			echo " Saliendo...."
-			exit
+			exit 0
 	fi
-	
-TIZO=$(curl -s https://ipapi.co/timezone)
-IDIOMA=$(curl -s https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
 
-		
 #----------------------------------------
 #          Getting Information   
 #----------------------------------------
@@ -486,14 +482,17 @@ center "Generando FSTAB"
 #----------------------------------------
 	
 center "Configurando Timezone y Locales"
-		$CHROOT ln -sf /usr/share/zoneinfo/"$TIZO" /etc/localtime
+		tizo=$(curl -s https://ipapi.co/timezone)
+		idiomains=$(curl -s https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
+		
+		$CHROOT ln -sf /usr/share/zoneinfo/"$tizo" /etc/localtime
 		$CHROOT hwclock --systohc
 		echo
-		sed -i 's/#'"${IDIOMA}"'/'"${IDIOMA}"'/' /mnt/etc/locale.gen
+		sed -i 's/#'"${idiomains}"'/'"${idiomains}"'/' /mnt/etc/locale.gen
 		$CHROOT locale-gen
-		echo "LANG=$IDIOMA" >> /mnt/etc/locale.conf
+		echo "LANG=$idiomains" >> /mnt/etc/locale.conf
 		echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
-		export LANG=$IDIOMA
+		export LANG=$idiomains
 		echo -e "${OK}"
 		sleep 2
 clear
