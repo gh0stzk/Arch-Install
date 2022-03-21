@@ -8,6 +8,8 @@
 clear
 loadkeys la-latin1
 setfont ter-v18n
+tizo=$(curl -s https://ipapi.co/timezone)
+idiomains=$(curl -s https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
 
 CRE='\033[0;31m'
 CYE='\033[0;33m'
@@ -21,10 +23,10 @@ OK='\n\033[0;32m OK...\033[0m'
 #          Logo z0mbi3              
 #----------------------------------------
 
-    clear
-	echo
-	echo
-	echo 
+logo () {
+	
+	local text="${1:?}"
+	echo -e "\n\n                                  "
 	echo "                      %%%                "
 	echo "               %%%%%//%%%%%              "
 	echo "             %%************%%%           "
@@ -42,9 +44,9 @@ OK='\n\033[0;32m OK...\033[0m'
     echo "                  &&//@@@**              "
     echo "                    ..***                "
     echo "                         z0mbi3 Script   "
-    echo -e "${CGR}\n\n\n   Cargando...${CNC}"
-    sleep 5
-    clear
+    echo -e "\n"
+    printf " $CYE$text$CNC\n\n"
+}
 
 #----------------------------------------
 #          Check  BIOS CPU And Graphics
@@ -53,7 +55,7 @@ OK='\n\033[0;32m OK...\033[0m'
 	while true
 	do
 	    if [ -d /sys/firmware/efi/efivars ]; then
-        echo "This script only works with BIOS/MBR.."
+        echo "este escript solo funciona para sistemas BIOS/MBR.."
         sleep 2
 			exit
 		else
@@ -61,60 +63,11 @@ OK='\n\033[0;32m OK...\033[0m'
 		fi
 	done
 	
-#---------
-	
-center()
-{
-
-    local terminal_width=$(tput cols)     # query the Terminfo database: number of columns
-    local text="${1:?}"                   # text to center
-    local glyph="${2:-=}"                 # glyph to compose the border
-    local padding="${3:-2}"               # spacing around the text
-
-    local text_width=${#text}             
-
-    local border_width=$(( (terminal_width - (padding * 2) - text_width) / 2 ))
-
-    local border=                         # shape of the border
-
-    # create the border (left side or right side)
-    for ((i=0; i<border_width; i++))
-    do
-        border+="${glyph}"
-    done
-
-    # a side of the border may be longer (e.g. the right border)
-    if (( ( terminal_width - ( padding * 2 ) - text_width ) % 2 == 0 ))
-    then
-        # the left and right borders have the same width
-        local left_border=$border
-        local right_border=$left_border
-    else
-        # the right border has one more character than the left border
-        # the text is aligned leftmost
-        local left_border=$border
-        local right_border="${border}${glyph}"
-    fi
-
-    # space between the text and borders
-    local spacing=
-
-    for ((i=0; i<$padding; i++))
-    do
-        spacing+=" "
-    done
-
-    # displays the text in the center of the screen, surrounded by borders.
-    printf "${left_border}${spacing}${CYE}${text}${CNC}${spacing}${right_border}\n\n"
-}
-	#center "Example text" "~"
-	#center "Example text" "=" 6
-	
 #----------------------------------------
 #          Testing Internet
 #----------------------------------------
 
-center "Probando conexion a internet"
+logo "Checndo conexion a internet.."
 	if ping archlinux.org -c 1 >/dev/null 2>&1; then
 			echo -e " Espera....\n"
 			sleep 3
@@ -131,7 +84,7 @@ center "Probando conexion a internet"
 #          Getting Information   
 #----------------------------------------
 
-center "Ingresa la informacion Necesaria"    	
+logo "Ingresa la informacion Necesaria"    	
 	while true
 		do 
 				read -rp "Ingresa tu usuario: " USR
@@ -179,7 +132,7 @@ center "Ingresa la informacion Necesaria"
 		done
 		clear
 		
-center "Ingresa la informacion Necesaria"
+logo "Ingresa la informacion Necesaria"
 			echo    
 			kernel_opts=("Linux (Default)" "Linux LTS" "Linux-Zen")
 			PS3="Escoge el Kernel que usaras (1, 2 o 3): "
@@ -253,7 +206,7 @@ center "Ingresa la informacion Necesaria"
 #          Select DISK
 #----------------------------------------
 
-center "Creando Formatenado y Montando Particiones"
+logo "Creando Formatenado y Montando Particiones"
 			echo
 			echo
 			lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
@@ -272,7 +225,7 @@ center "Creando Formatenado y Montando Particiones"
 #          Creando y Montando particion raiz
 #----------------------------------------
 
-center "Creando Formatenado y Montando Particiones"
+logo "Creando Formatenado y Montando Particiones"
 			cfdisk /dev/"${drive}"
 			echo
 			lsblk -I 8 -o NAME,SIZE,FSTYPE | grep "${drive}"
@@ -333,7 +286,7 @@ center "Creando Formatenado y Montando Particiones"
 #          NTFS partition Select
 #----------------------------------------
 	
-center "Particion NTFS de Windows para compartir almacenamiento"
+logo "Particion NTFS de Windows para compartir almacenamiento"
 			lsblk -o NAME,SIZE,FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
 			echo "------------------------------"
 			echo
@@ -398,8 +351,8 @@ center "Particion NTFS de Windows para compartir almacenamiento"
 		echo -e " CPU:       ${CBL}$cpu_name${CNC}"
 		echo -e " Kernel:    ${CBL}$kernel${CNC}"
 		echo -e " Graficos:  ${CBL}$gpu_name${CNC}"
-		echo -e " Lenguaje:  ${CBL}$IDIOMA${CNC}"
-		echo -e " Timezone:  ${CBL}$TIZO${CNC}"
+		echo -e " Lenguaje:  ${CBL}$idiomains${CNC}"
+		echo -e " Timezone:  ${CBL}$tizo${CNC}"
 		echo -e " Internet:  ${CBL}$redtitle${CNC}"
 		echo -e " Audio:     ${CBL}$audiotitle${CNC}"
 		echo -e " Desktop:   ${CBL}$DEN${CNC}"
@@ -450,7 +403,7 @@ center "Particion NTFS de Windows para compartir almacenamiento"
 #          Pacstrap base system
 #----------------------------------------
 
-center "Instalando sistema base"
+logo "Instalando sistema base"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 	pacstrap /mnt \
@@ -471,7 +424,7 @@ center "Instalando sistema base"
 #          Generating FSTAB
 #----------------------------------------
     
-center "Generando FSTAB"
+logo "Generando FSTAB"
 		genfstab -U /mnt >> /mnt/etc/fstab
 		echo -e "${OK}"
 		sleep 2
@@ -481,9 +434,7 @@ center "Generando FSTAB"
 #          Timezone, Lang & Keyboard
 #----------------------------------------
 	
-center "Configurando Timezone y Locales"
-		tizo=$(curl -s https://ipapi.co/timezone)
-		idiomains=$(curl -s https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
+logo "Configurando Timezone y Locales"
 		
 		$CHROOT ln -sf /usr/share/zoneinfo/"$tizo" /etc/localtime
 		$CHROOT hwclock --systohc
@@ -501,7 +452,7 @@ clear
 #          Hostname & Hosts
 #----------------------------------------
 
-center "Configurando Internet"
+logo "Configurando Internet"
 	echo "${HNAME}" >> /mnt/etc/hostname
 	cat >> /mnt/etc/hosts <<- EOL		
 		127.0.0.1   localhost
@@ -516,7 +467,7 @@ clear
 #          Users & Passwords
 #----------------------------------------
     
-center "Usuario Y Passwords"
+logo "Usuario Y Passwords"
 	echo "root:$PASSWDR" | $CHROOT chpasswd
 	$CHROOT useradd -m -g users -G wheel -s /usr/bin/zsh "${USR}"
 	echo "$USR:$PASSWD" | $CHROOT chpasswd
@@ -531,7 +482,7 @@ clear
 #          Refreshing Mirrors
 #----------------------------------------
 
-center "Refrescando mirros en la nueva Instalacion"
+logo "Refrescando mirros en la nueva Instalacion"
 	$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
 	$CHROOT pacman -Syy
 	echo -e "${OK}"
@@ -542,7 +493,7 @@ clear
 #          Install GRUB
 #----------------------------------------
 
-center "Instalando GRUB"
+logo "Instalando GRUB"
 	$CHROOT pacman -S grub os-prober ntfs-3g --noconfirm >/dev/null
 	$CHROOT grub-install --target=i386-pc /dev/"$drive"
 	echo
@@ -558,7 +509,7 @@ clear
 #          Optimizations
 #----------------------------------------
 
-center "Aplicando optmizaciones.."
+logo "Aplicando optmizaciones.."
 
 	echo -e "${CYE}Enchulando pacman${CNC}"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /mnt/etc/pacman.conf
@@ -657,7 +608,7 @@ center "Aplicando optmizaciones.."
 #          Installing Packages
 #----------------------------------------
 
-center "Instalando Audio & Video"	
+logo "Instalando Audio & Video"	
 	$CHROOT pacman -S \
 					  xorg-server $gpu_drivers \
 					  xorg-xinput xorg-xsetroot \
@@ -665,7 +616,7 @@ center "Instalando Audio & Video"
 					  --noconfirm
 	clear
 	
-center "Instalando codecs multimedia y utilidades"
+logo "Instalando codecs multimedia y utilidades"
 	$CHROOT pacman -S \
                       ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl \
                       jasper openjpeg2 libwebp webp-pixbuf-loader \
@@ -673,7 +624,7 @@ center "Instalando codecs multimedia y utilidades"
                       --noconfirm
 	clear
 	
-center "Instalando soporte para montar volumenes y dispositivos multimedia extraibles"
+logo "Instalando soporte para montar volumenes y dispositivos multimedia extraibles"
 	$CHROOT pacman -S \
 					  libmtp gvfs-nfs gvfs gvfs-mtp \
 					  dosfstools usbutils net-tools \
@@ -681,7 +632,7 @@ center "Instalando soporte para montar volumenes y dispositivos multimedia extra
 					  --noconfirm
 	clear
 	
-center "Instalando apps que yo uso"
+logo "Instalando apps que yo uso"
 	$CHROOT pacman -S \
 					  android-file-transfer bleachbit gimp gcolor3 geany gparted simplescreenrecorder \
 					  thunar thunar-archive-plugin tumbler xarchiver \
@@ -693,7 +644,7 @@ center "Instalando apps que yo uso"
 					  --noconfirm
 	clear
 	
-center "Instalando Entorno de Escritorio"
+logo "Instalando Entorno de Escritorio"
 		$CHROOT pacman -S $DE $DM --noconfirm
 	
 	if $CHROOT pacman -Qi lightdm >/dev/null 2>&1; then
@@ -714,7 +665,7 @@ center "Instalando Entorno de Escritorio"
 	fi
 	clear
 	
-center "Instalando soporte WIFI"
+logo "Instalando soporte WIFI"
 	if [ "$WIFI" = "y" ]; then
 			$CHROOT pacman -S iwd dialog wpa_supplicant wireless_tools --noconfirm
 		else
@@ -729,7 +680,7 @@ center "Instalando soporte WIFI"
 
 	if [ "${YAYH}" == "Si" ]; then
 
-		center "Instalando YAY"
+		logo "Instalando YAY"
 			sleep 2
 				echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 			clear
@@ -738,17 +689,17 @@ center "Instalando soporte WIFI"
 	if [ "$DEN" == "Bspwm" ]; then
 	
 		if $CHROOT pacman -Qi yay >/dev/null 2>&1; then
-			center "Complementando BSPWM"
+			logo "Complementando BSPWM"
 				echo "cd && yay -S $aurbspwm --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
 		else
-			center "Necesitas YAY para complemetar BSPWM"
+			logo "Necesitas YAY para complemetar BSPWM"
 				echo -e "\n Para instalar Polybar y Picom es necesario YAY.."
 				echo -e " Instalando YAY.."
 			sleep 2
 				echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 			clear
-		center "Complementando BSPWM"
+		logo "Complementando BSPWM"
 				echo "cd && yay -S $aurbspwm --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
 		fi
@@ -756,19 +707,19 @@ center "Instalando soporte WIFI"
 		
 	if [ "${YAYH}" == "Si" ]; then
 
-		center "zramswap termite"
+		logo "zramswap termite"
 			sleep 2
 				echo "cd && yay -S zramswap termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
-		center "spotify spotify-adblock mpv popcorn-time"
+		logo "spotify spotify-adblock mpv popcorn-time"
 			sleep 2
 				echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
-		center "Whatsapp & Telegram"
+		logo "Whatsapp & Telegram"
 			sleep 2
 				echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
-		center "Iconos, fuentes & stacer"
+		logo "Iconos, fuentes & stacer"
 			sleep 2
 				echo "cd && yay -S stacer nerd-fonts-jetbrains-mono nerd-fonts-ubuntu-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
@@ -778,7 +729,7 @@ center "Instalando soporte WIFI"
 #          Enable Services & other stuff
 #----------------------------------------
 
-center "Activando Servicios"
+logo "Activando Servicios"
 	$CHROOT systemctl enable $esys $SDM cpupower systemd-timesyncd.service
 	$CHROOT systemctl enable zramswap
 		
@@ -807,7 +758,7 @@ EOL
 
 	if [ "${DOTS}" == "Si" ]; then
 	
-center "Generating my XORG config files"
+logo "Generating my XORG config files"
 		sleep 2
 	cat >> /mnt/etc/X11/xorg.conf.d/20-intel.conf <<EOL		
 Section "Device"
@@ -855,7 +806,7 @@ EOL
 		sleep 2
 	clear
 
-center "Restaurando mis dotfiles"
+logo "Restaurando mis dotfiles"
 		mkdir /mnt/dots
 		mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
 		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
@@ -875,7 +826,7 @@ center "Restaurando mis dotfiles"
 #          Cleaning Garbage
 #----------------------------------------
 
-center "Limpiando sistema para su primer arranque"
+logo "Limpiando sistema para su primer arranque"
 	sleep 2
 	rm -rf /mnt/home/"$USR"/.cache/yay/
 	rm -rf /mnt/home/"$USR"/.cache/electron/
@@ -899,7 +850,7 @@ clear
 #                Bye
 #----------------------------------------
 
-center "Instalacion Finalizada"
+logo "Instalacion Finalizada"
 
 echo -e "          .            "
 echo -e "         / \           I use Arch BTW.."
