@@ -6,10 +6,9 @@
 #----------------------------------------
 
 clear
-loadkeys la-latin1
 setfont ter-v18n
-tizo=$(curl -s https://ipapi.co/timezone)
-idiomains=$(curl -s https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
+#tizo=$(curl -s https://ipapi.co/timezone)
+#idiomains=$(curl -s https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
 
 CRE='\033[0;31m'
 CYE='\033[0;33m'
@@ -17,7 +16,11 @@ CGR='\033[0;32m'
 CBL='\033[0;94m'
 CNC='\033[0m'
 CHROOT="arch-chroot /mnt"
-OK='\n\033[0;32m OK...\033[0m'
+
+okie() {
+	printf "\033[1;92m OK...\033[0m\n"
+	sleep 2
+}
 
 #----------------------------------------
 #          Logo z0mbi3              
@@ -26,26 +29,26 @@ OK='\n\033[0;32m OK...\033[0m'
 logo () {
 	
 	local text="${1:?}"
-	echo -e "\n\n                                  "
-	echo "                      %%%                "
-	echo "               %%%%%//%%%%%              "
-	echo "             %%************%%%           "
-	echo "          (%%//############*****%%       "
-	echo "        %%%%%**###&&&&&&&&&###**//       "
-    echo "        %%(**##&&&#########&&&##**       "
-    echo "        %%(**##*****#####*****##**%%%    "
-    echo "        %%(**##     *****     ##**       "
-    echo "           //##   @@**   @@   ##//       "
-    echo "             ##     **###     ##         "
-    echo "             #######     #####//         "
-    echo "               ###**&&&&&**###           "
-    echo "               &&&         &&&           "
-    echo "               &&&////   &&              "
-    echo "                  &&//@@@**              "
-    echo "                    ..***                "
-    echo "                         z0mbi3 Script   "
-    echo -e "\n"
-    printf " $CYE$text$CNC\n\n"
+	echo -en "                                  
+	               %%%                
+	        %%%%%//%%%%%              
+	      %%************%%%           
+	  (%%//############*****%%
+	%%%%%**###&&&&&&&&&###**//
+	%%(**##&&&#########&&&##**
+	%%(**##*****#####*****##**%%%
+	%%(**##     *****     ##**
+	   //##   @@**   @@   ##//
+	     ##     **###     ##
+	     #######     #####//
+	       ###**&&&&&**###
+	       &&&         &&&
+	       &&&////   &&
+	          &&//@@@**
+	            ..***                
+			  z0mbi3 Script\n\n"
+    printf ' \033[0;31m[ \033[0m\033[1;93m%s\033[0m \033[0;31m]\033[0m\n\n' "${text}"
+    sleep 3
 }
 
 #----------------------------------------
@@ -67,7 +70,7 @@ logo () {
 #          Testing Internet
 #----------------------------------------
 
-logo "Checndo conexion a internet.."
+logo "Checando conexion a internet.."
 	if ping archlinux.org -c 1 >/dev/null 2>&1; then
 			echo -e " Espera....\n"
 			sleep 3
@@ -79,7 +82,55 @@ logo "Checndo conexion a internet.."
 			echo " Saliendo...."
 			exit 0
 	fi
+	
+#----------------------------------------
+#          Basic configuration information  
+#----------------------------------------
 
+logo "Selecciona la distribucion de tu teclado"
+		setkmap_options=("US" "Español Latino" "Español ES" "Frances" "Italiano" "Aleman")
+		PS3="Selecciona la distrubucion de tu teclado (1, 2, 3, 4, 5 o 6): "
+	select opt in "${setkmap_options[@]}"; do
+		case "$REPLY" in
+			1) setkmap_title='US';setkmap='us';break;;
+			2) setkmap_title='Español Latino';setkmap='la-latin1';break;;
+			3) setkmap_title='Español ES';setkmap='es';break;;
+			4) setkmap_title='Frances';setkmap='fr';break;;
+			5) setkmap_title='Italiano';setkmap='it';break;;
+			6) setkmap_title='Alemanan';setkmap='de';break;;
+			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+		esac
+	done	
+
+		printf '\nCambiando distribucion de teclado a %s' "${setkmap_title}"
+		loadkeys "${setkmap}"
+		okie
+		clear
+		
+
+logo "Selecciona tu idioma"
+		PS3="Selecciona tu idioma: "
+select idiomains in $(ls /usr/share/i18n/locales)
+	do
+		if [ "$idiomains" ]; then
+				break
+		fi
+	done
+	
+		printf '\nCambiando idioma a %s ...\n' "${idiomains}"
+		echo "${idiomains}".UTF-8 UTF-8 >> /etc/locale.gen
+		locale-gen >/dev/null 2>&1
+		export LANG=${idiomains}.UTF-8
+		okie
+		clear
+		
+logo "Selecciona tu zona horaria"
+		tzselection=$(tzselect  | tail -n1 )
+		okie
+		clear
+		
+
+		
 #----------------------------------------
 #          Getting Information   
 #----------------------------------------
@@ -207,8 +258,7 @@ logo "Ingresa la informacion Necesaria"
 #----------------------------------------
 
 logo "Creando Formatenado y Montando Particiones"
-			echo
-			echo
+			
 			lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
 			echo "------------------------------"
 			echo
@@ -242,11 +292,13 @@ logo "Creando Formatenado y Montando Particiones"
 				break
 			fi
 		done
+		clear
 		
 #----------------------------------------
 #          Creando y Montando SWAP
 #----------------------------------------
-	
+
+logo "Configurando SWAP"
 			PS3="Escoge la particion SWAP: "
 		select swappart in $(fdisk -l | grep -E "swap / Solaris" | cut -d" " -f1) "No quiero swap" "Crear archivo swap"
 			do
@@ -259,8 +311,7 @@ logo "Creando Formatenado y Montando Particiones"
 					mkswap -L SWAP /mnt/swapfile >/dev/null
 					echo " Montando Swap, espera.."
 					swapon /mnt/swapfile
-					echo -e "${OK}"
-					sleep 2
+					okie
 					break
 					
 				elif [ "$swappart" = "No quiero swap" ]; then
@@ -274,8 +325,7 @@ logo "Creando Formatenado y Montando Particiones"
 					sleep 2
 					mkswap -L SWAP "${swappart}" >/dev/null 2>&1
 					swapon "${swappart}"
-					echo -e "${OK}"
-					sleep 2
+					okie
 					break
 				fi
 			done
@@ -297,10 +347,13 @@ logo "Particion NTFS de Windows para compartir almacenamiento"
 					break	
 				fi				
 			done
+			clear
 	
 #----------------------------------------
 #          Detectando Hardware
 #----------------------------------------
+
+logo "Detectando hardware.. espera.."
 	
 	# Detectando tarjeta WiFi
 	if [ "$(lspci -d ::280)" ]; then
@@ -352,7 +405,7 @@ logo "Particion NTFS de Windows para compartir almacenamiento"
 		echo -e " Kernel:    ${CBL}$kernel${CNC}"
 		echo -e " Graficos:  ${CBL}$gpu_name${CNC}"
 		echo -e " Lenguaje:  ${CBL}$idiomains${CNC}"
-		echo -e " Timezone:  ${CBL}$tizo${CNC}"
+		echo -e " Timezone:  ${CBL}$tzselection${CNC}"
 		echo -e " Internet:  ${CBL}$redtitle${CNC}"
 		echo -e " Audio:     ${CBL}$audiotitle${CNC}"
 		echo -e " Desktop:   ${CBL}$DEN${CNC}"
@@ -416,8 +469,7 @@ logo "Instalando sistema base"
 	         mkinitcpio \
 	         reflector \
 	         zsh
-	echo -e "${OK}"
-	sleep 2
+	okie
 	clear
 
 #----------------------------------------
@@ -426,8 +478,7 @@ logo "Instalando sistema base"
     
 logo "Generando FSTAB"
 		genfstab -U /mnt >> /mnt/etc/fstab
-		echo -e "${OK}"
-		sleep 2
+		okie
 	clear
 
 #----------------------------------------
@@ -436,17 +487,18 @@ logo "Generando FSTAB"
 	
 logo "Configurando Timezone y Locales"
 		
-		$CHROOT ln -sf /usr/share/zoneinfo/"$tizo" /etc/localtime
+		$CHROOT ln -sf /usr/share/zoneinfo/"$tzselection" /etc/localtime
 		$CHROOT hwclock --systohc
 		echo
-		sed -i 's/#'"${idiomains}"'/'"${idiomains}"'/' /mnt/etc/locale.gen
+		echo "${idiomains}".UTF-8 UTF-8 >> /mnt/etc/locale.gen
+		#sed -i 's/#'"${idiomains}"'/'"${idiomains}"'/' /mnt/etc/locale.gen
 		$CHROOT locale-gen
-		echo "LANG=$idiomains" >> /mnt/etc/locale.conf
-		echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
+		echo "LANG=$idiomains".UTF-8 >> /mnt/etc/locale.conf
+		echo "KEYMAP=$setkmap" >> /mnt/etc/vconsole.conf
+		echo "FONT=ter-v18n" >> /mnt/etc/vconsole.conf
 		export LANG=$idiomains
-		echo -e "${OK}"
-		sleep 2
-clear
+		okie
+		clear
 
 #----------------------------------------
 #          Hostname & Hosts
@@ -459,9 +511,8 @@ logo "Configurando Internet"
 		::1         localhost
 		127.0.1.1   ${HNAME}.localdomain ${HNAME}
 	EOL
-	echo -e "${OK}"
-	sleep 2
-clear
+	okie
+	clear
 
 #----------------------------------------
 #          Users & Passwords
@@ -474,20 +525,19 @@ logo "Usuario Y Passwords"
 	sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 	echo "Defaults insults" >> /mnt/etc/sudoers
 	echo -e " ${CBL}root${CNC} : ${CRE}$PASSWDR${CNC}\n ${CYE}$USR${CNC} : ${CRE}$PASSWD${CNC}"
-	echo -e "${OK}"
-	sleep 5
-clear
+	okie
+	sleep 3
+	clear
 
 #----------------------------------------
 #          Refreshing Mirrors
 #----------------------------------------
 
 logo "Refrescando mirros en la nueva Instalacion"
-	$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist
+	$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 	$CHROOT pacman -Syy
-	echo -e "${OK}"
-	sleep 2
-clear
+	okie
+	clear
 
 #----------------------------------------
 #          Install GRUB
@@ -501,9 +551,8 @@ logo "Instalando GRUB"
 	sed -i "s/MODULES=()/MODULES=(${cpu_atkm})/" /mnt/etc/mkinitcpio.conf
 	echo
 	$CHROOT grub-mkconfig -o /boot/grub/grub.cfg
-	echo -e "${OK}"
-	sleep 2
-clear  
+	okie
+	clear  
 
 #----------------------------------------
 #          Optimizations
@@ -513,46 +562,45 @@ logo "Aplicando optmizaciones.."
 
 	echo -e "${CYE}Enchulando pacman${CNC}"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /mnt/etc/pacman.conf
-	echo -e "${OK}"
-	sleep 2
+	okie
     
 	echo -e "\n${CYE}Tunning ext4 file system for SSD and SpeedUp${CNC}"
 	sed -i 's/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
 	$CHROOT tune2fs -O fast_commit "${partroot}" >/dev/null
-	echo -e "${OK}"
-	sleep 2
+	okie
     
 	echo -e "\n${CYE}Optimizando las make flags para acelerar tiempos de compilado${CNC}\n"
 	echo -e "Tienes ${CBL}$(nproc)${CNC} cores."
 	sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
-	echo -e "${OK}"
-	sleep 2
+	okie
+	clear
+	
+logo "Aplicando optmizaciones.."
     
 	echo -e "\n${CYE}Configurando CPU a modo performance${CNC}"
 	$CHROOT pacman -S cpupower --noconfirm >/dev/null
 	sed -i "s/#governor='ondemand'/governor='performance'/" /mnt/etc/default/cpupower
-	echo -e "${OK}"
-	sleep 2
+	okie
     
 	echo -e "\n${CYE}Cambiando el scheduler del kernel a mq-deadline${CNC}"
 	cat >> /mnt/etc/udev/rules.d/60-ssd.rules <<- EOL
 		ACTION=="add|change", KERNEL=="sd[a-z]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
 	EOL
-	echo -e "${OK}"
-	sleep 2
+	okie
 
 	echo -e "\n${CYE}Configurando swappiness${CNC}"
 	cat >> /mnt/etc/sysctl.d/99-swappiness.conf <<- EOL
 		vm.swappiness=10
 		vm.vfs_cache_pressure=50
 	EOL
-	echo -e "${OK}"
-	sleep 2
+	okie
+	clear
+
+logo "Aplicando optmizaciones.."
 
 	echo -e "\n${CYE}Deshabilitando Journal logs..${CNC}"
 	sed -i 's/#Storage=auto/Storage=none/' /mnt/etc/systemd/journald.conf
-	echo -e "${OK}"
-	sleep 2
+	okie
     
 	echo -e "\n${CYE}Desabilitando modulos del kernel innecesarios${CNC}"
 	cat >> /mnt/etc/modprobe.d/blacklist.conf <<- EOL
@@ -561,13 +609,11 @@ logo "Aplicando optmizaciones.."
 		blacklist mac_hid
 		blacklist uvcvideo
 	EOL
-	echo -e "${OK}"
-	sleep 2
+	okie
 		
 	echo -e "\n${CYE}Deshabilitando servicios innecesarios${CNC}\n"
 	$CHROOT systemctl mask lvm2-monitor.service systemd-random-seed.service
-	echo -e "${OK}"
-	sleep 2
+	okie
 		
 	echo -e "\n${CYE}Acelerando internet con los DNS de Cloudflare${CNC}"
 	if $CHROOT pacman -Qi dhcpcd > /dev/null ; then
@@ -581,10 +627,11 @@ logo "Aplicando optmizaciones.."
 		servers=1.1.1.1,1.0.0.1
 	EOL
 	fi
-	echo -e "${OK}"
-	sleep 2
+	okie
+	clear
+	
+logo "Aplicando optmizaciones.."
     
-			
 	if [ "${ntfspart}" != "Ninguna" ]; then
 		echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
 		ntfsuuid=$(blkid -o value -s UUID "${ntfspart}") 
@@ -598,8 +645,7 @@ logo "Aplicando optmizaciones.."
 		echo
 		echo -e "${CYE}Tu particion compartida NTFS 'WINDOWS' Se cargara automaticamente en cada inicio para que puedas compartir archivos entre Linux y Windows.${CNC}"
 		sleep 5
-		echo -e "${OK}"
-		sleep 2
+		okie
 	fi
 	
 	clear
@@ -748,7 +794,7 @@ EOL
 #----------------------------------------
 
 	sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /mnt/etc/sudoers
-	echo -e "${OK}"
+	okie
 	sleep 2
 	clear
 
@@ -759,7 +805,7 @@ EOL
 	if [ "${DOTS}" == "Si" ]; then
 	
 logo "Generating my XORG config files"
-		sleep 2
+	
 	cat >> /mnt/etc/X11/xorg.conf.d/20-intel.conf <<EOL		
 Section "Device"
 	Identifier	"Intel Graphics"
@@ -817,8 +863,7 @@ logo "Restaurando mis dotfiles"
 		$CHROOT cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/
 		$CHROOT cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/
 		
-		echo -e "${OK}"
-		sleep 5
+		okie
 		clear
 	fi
 
@@ -842,8 +887,7 @@ logo "Limpiando sistema para su primer arranque"
 	$CHROOT pacman -Rns go --noconfirm >/dev/null
 	$CHROOT pacman -Rns "$(pacman -Qtdq)" >/dev/null
 	$CHROOT fstrim -av >/dev/null
-	echo -e "${OK}"
-	sleep 2
+	okie
 clear
 
 #----------------------------------------
