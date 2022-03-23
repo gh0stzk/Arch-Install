@@ -18,7 +18,7 @@ CNC='\033[0m'
 CHROOT="arch-chroot /mnt"
 
 okie() {
-	printf "\033[1;92m OK...\033[0m\n"
+	printf "\n\033[1;92m OK...\033[0m\n"
 	sleep 2
 }
 
@@ -117,7 +117,7 @@ select idiomains in $(ls /usr/share/i18n/locales)
 		fi
 	done
 	
-		printf '\nCambiando idioma a %s ...\n' "${idiomains}"
+		printf '\nCambiando idioma a %s ...' "${idiomains}"
 		echo "${idiomains}".UTF-8 UTF-8 >> /etc/locale.gen
 		locale-gen >/dev/null 2>&1
 		export LANG=${idiomains}.UTF-8
@@ -496,7 +496,7 @@ logo "Configurando Timezone y Locales"
 		echo "LANG=$idiomains".UTF-8 >> /mnt/etc/locale.conf
 		echo "KEYMAP=$setkmap" >> /mnt/etc/vconsole.conf
 		echo "FONT=ter-v18n" >> /mnt/etc/vconsole.conf
-		export LANG=$idiomains
+		export LANG=${idiomains}.UTF-8
 		okie
 		clear
 
@@ -524,7 +524,7 @@ logo "Usuario Y Passwords"
 	echo "$USR:$PASSWD" | $CHROOT chpasswd
 	sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 	echo "Defaults insults" >> /mnt/etc/sudoers
-	echo -e " ${CBL}root${CNC} : ${CRE}$PASSWDR${CNC}\n ${CYE}$USR${CNC} : ${CRE}$PASSWD${CNC}"
+	echo -e " ${CBL}root${CNC} : ${CRE}$PASSWDR${CNC}\n ${CYE}$USR${CNC} : ${CRE}$PASSWD${CNC}\n"
 	okie
 	sleep 3
 	clear
