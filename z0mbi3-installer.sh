@@ -88,21 +88,20 @@ logo "Checando conexion a internet.."
 #----------------------------------------
 
 logo "Selecciona la distribucion de tu teclado"
-		setkmap_options=("US" "Español Latino" "Español ES" "Frances" "Italiano" "Aleman")
+		setkmap_options=("US" "Español" "Frances" "Italiano" "Aleman")
 		PS3="Selecciona la distrubucion de tu teclado (1, 2, 3, 4, 5 o 6): "
 	select opt in "${setkmap_options[@]}"; do
 		case "$REPLY" in
-			1) setkmap_title='US';setkmap='us';break;;
-			2) setkmap_title='Español Latino';setkmap='la-latin1';break;;
-			3) setkmap_title='Español ES';setkmap='es';break;;
-			4) setkmap_title='Frances';setkmap='fr';break;;
-			5) setkmap_title='Italiano';setkmap='it';break;;
-			6) setkmap_title='Alemanan';setkmap='de';break;;
+			1) setkmap_title='US';setkmap='us';x11keymap="us";break;;
+			2) setkmap_title='Español';setkmap='la-latin1';x11keymap="latam";break;;
+			3) setkmap_title='Frances';setkmap='fr';x11keymap="fr";break;;
+			4) setkmap_title='Italiano';setkmap='it';x11keymap="it";break;;
+			5) setkmap_title='Alemanan';setkmap='de';x11keymap="de";break;;
 			*) echo "Opcion invalida, intenta de nuevo.";continue;;
 		esac
 	done	
 
-		printf '\nCambiando distribucion de teclado a %s' "${setkmap_title}"
+		printf '\nCambiando distribucion de teclado a %s\n' "${setkmap_title}"
 		loadkeys "${setkmap}"
 		okie
 		clear
@@ -117,7 +116,7 @@ select idiomains in $(ls /usr/share/i18n/locales)
 		fi
 	done
 	
-		printf '\nCambiando idioma a %s ...' "${idiomains}"
+		printf '\nCambiando idioma a %s ...\n' "${idiomains}"
 		echo "${idiomains}".UTF-8 UTF-8 >> /etc/locale.gen
 		locale-gen >/dev/null 2>&1
 		export LANG=${idiomains}.UTF-8
@@ -183,8 +182,7 @@ logo "Ingresa la informacion Necesaria"
 		done
 		clear
 		
-logo "Ingresa la informacion Necesaria"
-			echo    
+logo "Ingresa la informacion Necesaria"  
 			kernel_opts=("Linux (Default)" "Linux LTS" "Linux-Zen")
 			PS3="Escoge el Kernel que usaras (1, 2 o 3): "
 	select opt in "${kernel_opts[@]}"; do
@@ -233,8 +231,9 @@ logo "Ingresa la informacion Necesaria"
 			*) echo "Opcion invalida, intenta de nuevo.";continue;;
 		esac
 	done
-	
-			echo
+			clear
+			
+logo "Ingresa la informacion Necesaria"
 			PS3="Quieres instalar YAY como AUR Helper?: "
 	select YAYH in "Si" "No"
 		do
@@ -406,6 +405,7 @@ logo "Detectando hardware.. espera.."
 		echo -e " Graficos:  ${CBL}$gpu_name${CNC}"
 		echo -e " Lenguaje:  ${CBL}$idiomains${CNC}"
 		echo -e " Timezone:  ${CBL}$tzselection${CNC}"
+		echo -e " Teclado:   ${CBL}$setkmap_title${CNC}"
 		echo -e " Internet:  ${CBL}$redtitle${CNC}"
 		echo -e " Audio:     ${CBL}$audiotitle${CNC}"
 		echo -e " Desktop:   ${CBL}$DEN${CNC}"
@@ -524,7 +524,7 @@ logo "Usuario Y Passwords"
 	echo "$USR:$PASSWD" | $CHROOT chpasswd
 	sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 	echo "Defaults insults" >> /mnt/etc/sudoers
-	echo -e " ${CBL}root${CNC} : ${CRE}$PASSWDR${CNC}\n ${CYE}$USR${CNC} : ${CRE}$PASSWD${CNC}\n"
+	echo -e " ${CBL}root${CNC} : ${CRE}$PASSWDR${CNC}\n ${CYE}$USR${CNC} : ${CRE}$PASSWD${CNC}"
 	okie
 	sleep 3
 	clear
@@ -629,27 +629,23 @@ logo "Aplicando optmizaciones.."
 	fi
 	okie
 	clear
-	
-logo "Aplicando optmizaciones.."
     
 	if [ "${ntfspart}" != "Ninguna" ]; then
+logo "Aplicando optmizaciones.."
 		echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
 		ntfsuuid=$(blkid -o value -s UUID "${ntfspart}") 
 		cat >> /mnt/etc/fstab <<-EOL		
 		# My sTuFF
 		UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
 		EOL
-		clear
 		cat /mnt/etc/fstab
-		echo
 		echo
 		echo -e "${CYE}Tu particion compartida NTFS 'WINDOWS' Se cargara automaticamente en cada inicio para que puedas compartir archivos entre Linux y Windows.${CNC}"
 		sleep 5
 		okie
+		clear
 	fi
 	
-	clear
-
 #----------------------------------------
 #          Installing Packages
 #----------------------------------------
@@ -783,7 +779,7 @@ logo "Activando Servicios"
 Section "InputClass"
 		Identifier	"system-keyboard"
 		MatchIsKeyboard	"on"
-		Option	"XkbLayout"	"latam"
+		Option	"XkbLayout"	"${x11keymap}"
 EndSection
 EOL
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
