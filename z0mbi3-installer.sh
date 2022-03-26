@@ -386,11 +386,11 @@ logo "Configurando SWAP"
 #----------------------------------------
 	
 logo "Particion NTFS de Windows para compartir almacenamiento"
-			lsblk -I 8 -o NAME,SIZE,PARTTYPENAME,FSTYPE,LABEL
+			lsblk -I 8 -o NAME,SIZE,PARTTYPENAME,FSTYPE,LABEL | grep "NTFS\|Microsoft"
 			echo "------------------------------"
 			echo
 			PS3="Deseas montar una particion de almacenamiento compartida con WINDOWS, Escogela: "
-		select ntfspart in $(fdisk -l | grep -qE "NTFS|Microsoft" | cut -d" " -f1) "Ninguna"
+		select ntfspart in $(fdisk -l | grep "NTFS\|Microsoft" | cut -d" " -f1) "Ninguna"
 			do
 				if [ "$ntfspart" ]; then
 					break	
