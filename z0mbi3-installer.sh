@@ -59,12 +59,12 @@ logo "Checando modo de arranque"
 
 	if [ -d /sys/firmware/efi/efivars ]; then	
 			bootmode="uefi"
-			echo "El escript se ejecutara en modo EFI"
+			echo " El escript se ejecutara en modo EFI"
 			sleep 2
 			clear			
 		else		
 			bootmode="mbrbios"
-			echo "El escript se ejecutara en modo BIOS/MBR"
+			echo " El escript se ejecutara en modo BIOS/MBR"
 			sleep 2
 			clear
 	fi
@@ -287,17 +287,21 @@ logo "Creando Formatenado y Montando Particiones"
 
 	if [ "$bootmode" == "uefi" ]; then	
 			cfdisk "${drive}"
-			partprobe
+			partx -u "${drive}"
 			clear
-			echo
-			lsblk "${drive}" -I 8 -o NAME,SIZE,FSTYPE
+			
+logo "Selecciona tu particion EFI"
+			lsblk "${drive}" -I 8 -o NAME,SIZE,PARTTYPENAME
 			echo
 			
 			PS3="Escoge la particion EFI que acabas de crear: "
 		select efipart in $(fdisk -l "${drive}" | grep EFI | cut -d" " -f1) 
 			do
 				efipart="$efipart"
+				echo -e " Formateando la particion EFI ${efipart}\n Espere.."
+				sleep 3
 				mkfs.fat -F 32 "${efipart}"
+				okie
 				clear
 				break
 			done
@@ -310,7 +314,7 @@ logo "Creando Formatenado y Montando Particiones"
 logo "Creando Formatenado y Montando Particiones"
 
 			echo
-			lsblk "${drive}" -I 8 -o NAME,SIZE,FSTYPE
+			lsblk "${drive}" -I 8 -o NAME,SIZE,FSTYPE,PARTTYPENAME
 			echo
 			
 			PS3="Escoge la particion raiz que acabas de crear donde Arch Linux se instalara: "
@@ -319,7 +323,9 @@ logo "Creando Formatenado y Montando Particiones"
 			partroot="$partroot"
 			break
 		done
-		
+		    echo
+		    echo -e " Formateando la particion RAIZ {$partroot}\n Espere.."
+		    sleep 3
 			mkfs.ext4 -L Arch "${partroot}"
 			mount "${partroot}" /mnt
 			sleep 3				
@@ -330,6 +336,7 @@ logo "Creando Formatenado y Montando Particiones"
 			mount "${efipart}" /mnt/efi
 			sleep 3
 	fi
+			okie
 			clear
 			
 		
@@ -351,6 +358,7 @@ logo "Configurando SWAP"
 					mkswap -L SWAP /mnt/swapfile >/dev/null
 					echo " Montando Swap, espera.."
 					swapon /mnt/swapfile
+					sleep 3
 					okie
 					break
 					
@@ -361,10 +369,12 @@ logo "Configurando SWAP"
 				elif [ "$swappart" ]; then
 				
 					echo
-					echo " Creando y montando particion swap, espera.."
+					echo " Formateando la particion swap, espera.."
 					sleep 2
 					mkswap -L SWAP "${swappart}" >/dev/null 2>&1
+					echo " Montando Swap, espera.."
 					swapon "${swappart}"
+					sleep 3
 					okie
 					break
 				fi
