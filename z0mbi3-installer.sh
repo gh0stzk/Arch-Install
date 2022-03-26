@@ -55,22 +55,26 @@ logo () {
 #          Check  BIOS CPU And Graphics
 #----------------------------------------
 
-	while true
-	do
-	    if [ -d /sys/firmware/efi/efivars ]; then
-        echo "este escript solo funciona para sistemas BIOS/MBR.."
-        sleep 2
-			exit
-		else
-			break
-		fi
-	done
+logo "Checando modo de arranque"
+
+	if [ -d /sys/firmware/efi/efivars ]; then	
+			bootmode="uefi"
+			echo "El escript se ejecutara en modo EFI"
+			sleep 2
+			clear			
+		else		
+			bootmode="mbrbios"
+			echo "El escript se ejecutara en modo BIOS/MBR"
+			sleep 2
+			clear
+	fi
 	
 #----------------------------------------
 #          Testing Internet
 #----------------------------------------
 
 logo "Checando conexion a internet.."
+
 	if ping archlinux.org -c 1 >/dev/null 2>&1; then
 			echo -e " Espera....\n"
 			sleep 3
@@ -80,6 +84,7 @@ logo "Checando conexion a internet.."
 		else
 			echo " Error: Parace que no hay internet.."
 			echo " Saliendo...."
+			sleep 2
 			exit 0
 	fi
 	
@@ -275,29 +280,60 @@ logo "Creando Formatenado y Montando Particiones"
 #----------------------------------------
 
 logo "Creando Formatenado y Montando Particiones"
+
+	if [ "$bootmode" == "uefi" ]; then	
 			cfdisk /dev/"${drive}"
+			clear
 			echo
 			lsblk -I 8 -o NAME,SIZE,FSTYPE | grep "${drive}"
 			echo
+			
+			PS3="Escoge la particion EFI que acabas de crear: "
+		select efipart in $(fdisk -l /dev/"${drive}" | grep EFI | cut -d" " -f1) 
+			do
+				efipart="$efipart"
+				clear
+				break
+			done
+		
+		else
+			cfdisk /dev/"${drive}"
+			clear
+	fi
 	
+logo "Creando Formatenado y Montando Particiones"
+
+			echo
+			lsblk -I 8 -o NAME,SIZE,FSTYPE | grep "${drive}"
+			echo
+			
 			PS3="Escoge la particion raiz que acabas de crear donde Arch Linux se instalara: "
 	select partroot in $(fdisk -l /dev/"${drive}" | grep Linux | cut -d" " -f1) 
 		do
-			if [ "$partroot" ]; then
-				mkfs.ext4 -L Arch "${partroot}"
-				mount "${partroot}" /mnt
-				sleep 3
-				echo
-				break
-			fi
+			partroot="$partroot"
+			break
 		done
-		clear
+		
+			mkfs.ext4 -L Arch "${partroot}"
+			mount "${partroot}" /mnt
+			sleep 3				
+			
+	if [ "$bootmode" == "uefi" ]; then
+	
+			mkfs.fat -F 32 "${efipart}"
+			mkdir -p /mnt/efi
+			mount "${efipart}" /mnt/efi
+			sleep 3
+	fi
+			clear
+			
 		
 #----------------------------------------
 #          Creando y Montando SWAP
 #----------------------------------------
 
 logo "Configurando SWAP"
+
 			PS3="Escoge la particion SWAP: "
 		select swappart in $(fdisk -l | grep -E "swap / Solaris" | cut -d" " -f1) "No quiero swap" "Crear archivo swap"
 			do
@@ -544,9 +580,16 @@ logo "Refrescando mirros en la nueva Instalacion"
 #----------------------------------------
 
 logo "Instalando GRUB"
-	$CHROOT pacman -S grub os-prober ntfs-3g --noconfirm >/dev/null
-	$CHROOT grub-install --target=i386-pc /dev/"$drive"
-	echo
+
+	if [ "$bootmode" == "uefi" ]; then
+	
+			$CHROOT pacman -S grub efibootmgr os-prober ntfs-3g --noconfirm >/dev/null
+			$CHROOT grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=Arch
+		else		
+			$CHROOT pacman -S grub os-prober ntfs-3g --noconfirm >/dev/null
+			$CHROOT grub-install --target=i386-pc /dev/"$drive"
+	fi
+	
 	sed -i 's/quiet/zswap.enabled=0 mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
 	sed -i "s/MODULES=()/MODULES=(${cpu_atkm})/" /mnt/etc/mkinitcpio.conf
 	echo
@@ -631,7 +674,9 @@ logo "Aplicando optmizaciones.."
 	clear
     
 	if [ "${ntfspart}" != "Ninguna" ]; then
+	
 logo "Aplicando optmizaciones.."
+
 		echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
 		ntfsuuid=$(blkid -o value -s UUID "${ntfspart}") 
 		cat >> /mnt/etc/fstab <<-EOL		
