@@ -325,7 +325,6 @@ logo "Creando Formatenado y Montando Particiones"
 			
 	if [ "$bootmode" == "uefi" ]; then
 	
-			mkfs.fat -F 32 "${efipart}"
 			mkdir -p /mnt/efi
 			mount "${efipart}" /mnt/efi
 			sleep 3
@@ -340,7 +339,7 @@ logo "Creando Formatenado y Montando Particiones"
 logo "Configurando SWAP"
 
 			PS3="Escoge la particion SWAP: "
-		select swappart in $(fdisk -l | grep -E "swap / Solaris" | cut -d" " -f1) "No quiero swap" "Crear archivo swap"
+		select swappart in $(fdisk -l | grep -E "swap" | cut -d" " -f1) "No quiero swap" "Crear archivo swap"
 			do
 				if [ "$swappart" = "Crear archivo swap" ]; then
 				
