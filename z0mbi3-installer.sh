@@ -116,7 +116,7 @@ logo "Selecciona la distribucion de tu teclado"
 logo "Selecciona tu idioma"
 
 		PS3="Selecciona tu idioma: "
-	select idiomains in $(ls /usr/share/i18n/locales)
+	select idiomains in $(grep UTF-8 /etc/locale.gen | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g')
 		do
 			if [ "$idiomains" ]; then
 					break
@@ -267,11 +267,11 @@ logo "Ingresa la informacion Necesaria"
 
 logo "Creando Formatenado y Montando Particiones"
 			
-			lsblk -I 8 -d -o NAME,SIZE,TYPE,MODEL
+			lsblk -d -e 7,11 -o NAME,SIZE,TYPE,MODEL
 			echo "------------------------------"
 			echo
 			PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
-	select drive in $(lsblk -nd -e 7,11 -o NAME) 
+	select drive in $(lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd\|nvme\|mmcblk') 
 		do
 			if [ "$drive" ]; then
 				break
@@ -286,14 +286,15 @@ logo "Creando Formatenado y Montando Particiones"
 logo "Creando Formatenado y Montando Particiones"
 
 	if [ "$bootmode" == "uefi" ]; then	
-			cgdisk /dev/"${drive}"
+			cfdisk "${drive}"
+			partprobe
 			clear
 			echo
-			lsblk -I 8 -o NAME,SIZE,FSTYPE | grep "${drive}"
+			lsblk "${drive}" -I 8 -o NAME,SIZE,FSTYPE
 			echo
 			
 			PS3="Escoge la particion EFI que acabas de crear: "
-		select efipart in $(fdisk -l /dev/"${drive}" | grep EFI | cut -d" " -f1) 
+		select efipart in $(fdisk -l "${drive}" | grep EFI | cut -d" " -f1) 
 			do
 				efipart="$efipart"
 				mkfs.fat -F 32 "${efipart}"
@@ -302,18 +303,18 @@ logo "Creando Formatenado y Montando Particiones"
 			done
 		
 		else
-			cfdisk /dev/"${drive}"
+			cfdisk "${drive}"
 			clear
 	fi
 	
 logo "Creando Formatenado y Montando Particiones"
 
 			echo
-			lsblk -I 8 -o NAME,SIZE,FSTYPE | grep "${drive}"
+			lsblk "${drive}" -I 8 -o NAME,SIZE,FSTYPE
 			echo
 			
 			PS3="Escoge la particion raiz que acabas de crear donde Arch Linux se instalara: "
-	select partroot in $(fdisk -l /dev/"${drive}" | grep Linux | cut -d" " -f1) 
+	select partroot in $(fdisk -l "${drive}" | grep Linux | cut -d" " -f1) 
 		do
 			partroot="$partroot"
 			break
@@ -376,7 +377,7 @@ logo "Configurando SWAP"
 #----------------------------------------
 	
 logo "Particion NTFS de Windows para compartir almacenamiento"
-			lsblk -o NAME,SIZE,FSTYPE,LABEL | sed '/\(^├\|^└\)/!d'
+			lsblk -I 8 -o NAME,SIZE,PARTTYPENAME,FSTYPE,LABEL | grep ntfs
 			echo "------------------------------"
 			echo
 			PS3="Deseas montar una particion de almacenamiento compartida con WINDOWS, Escogela: "
@@ -591,7 +592,7 @@ logo "Instalando GRUB"
 			$CHROOT grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=Arch
 		else		
 			$CHROOT pacman -S grub os-prober ntfs-3g --noconfirm >/dev/null
-			$CHROOT grub-install --target=i386-pc /dev/"$drive"
+			$CHROOT grub-install --target=i386-pc "$drive"
 	fi
 	
 	sed -i 's/quiet/zswap.enabled=0 mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
