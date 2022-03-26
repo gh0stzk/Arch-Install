@@ -93,6 +93,7 @@ logo "Checando conexion a internet.."
 #----------------------------------------
 
 logo "Selecciona la distribucion de tu teclado"
+
 		setkmap_options=("US" "Español" "Frances" "Italiano" "Aleman")
 		PS3="Selecciona la distrubucion de tu teclado (1, 2, 3, 4, 5 o 6): "
 	select opt in "${setkmap_options[@]}"; do
@@ -113,13 +114,14 @@ logo "Selecciona la distribucion de tu teclado"
 		
 
 logo "Selecciona tu idioma"
+
 		PS3="Selecciona tu idioma: "
-select idiomains in $(ls /usr/share/i18n/locales)
-	do
-		if [ "$idiomains" ]; then
-				break
-		fi
-	done
+	select idiomains in $(ls /usr/share/i18n/locales)
+		do
+			if [ "$idiomains" ]; then
+					break
+			fi
+		done
 	
 		printf '\nCambiando idioma a %s ...\n' "${idiomains}"
 		echo "${idiomains}".UTF-8 UTF-8 >> /etc/locale.gen
@@ -129,6 +131,7 @@ select idiomains in $(ls /usr/share/i18n/locales)
 		clear
 		
 logo "Selecciona tu zona horaria"
+
 		tzselection=$(tzselect  | tail -n1 )
 		okie
 		clear
@@ -187,7 +190,8 @@ logo "Ingresa la informacion Necesaria"
 		done
 		clear
 		
-logo "Ingresa la informacion Necesaria"  
+logo "Ingresa la informacion Necesaria"
+
 			kernel_opts=("Linux (Default)" "Linux LTS" "Linux-Zen")
 			PS3="Escoge el Kernel que usaras (1, 2 o 3): "
 	select opt in "${kernel_opts[@]}"; do
@@ -292,6 +296,7 @@ logo "Creando Formatenado y Montando Particiones"
 		select efipart in $(fdisk -l /dev/"${drive}" | grep EFI | cut -d" " -f1) 
 			do
 				efipart="$efipart"
+				mkfs.fat -F 32 "${efipart}"
 				clear
 				break
 			done
