@@ -298,6 +298,7 @@ logo "Selecciona tu particion EFI"
 		select efipart in $(fdisk -l "${drive}" | grep EFI | cut -d" " -f1) 
 			do
 				efipart="$efipart"
+				echo
 				echo -e " Formateando la particion EFI ${efipart}\n Espere.."
 				sleep 3
 				mkfs.fat -F 32 "${efipart}"
@@ -771,7 +772,7 @@ logo "Instalando soporte WIFI"
 	if [ "$WIFI" = "y" ]; then
 			$CHROOT pacman -S iwd dialog wpa_supplicant wireless_tools --noconfirm
 		else
-			echo -e "No tienes tarjeta de red WIFI. No se instala.."
+			echo -e " No tienes tarjeta de red WIFI. No se instala.."
 			sleep 5
 	fi
 	clear
