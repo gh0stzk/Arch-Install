@@ -94,15 +94,12 @@ logo "Checando conexion a internet.."
 
 logo "Selecciona la distribucion de tu teclado"
 
-		setkmap_options=("US" "Español" "Frances" "Italiano" "Aleman")
-		PS3="Selecciona la distrubucion de tu teclado (1, 2, 3, 4, 5 o 6): "
+		setkmap_options=("Ingles US" "Español")
+		PS3="Selecciona la distrubucion de tu teclado (1 o 2): "
 	select opt in "${setkmap_options[@]}"; do
 		case "$REPLY" in
 			1) setkmap_title='US';setkmap='us';x11keymap="us";break;;
 			2) setkmap_title='Español';setkmap='la-latin1';x11keymap="latam";break;;
-			3) setkmap_title='Frances';setkmap='fr';x11keymap="fr";break;;
-			4) setkmap_title='Italiano';setkmap='it';x11keymap="it";break;;
-			5) setkmap_title='Alemanan';setkmap='de';x11keymap="de";break;;
 			*) echo "Opcion invalida, intenta de nuevo.";continue;;
 		esac
 	done	
@@ -388,11 +385,11 @@ logo "Configurando SWAP"
 #----------------------------------------
 	
 logo "Particion NTFS de Windows para compartir almacenamiento"
-			lsblk -I 8 -o NAME,SIZE,PARTTYPENAME,FSTYPE,LABEL | grep ntfs
+			lsblk -I 8 -o NAME,SIZE,PARTTYPENAME,FSTYPE,LABEL
 			echo "------------------------------"
 			echo
 			PS3="Deseas montar una particion de almacenamiento compartida con WINDOWS, Escogela: "
-		select ntfspart in $(fdisk -l | grep NTFS | cut -d" " -f1) "Ninguna"
+		select ntfspart in $(fdisk -l | grep -E NTFS|Microsoft | cut -d" " -f1) "Ninguna"
 			do
 				if [ "$ntfspart" ]; then
 					break	
