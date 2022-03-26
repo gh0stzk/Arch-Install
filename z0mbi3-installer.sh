@@ -284,6 +284,7 @@ logo "Creando Formatenado y Montando Particiones"
 
 	if [ "$bootmode" == "uefi" ]; then	
 			cfdisk "${drive}"
+			sleep 3
 			partx -u "${drive}"
 			clear
 			
@@ -389,7 +390,7 @@ logo "Particion NTFS de Windows para compartir almacenamiento"
 			echo "------------------------------"
 			echo
 			PS3="Deseas montar una particion de almacenamiento compartida con WINDOWS, Escogela: "
-		select ntfspart in $(fdisk -l | grep -E NTFS|Microsoft | cut -d" " -f1) "Ninguna"
+		select ntfspart in $(fdisk -l | grep -qE "NTFS|Microsoft" | cut -d" " -f1) "Ninguna"
 			do
 				if [ "$ntfspart" ]; then
 					break	
