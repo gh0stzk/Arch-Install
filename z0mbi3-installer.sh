@@ -286,7 +286,7 @@ logo "Creando Formatenado y Montando Particiones"
 logo "Creando Formatenado y Montando Particiones"
 
 	if [ "$bootmode" == "uefi" ]; then	
-			cfdisk /dev/"${drive}"
+			cgdisk /dev/"${drive}"
 			clear
 			echo
 			lsblk -I 8 -o NAME,SIZE,FSTYPE | grep "${drive}"
