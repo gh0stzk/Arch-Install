@@ -920,8 +920,11 @@ logo "Restaurando mis dotfiles"
 		$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
 		$CHROOT rm -rf /home/"$USR"/.themes
 		$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
-		$CHROOT cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/
-		$CHROOT cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/
+		
+		# My Firefox theme
+		git clone https://github.com/gh0stzk/z0mbi3-f0x.git >/dev/null 2>&1 | $CHROOT su "$USR"
+		mv /mnt/home/"$USR"/z0mbi3-f0x/z0mbi3-Fox-Theme/chrome /mnt/home/"$USR"/.mozilla/firefox/*.default-release/
+		mv /mnt/home/"$USR"/z0mbi3-f0x/z0mbi3-Fox-Theme/user.js /mnt/home/"$USR"/.mozilla/firefox/*.default-release/
 		
 		okie
 		clear
@@ -951,6 +954,7 @@ clear
 
 	curl -s https://raw.githubusercontent.com/gh0stzk/Arch-Install/main/zfetch > zfetch
 	mv zfetch /mnt/usr/bin/
+	chmod +x /mnt/usr/bin/zfetch
 	$CHROOT /usr/bin/zfetch
 		
 		echo
