@@ -951,9 +951,9 @@ clear
 
 logo "Instalacion Finalizada"
 
-	curl -s https://raw.githubusercontent.com/gh0stzk/Arch-Install/main/zfetch > zfetch.sh
-	mv zfetch.sh /mnt/usr/bin/
-	$CHROOT /usr/bin/zfetch.sh
+	curl -s https://raw.githubusercontent.com/gh0stzk/Arch-Install/main/zfetch > zfetch
+	mv zfetch /mnt/usr/bin/
+	$CHROOT /usr/bin/zfetch
 		
 		echo
 		echo
