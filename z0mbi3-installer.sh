@@ -951,14 +951,9 @@ clear
 
 logo "Instalacion Finalizada"
 
-echo -e "          .            "
-echo -e "         / \           I use Arch BTW.."
-echo -e "        /   \          ==========================="     
-echo -e "       /^.   \         os       $(source /mnt/etc/os-release && echo "${PRETTY_NAME}")"    
-echo -e "      /  .-.  \        Kernel   $(uname -r)"   
-echo -e "     /  (   ) _\       pkgs     $(arch-chroot /mnt pacman -Q | wc -l)"
-echo -e "    / _.~   ~._^\      ram      $(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/''\2 MB/p')"
-echo -e "   /.^         ^.\     Disk     $(arch-chroot /mnt df -h / | grep "/" | awk '{print $3}')"
+	curl -s https://raw.githubusercontent.com/gh0stzk/Arch-Install/main/zfetch > zfetch.sh
+	mv zfetch.sh /mnt/usr/bin/
+	$CHROOT /usr/bin/zfetch.sh
 		
 		echo
 		echo
@@ -971,8 +966,3 @@ echo -e "   /.^         ^.\     Disk     $(arch-chroot /mnt df -h / | grep "/" |
 			* ) echo "Error: solo escribe 's' o 'n'";;
 		esac
 	done
-
-# Agregue info de la swap
-# Agregue comando para ejecutar firefox y generar el perfil y directorios.
-# copy firefox theme to new firefox default dirs created
-# Agregue zona horaria y lenguaje general
