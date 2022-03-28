@@ -185,7 +185,7 @@ logo "Ingresa la informacion Necesaria"
 			echo
 			[ "$PASSWDR" != "$CONF_PASSWDR" ]
 		do 
-			printf "Los passwords no coinciden!!\n\n"; 
+			printf "Los passwords no coinciden!!\n"; 
 		done
 			printf "Password correcto\n"
 			
@@ -337,7 +337,7 @@ logo "Ingresa la informacion Necesaria"
 logo "Creando Formatenado y Montando Particiones"
 			
 		lsblk -d -e 7,11 -o NAME,SIZE,TYPE,MODEL
-		printf "------------------------------"
+		printf "%s\n" "------------------------------"
 		echo
 		PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
 	select drive in $(lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd\|nvme\|mmcblk') 
@@ -463,7 +463,7 @@ logo "Configurando SWAP"
 logo "Particion NTFS de Windows para compartir almacenamiento"
 
 			lsblk -o NAME,SIZE,PARTTYPENAME,FSTYPE,LABEL | grep "NTFS\|Microsoft"
-			printf "------------------------------\n"
+			printf "%s\n" "------------------------------"
 			echo
 			PS3="Deseas montar una particion de almacenamiento compartida con WINDOWS, Escogela: "
 	select ntfspart in $(fdisk -l | grep "NTFS\|Microsoft" | cut -d" " -f1) "Ninguna"
