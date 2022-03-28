@@ -772,7 +772,7 @@ logo "Aplicando optmizaciones.."
 	UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
 	EOL
 	
-	printf "\nLa particion Windows %s %s Se cargara automaticamente en cada inicio para compartir archivos entre tu Linux y Windows.\n" "${ntfspart}" "${ntfsuuid}"
+	printf "\n La particion Windows %s %s Se cargara automaticamente en cada inicio para compartir archivos entre tu Linux y Windows.\n" "${ntfspart}" "${ntfsuuid}"
 	sleep 5
 	okie
 	clear
