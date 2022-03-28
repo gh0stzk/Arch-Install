@@ -368,15 +368,11 @@ logo "Selecciona tu particion EFI"
 			
 		PS3="Escoge la particion EFI que acabas de crear: "
 	select efipart in $(fdisk -l "${drive}" | grep EFI | cut -d" " -f1) 
-		do true
-				
-			echo
-			printf " Formateando la particion EFI %s\n Espere.." "${efipart}"
-			sleep 3
-			mkfs.fat -F 32 "${efipart}"
-			okie
-			clear
+		do
+			if [ "$efipart" ]; then	
+			
 				break
+			fi 
 		done
 		
 		else
@@ -392,16 +388,17 @@ logo "Creando Formatenado y Montando Particiones"
 			
 			PS3="Escoge la particion raiz que acabas de crear donde Arch Linux se instalara: "
 	select partroot in $(fdisk -l "${drive}" | grep Linux | cut -d" " -f1) 
-		do true
-			
-			break
+		do
+			if [ "$partroot" ]; then
+				printf " \nFormateando la particion RAIZ %s\n Espere..\n" "{$partroot}"
+				sleep 3
+				mkfs.ext4 -L Arch "${partroot}"
+				mount "${partroot}" /mnt
+				sleep 3	
+				break
+			fi
 		done
-		    echo
-		    printf " Formateando la particion RAIZ %s\n Espere..\n" "{$partroot}"
-		    sleep 3
-			mkfs.ext4 -L Arch "${partroot}"
-			mount "${partroot}" /mnt
-			sleep 3				
+					
 			
 	if [ "$bootmode" == "uefi" ]; then
 	
