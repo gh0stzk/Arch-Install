@@ -25,7 +25,7 @@ okie() {
 titleopts () {
 	
 	local textopts="${1:?}"
-	printf " \n%s>>>%s %s%s%s\n\n" "${CBL}" "${CNC}" "${CYE}" "${textopts}" "${CNC}"
+	printf " \n%s>>>%s %s%s%s\n" "${CBL}" "${CNC}" "${CYE}" "${textopts}" "${CNC}"
 	
 }
 
@@ -83,7 +83,7 @@ logo "Checando modo de arranque"
 logo "Checando conexion a internet.."
 
 	if ping archlinux.org -c 1 >/dev/null 2>&1; then
-			printf " Espera....\n"
+			printf " Espera....\n\n"
 			sleep 3
 			printf " %sSi hay Internet!!%s" "${CGR}" "${CNC}"
 			sleep 2
@@ -372,6 +372,7 @@ logo "Selecciona tu particion EFI"
 			if [ "$efipart" ]; then	
 			
 				break
+				clear
 			fi 
 		done
 		
@@ -392,7 +393,7 @@ logo "Creando Formatenado y Montando Particiones"
 			if [ "$partroot" ]; then
 				printf " \nFormateando la particion RAIZ %s\n Espere..\n" "{$partroot}"
 				sleep 3
-				mkfs.ext4 -L Arch "${partroot}"
+				mkfs.ext4 -L Arch "${partroot}" >/dev/null 2>&1
 				mount "${partroot}" /mnt
 				sleep 3	
 				break
@@ -402,10 +403,11 @@ logo "Creando Formatenado y Montando Particiones"
 			
 	if [ "$bootmode" == "uefi" ]; then
 	
-			printf " Configurando y montando la particion EFI\n Espere..\n"
+			printf "\n\n Formateando y montando la particion EFI\n Espere..\n"
 			sleep 3
 			mkdir -p /mnt/efi
-			mount "${efipart}" /mnt/efi
+			mkfs.fat -F 32 "${efipart}" 
+			mount "${efipart}" /mnt/efi >/dev/null 2>&1
 			sleep 3
 	fi
 			okie
@@ -645,7 +647,7 @@ logo "Usuario Y Passwords"
 	echo "$USR:$PASSWD" | $CHROOT chpasswd
 	sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 	echo "Defaults insults" >> /mnt/etc/sudoers
-	printf " %sroot%s : %s%s%s\n %s%s%s : %s%s%s" "${CBL}" "${CNC}" "${CRE}" "${PASSWDR}" "${CNC}" "${CYE}" "${USR}" "${CNC}" "${CRE}" "${PASSWD}" "${CNC}"
+	printf " %sroot%s : %s%s%s\n %s%s%s : %s%s%s\n" "${CBL}" "${CNC}" "${CRE}" "${PASSWDR}" "${CNC}" "${CYE}" "${USR}" "${CNC}" "${CRE}" "${PASSWD}" "${CNC}"
 	okie
 	sleep 3
 	clear
@@ -699,7 +701,7 @@ logo "Aplicando optmizaciones.."
 	okie
     
     titleopts "Optimizando las make flags para acelerar tiempos de compilado"
-	printf "Tienes %s%s%s cores\n" "${CBL}" "$(nproc)" "${CNC}"
+	printf "\nTienes %s%s%s cores\n" "${CBL}" "$(nproc)" "${CNC}"
 	sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
 	okie
     
@@ -770,7 +772,7 @@ logo "Aplicando optmizaciones.."
 	UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
 	EOL
 	
-	printf "La particion Windows %s %s Se cargara automaticamente en cada inicio para compartir archivos entre tu Linux y Windows.\n" "${ntfspart}" "${ntfsuuid}"
+	printf "\nLa particion Windows %s %s Se cargara automaticamente en cada inicio para compartir archivos entre tu Linux y Windows.\n" "${ntfspart}" "${ntfsuuid}"
 	sleep 5
 	okie
 	clear
