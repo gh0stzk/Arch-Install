@@ -308,10 +308,8 @@ logo "Ingresa la informacion Necesaria"
 				continue;;
 		esac
 	done
-			clear
-			
-logo "Ingresa la informacion Necesaria"
 
+		echo
 		PS3="Quieres instalar YAY como AUR Helper?: "
 	select YAYH in "Si" "No"
 		do
@@ -372,8 +370,8 @@ logo "Selecciona tu particion EFI"
 			if [ "$efipart" ]; then	
 			
 				break
-				clear
 			fi 
+			clear
 		done
 		
 		else
@@ -403,11 +401,11 @@ logo "Creando Formatenado y Montando Particiones"
 			
 	if [ "$bootmode" == "uefi" ]; then
 	
-			printf "\n\n Formateando y montando la particion EFI\n Espere..\n"
+			printf "\n Formateando y montando la particion EFI\n Espere..\n"
 			sleep 3
 			mkdir -p /mnt/efi
-			mkfs.fat -F 32 "${efipart}" 
-			mount "${efipart}" /mnt/efi >/dev/null 2>&1
+			mkfs.fat -F 32 "${efipart}" >/dev/null 2>&1
+			mount "${efipart}" /mnt/efi
 			sleep 3
 	fi
 			okie
@@ -740,6 +738,7 @@ logo "Aplicando optmizaciones.."
 	okie
 	
 	titleopts "Deshabilitando servicios innecesarios"
+	echo
 	$CHROOT systemctl mask lvm2-monitor.service systemd-random-seed.service
 	okie
 	clear
@@ -983,29 +982,41 @@ EOL
 		clear
 	fi
 	
-		if [ "${DOTS}" == "Si" ]; then
+#----------------------------------------
+#          BSPWM Dotfiles
+#----------------------------------------
+	
+	if [ "${DEN}" == "Bspwm" ]; then
+	
+logo " Descargando la configuracion para BSPWM"
+		
+		printf "\n Descargando archivos desde github\n"
+		git clone https://github.com/gh0stzk/dotfiles.git >/dev/null 2>&1 | $CHROOT su "$USR"
+		printf "\n Moviendo los archivos de configuracion..\n"
+		mv /mnt/home/"$USR"/dotfiles/{arch.png,gh0st.png,bg_1.jpg} /mnt/usr/share/pixmaps/
+		mv /mnt/home/"$USR"/dotfiles/.zshrc /mnt/home/"$USR"/
+		mv /mnt/home/"$USR"/dotfiles/config/* /mnt/home/"$USR"/.config/
+		mkdir -p /mnt/home/"$USR"/.local/share/
+		mv /mnt/home/"$USR"/dotfiles/local/* /mnt/home/"$USR"/.local/share/
+		okie
+		clear
+	fi
+	
+	
+	if [ "${DOTS}" == "Si" ]; then
 		
 logo "Restaurando mis dotfiles"
-
+		
+		titleopts "Aviso!! Esta opcion solo funciona en mi maquina, diseñada para mi instalacion. Tu veras mensajes de error, no hay de que preocuparse."
 		mkdir /mnt/dots
 		mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
 		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
 		$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
 		$CHROOT rm -rf /home/"$USR"/.themes
-		
-		# Some images
-		printf "Descargando algunas images y mi version modificada del theme DRACULA"
-		curl -sLO https://github.com/gh0stzk/dotfiles/raw/master/gh0st.png | $CHROOT su "$USR"
-		curl -sLO https://github.com/gh0stzk/dotfiles/raw/master/arch.png | $CHROOT su "$USR"
-		mv /mnt/home/"$USR"/{arch.png,gh0st.png} /usr/share/pixmaps/
-		
-		# My Firefox theme
-		printf " Descargando y aplicando z0mbi3-F0x Firefox theme\n Espera.."
-		git clone https://github.com/gh0stzk/z0mbi3-f0x.git >/dev/null 2>&1 | $CHROOT su "$USR"
-		mv /mnt/home/"$USR"/z0mbi3-f0x/z0mbi3-Fox-Theme/chrome /mnt/home/"$USR"/.mozilla/firefox/*.default-release/
-		mv /mnt/home/"$USR"/z0mbi3-f0x/z0mbi3-Fox-Theme/user.js /mnt/home/"$USR"/.mozilla/firefox/*.default-release/
-		
-		okie
+		$CHROOT cp /dots/stuff/zfetch /usr/bin/
+		$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
+		$CHROOT cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/
+		$CHROOT cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/
 		clear
 	fi
 
@@ -1015,7 +1026,7 @@ logo "Restaurando mis dotfiles"
 
 logo "Limpiando sistema para su primer arranque"
 	sleep 2
-	rm -rf /mnt/home/"$USR"/z0mbi3-f0x/
+	rm -rf /mnt/home/"$USR"/dotfiles/
 	rm -rf /mnt/home/"$USR"/.cache/yay/
 	rm -rf /mnt/home/"$USR"/.cache/electron/
 	rm -rf /mnt/home/"$USR"/.cache/go-build/
