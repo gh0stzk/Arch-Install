@@ -520,7 +520,7 @@ logo "Detectando hardware.. espera.."
 #          Info
 #----------------------------------------
 	
-		printf "\n\n --------------------\n\n" """"""
+		printf "\n\n%s\n\n" "--------------------"
 		printf " User:      %s%s%s\n" "${CBL}" "$USR" "${CNC}"
 		printf " Hostname:  %s%s%s\n" "${CBL}" "$HNAME" "${CNC}"
 		printf " CPU:       %s%s%s\n" "${CBL}" "$cpu_name" "${CNC}"
@@ -560,7 +560,7 @@ logo "Detectando hardware.. espera.."
 	fi
 		
 			echo		
-			printf " Arch Linux se instalara en el disco %s[%s%s%s%s%s]${CNC}%s en la particion %s[%s%s%s%s%s]%s\n\n\n" "${CYE}" "${CNC}" "${CRE}" "${drive}" "${CNC}" "${CYE}" "${CYE}" "${CNC}" "${CBL}" "${partroot}" "${CNC}" "${CYE}" "${CNC}"
+			printf " \nArch Linux se instalara en el disco %s[%s%s%s%s%s]%s en la particion %s[%s%s%s%s%s]%s\n\n\n" "${CYE}" "${CNC}" "${CRE}" "${drive}" "${CNC}" "${CYE}" "${CNC}" "${CYE}" "${CNC}" "${CBL}" "${partroot}" "${CNC}" "${CYE}" "${CNC}"
 		
 	while true; do
 			read -rp " Deseas continuar? [s/N]: " sn
