@@ -10,16 +10,23 @@ setfont ter-v18n
 #tizo=$(curl -s https://ipapi.co/timezone)
 #idiomains=$(curl -s https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF-8|")
 
-CRE='\033[0;31m'
-CYE='\033[0;33m'
-CGR='\033[0;32m'
-CBL='\033[0;94m'
-CNC='\033[0m'
+CRE=$(tput setaf 1)
+CYE=$(tput setaf 3)
+CGR=$(tput setaf 2)
+CBL=$(tput setaf 4)
+CNC=$(tput sgr0)
 CHROOT="arch-chroot /mnt"
 
 okie() {
-	printf "\n\033[1;92m OK...\033[0m\n"
+	printf "\n%s OK...%s\n" "$CGR" "$CNC"
 	sleep 2
+}
+
+titleopts () {
+	
+	local textopts="${1:?}"
+	printf " \n%s>>>%s %s%s%s\n\n" "${CBL}" "${CNC}" "${CYE}" "${textopts}" "${CNC}"
+	
 }
 
 #----------------------------------------
@@ -59,12 +66,12 @@ logo "Checando modo de arranque"
 
 	if [ -d /sys/firmware/efi/efivars ]; then	
 			bootmode="uefi"
-			echo " El escript se ejecutara en modo EFI"
+			printf " El escript se ejecutara en modo EFI"
 			sleep 2
 			clear			
 		else		
 			bootmode="mbrbios"
-			echo " El escript se ejecutara en modo BIOS/MBR"
+			printf " El escript se ejecutara en modo BIOS/MBR"
 			sleep 2
 			clear
 	fi
@@ -76,14 +83,13 @@ logo "Checando modo de arranque"
 logo "Checando conexion a internet.."
 
 	if ping archlinux.org -c 1 >/dev/null 2>&1; then
-			echo -e " Espera....\n"
+			printf " Espera....\n"
 			sleep 3
-			echo -e "${CGR} Si hay Internet!!${CNC}"
+			printf " %sSi hay Internet!!%s" "${CGR}" "${CNC}"
 			sleep 2
 			clear
 		else
-			echo " Error: Parace que no hay internet.."
-			echo " Saliendo...."
+			printf " Error: Parace que no hay internet..\n\n Saliendo...."
 			sleep 2
 			exit 0
 	fi
@@ -98,9 +104,19 @@ logo "Selecciona la distribucion de tu teclado"
 		PS3="Selecciona la distrubucion de tu teclado (1 o 2): "
 	select opt in "${setkmap_options[@]}"; do
 		case "$REPLY" in
-			1) setkmap_title='US';setkmap='us';x11keymap="us";break;;
-			2) setkmap_title='Español';setkmap='la-latin1';x11keymap="latam";break;;
-			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+			1)
+				setkmap_title='US';
+				setkmap='us';
+				x11keymap="us";
+				break;;
+			2)
+				setkmap_title='Español';
+				setkmap='la-latin1';
+				
+				x11keymap="latam";break;;
+			*)
+				echo "Opcion invalida, intenta de nuevo.";
+				continue;;
 		esac
 	done	
 
@@ -132,14 +148,13 @@ logo "Selecciona tu zona horaria"
 		tzselection=$(tzselect  | tail -n1 )
 		okie
 		clear
-		
 
-		
 #----------------------------------------
 #          Getting Information   
 #----------------------------------------
 
-logo "Ingresa la informacion Necesaria"    	
+logo "Ingresa la informacion Necesaria"
+	
 	while true
 		do 
 				read -rp "Ingresa tu usuario: " USR
@@ -147,7 +162,7 @@ logo "Ingresa la informacion Necesaria"
 				then 
 					break
 			fi 
-			echo -e "Incorrecto!! Solo se permiten minusculas.\n"
+			printf "Incorrecto!! Solo se permiten minusculas.\n\n"
 		done  
 		
 			echo
@@ -158,9 +173,9 @@ logo "Ingresa la informacion Necesaria"
 			echo
 			[ "$PASSWD" != "$CONF_PASSWD" ]
 		do 
-			echo "Los passwords no coinciden!!"; 
+			printf "Los passwords no coinciden!!\n\n"; 
 		done
-			echo "Password correcto"
+			printf "Password correcto\n"
 		
 	while        
 			echo
@@ -170,11 +185,10 @@ logo "Ingresa la informacion Necesaria"
 			echo
 			[ "$PASSWDR" != "$CONF_PASSWDR" ]
 		do 
-			echo "Los passwords no coinciden!!"; 
+			printf "Los passwords no coinciden!!\n\n"; 
 		done
-			echo "Password correcto"
-		
-					
+			printf "Password correcto\n"
+			
 	while true
 		do
 				echo
@@ -183,9 +197,9 @@ logo "Ingresa la informacion Necesaria"
 				then 
 					break 
 			fi
-			echo -e "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
+			printf "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 		done
-		clear
+	clear
 		
 logo "Ingresa la informacion Necesaria"
 
@@ -193,10 +207,18 @@ logo "Ingresa la informacion Necesaria"
 			PS3="Escoge el Kernel que usaras (1, 2 o 3): "
 	select opt in "${kernel_opts[@]}"; do
 		case "$REPLY" in
-			1) kernel='linux';break;;
-			2) kernel='linux-lts';break;;
-			3) kernel='linux-zen';break;;
-			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+			1)
+				kernel='linux';
+				break;;
+			2)
+				kernel='linux-lts';
+				break;;
+			3)
+				kernel='linux-zen';
+				break;;
+			*)
+				printf "Opcion invalida, intenta de nuevo.\n";
+				continue;;
 		esac
 	done
 	
@@ -205,9 +227,19 @@ logo "Ingresa la informacion Necesaria"
 			PS3="Selecciona cliente para manejar Internet (1 o 2): "
 	select opt in "${red_options[@]}"; do
 		case "$REPLY" in
-			1) redtitle='DHCPCD';redpack='dhcpcd';esys='dhcpcd.service';break;;
-			2) redtitle='NetworkManager';redpack='networkmanager';esys='NetworkManager';break;;
-			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+			1)
+				redtitle='DHCPCD';
+				redpack='dhcpcd';
+				esys='dhcpcd.service';
+				break;;
+			2)
+				redtitle='NetworkManager';
+				redpack='networkmanager';
+				esys='NetworkManager';
+				break;;
+			*)
+				printf "Opcion invalida, intenta de nuevo.\n";
+				continue;;
 		esac
 	done	
 
@@ -216,9 +248,17 @@ logo "Ingresa la informacion Necesaria"
 			PS3="Selecciona servidor de Audio (1 o 2): "
 	select opt in "${audioopts[@]}"; do
 		case "$REPLY" in
-			1) audiotitle='PipeWire';audiopack='pipewire pipewire-pulse pipewire-alsa pipewire-jack';break;;
-			2) audiotitle='PulseAudio';audiopack='pulseaudio';break;;
-			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+			1)
+				audiotitle='PipeWire';
+				audiopack='pipewire pipewire-pulse pipewire-alsa pipewire-jack';
+				break;;
+			2)
+				audiotitle='PulseAudio';
+				audiopack='pulseaudio';
+				break;;
+			*)
+				printf "Opcion invalida, intenta de nuevo.\n";
+				continue;;
 		esac
 	done
 	
@@ -227,20 +267,52 @@ logo "Ingresa la informacion Necesaria"
 			PS3="Escoge el entorno de escritorio que deseas instalar (1, 2, 3, 4, 5, 6 o 7): "
 	select opt in "${de_opts[@]}"; do
 		case "$REPLY" in
-			1) DEN='Bspwm';DE='bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';aurbspwm='picom-jonaburg-fix polybar xtitle';break;;
-			2) DEN='Gnome Minimal';DE='gnome';DM='gdm';SDM='gdm.service';break;;
-			3) DEN='Mate Minimal';DE='mate';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
-			4) DEN='OpenBox';DE='openbox ttf-dejavu';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
-			5) DEN='Plasma Minimal';DE='plasma-desktop';DM='sddm';SDM='sddm';break;;
-			6) DEN='XFCE';DE='xfce4 xfce4-goodies';DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';SDM='lightdm';break;;
-			7) DEN='Ninguno';break;;
-			*) echo "Opcion invalida, intenta de nuevo.";continue;;
+			1)
+				DEN='Bspwm';
+				DE='bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome';
+				DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';
+				SDM='lightdm';
+				aurbspwm='picom-jonaburg-fix polybar xtitle';
+				break;;
+			2)
+				DEN='Gnome Minimal';DE='gnome';DM='gdm';SDM='gdm.service';break;;
+			3)
+				DEN='Mate Minimal';
+				DE='mate';
+				DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';
+				SDM='lightdm';
+				break;;
+			4)
+				DEN='OpenBox';
+				DE='openbox ttf-dejavu';
+				DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';
+				SDM='lightdm';
+				break;;
+			5)
+				DEN='Plasma Minimal';
+				DE='plasma-desktop';
+				DM='sddm';
+				SDM='sddm';
+				break;;
+			6)
+				DEN='XFCE';
+				DE='xfce4 xfce4-goodies';
+				DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';
+				SDM='lightdm';
+				break;;
+			7)
+				DEN='Ninguno';
+				break;;
+			*)
+				printf "Opcion invalida, intenta de nuevo.\n";
+				continue;;
 		esac
 	done
 			clear
 			
 logo "Ingresa la informacion Necesaria"
-			PS3="Quieres instalar YAY como AUR Helper?: "
+
+		PS3="Quieres instalar YAY como AUR Helper?: "
 	select YAYH in "Si" "No"
 		do
 			if [ $YAYH ]; then
@@ -248,8 +320,8 @@ logo "Ingresa la informacion Necesaria"
 			fi
 		done
     
-			echo
-			PS3="Rstaurar mis dotfiles?: "
+		echo
+		PS3="Rstaurar mis dotfiles?: "
 	select DOTS in "Si" "No"
 		do
 			if [ $DOTS ]; then
@@ -264,10 +336,10 @@ logo "Ingresa la informacion Necesaria"
 
 logo "Creando Formatenado y Montando Particiones"
 			
-			lsblk -d -e 7,11 -o NAME,SIZE,TYPE,MODEL
-			echo "------------------------------"
-			echo
-			PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
+		lsblk -d -e 7,11 -o NAME,SIZE,TYPE,MODEL
+		printf "------------------------------"
+		echo
+		PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
 	select drive in $(lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd\|nvme\|mmcblk') 
 		do
 			if [ "$drive" ]; then
@@ -282,28 +354,30 @@ logo "Creando Formatenado y Montando Particiones"
 
 logo "Creando Formatenado y Montando Particiones"
 
-	if [ "$bootmode" == "uefi" ]; then	
-			cfdisk "${drive}"
-			sleep 3
-			partx -u "${drive}"
-			clear
+	if [ "$bootmode" == "uefi" ]; then
+	
+		cfdisk "${drive}"
+		sleep 3
+		partx -u "${drive}"
+		clear
 			
 logo "Selecciona tu particion EFI"
-			lsblk "${drive}" -I 8 -o NAME,SIZE,PARTTYPENAME
-			echo
+
+		lsblk "${drive}" -I 8 -o NAME,SIZE,PARTTYPENAME
+		echo
 			
-			PS3="Escoge la particion EFI que acabas de crear: "
-		select efipart in $(fdisk -l "${drive}" | grep EFI | cut -d" " -f1) 
-			do
-				efipart="$efipart"
-				echo
-				echo -e " Formateando la particion EFI ${efipart}\n Espere.."
-				sleep 3
-				mkfs.fat -F 32 "${efipart}"
-				okie
-				clear
+		PS3="Escoge la particion EFI que acabas de crear: "
+	select efipart in $(fdisk -l "${drive}" | grep EFI | cut -d" " -f1) 
+		do true
+				
+			echo
+			printf " Formateando la particion EFI %s\n Espere.." "${efipart}"
+			sleep 3
+			mkfs.fat -F 32 "${efipart}"
+			okie
+			clear
 				break
-			done
+		done
 		
 		else
 			cfdisk "${drive}"
@@ -318,12 +392,12 @@ logo "Creando Formatenado y Montando Particiones"
 			
 			PS3="Escoge la particion raiz que acabas de crear donde Arch Linux se instalara: "
 	select partroot in $(fdisk -l "${drive}" | grep Linux | cut -d" " -f1) 
-		do
-			partroot="$partroot"
+		do true
+			
 			break
 		done
 		    echo
-		    echo -e " Formateando la particion RAIZ {$partroot}\n Espere.."
+		    printf " Formateando la particion RAIZ %s\n Espere..\n" "{$partroot}"
 		    sleep 3
 			mkfs.ext4 -L Arch "${partroot}"
 			mount "${partroot}" /mnt
@@ -331,6 +405,8 @@ logo "Creando Formatenado y Montando Particiones"
 			
 	if [ "$bootmode" == "uefi" ]; then
 	
+			printf " Configurando y montando la particion EFI\n Espere..\n"
+			sleep 3
 			mkdir -p /mnt/efi
 			mount "${efipart}" /mnt/efi
 			sleep 3
@@ -346,56 +422,56 @@ logo "Creando Formatenado y Montando Particiones"
 logo "Configurando SWAP"
 
 			PS3="Escoge la particion SWAP: "
-		select swappart in $(fdisk -l | grep -E "swap" | cut -d" " -f1) "No quiero swap" "Crear archivo swap"
-			do
-				if [ "$swappart" = "Crear archivo swap" ]; then
+	select swappart in $(fdisk -l | grep -E "swap" | cut -d" " -f1) "No quiero swap" "Crear archivo swap"
+		do
+			if [ "$swappart" = "Crear archivo swap" ]; then
 				
-					echo "Creando archivo swap.."
-					sleep 2
-					fallocate -l 2048M /mnt/swapfile
-					chmod 600 /mnt/swapfile
-					mkswap -L SWAP /mnt/swapfile >/dev/null
-					echo " Montando Swap, espera.."
-					swapon /mnt/swapfile
-					sleep 3
-					okie
-					break
+				printf "Creando archivo swap.."
+				sleep 2
+				fallocate -l 2048M /mnt/swapfile
+				chmod 600 /mnt/swapfile
+				mkswap -L SWAP /mnt/swapfile >/dev/null
+				printf " Montando Swap, espera.."
+				swapon /mnt/swapfile
+				sleep 3
+				okie
+				break
 					
-				elif [ "$swappart" = "No quiero swap" ]; then
+			elif [ "$swappart" = "No quiero swap" ]; then
 					
-					break
+				break
 					
-				elif [ "$swappart" ]; then
+			elif [ "$swappart" ]; then
 				
-					echo
-					echo " Formateando la particion swap, espera.."
-					sleep 2
-					mkswap -L SWAP "${swappart}" >/dev/null 2>&1
-					echo " Montando Swap, espera.."
-					swapon "${swappart}"
-					sleep 3
-					okie
-					break
-				fi
-			done
-	
-			clear
+				echo
+				printf " Formateando la particion swap, espera..\n"
+				sleep 2
+				mkswap -L SWAP "${swappart}" >/dev/null 2>&1
+				printf " Montando Swap, espera..\n"
+				swapon "${swappart}"
+				sleep 3
+				okie
+				break
+			fi
+		done
+				clear
 	
 #----------------------------------------
 #          NTFS partition Select
 #----------------------------------------
 	
 logo "Particion NTFS de Windows para compartir almacenamiento"
+
 			lsblk -o NAME,SIZE,PARTTYPENAME,FSTYPE,LABEL | grep "NTFS\|Microsoft"
-			echo "------------------------------"
+			printf "------------------------------\n"
 			echo
 			PS3="Deseas montar una particion de almacenamiento compartida con WINDOWS, Escogela: "
-		select ntfspart in $(fdisk -l | grep "NTFS\|Microsoft" | cut -d" " -f1) "Ninguna"
-			do
-				if [ "$ntfspart" ]; then
-					break	
-				fi				
-			done
+	select ntfspart in $(fdisk -l | grep "NTFS\|Microsoft" | cut -d" " -f1) "Ninguna"
+		do
+			if [ "$ntfspart" ]; then
+				break	
+			fi				
+		done
 			clear
 	
 #----------------------------------------
@@ -444,59 +520,54 @@ logo "Detectando hardware.. espera.."
 #          Info
 #----------------------------------------
 	
-		echo
-		echo -e "\n --------------------"
-		echo
-		
-		echo -e " User:      ${CBL}$USR${CNC}"
-		echo -e " Hostname:  ${CBL}$HNAME${CNC}"
-		echo -e " CPU:       ${CBL}$cpu_name${CNC}"
-		echo -e " Kernel:    ${CBL}$kernel${CNC}"
-		echo -e " Graficos:  ${CBL}$gpu_name${CNC}"
-		echo -e " Lenguaje:  ${CBL}$idiomains${CNC}"
-		echo -e " Timezone:  ${CBL}$tzselection${CNC}"
-		echo -e " Teclado:   ${CBL}$setkmap_title${CNC}"
-		echo -e " Internet:  ${CBL}$redtitle${CNC}"
-		echo -e " Audio:     ${CBL}$audiotitle${CNC}"
-		echo -e " Desktop:   ${CBL}$DEN${CNC}"
+		printf "\n\n --------------------\n\n" """"""
+		printf " User:      %s%s%s\n" "${CBL}" "$USR" "${CNC}"
+		printf " Hostname:  %s%s%s\n" "${CBL}" "$HNAME" "${CNC}"
+		printf " CPU:       %s%s%s\n" "${CBL}" "$cpu_name" "${CNC}"
+		printf " Kernel:    %s%s%s\n" "${CBL}" "$kernel" "${CNC}"
+		printf " Graficos:  %s%s%s\n" "${CBL}" "$gpu_name" "${CNC}"
+		printf " Lenguaje:  %s%s%s\n" "${CBL}" "$idiomains" "${CNC}"
+		printf " Timezone:  %s%s%s\n" "${CBL}" "$tzselection" "${CNC}"
+		printf " Teclado:   %s%s%s\n" "${CBL}" "$setkmap_title" "${CNC}"
+		printf " Internet:  %s%s%s\n" "${CBL}" "$redtitle" "${CNC}"
+		printf " Audio:     %s%s%s\n" "${CBL}" "$audiotitle" "${CNC}"
+		printf " Desktop:   %s%s%s\n" "${CBL}" "$DEN" "${CNC}"
     
 	if [ "${YAYH}" = "Si" ]; then
-			echo -e " Yay:       ${CGR}Si${CNC}"
+			printf " Yay:       %sSi%s\n" "${CGR}" "${CNC}"
 		else
-			echo -e " Yay:       ${CRE}No${CNC}"
+			printf " Yay:       %sNo%s\n" "${CRE}" "${CNC}"
 	fi
 		
 	if [ "${DOTS}" = "Si" ]; then
-			echo -e " Dotfiles:  ${CGR}Si${CNC}"
+			printf " Dotfiles:  %sSi%s\n" "${CGR}" "${CNC}"
 		else
-			echo -e " Dotfiles:  ${CRE}No${CNC}"
+			printf " Dotfiles:  %sNo%s\n" "${CRE}" "${CNC}"
 	fi
 	
 	if [ "$swappart" = "Crear archivo swap" ]; then
-			echo -e " Swap:      ${CGR}Si${CNC} se crea archivo swap de 2G"
+			printf " Swap:      %sSi%s se crea archivo swap de 2G\n" "${CGR}" "${CNC}"
 	elif [ "$swappart" = "No quiero swap" ]; then
-			echo -e " Swap:      ${CRE}No${CNC}"
+			printf " Swap:      %sNo%s\n" "${CRE}" "${CNC}"
 	elif [ "$swappart" ]; then
-			echo -e " Swap:      ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${swappart}${CNC}${CYE}]${CNC}"
+			printf " Swap:      %sSi%s en %s[%s%s%s%s%s]%s\n" "${CGR}" "${CNC}" "${CYE}" "${CNC}" "${CBL}" "${swappart}" "${CNC}" "${CYE}" "${CNC}"
 	fi
 		
 	if [ "${ntfspart}" != "Ninguna" ]; then
-			echo -e " Almacenamiento Personal:  ${CGR}Si${CNC} en ${CYE}[${CNC}${CBL}${ntfspart}${CNC}${CYE}]${CNC}"
+			printf " Almacenamiento Personal:  %sSi%s en %s[%s%s%s%s%s]%s" "${CGR}" "${CNC}" "${CYE}" "${CNC}" "${CBL}" "${ntfspart}" "${CNC}" "${CYE}" "${CNC}"
 		else
-			echo -e " Almacenamiento Personal:  ${CRE}No${CNC}"
+			printf " Almacenamiento Personal:  %sNo%s\n" "${CRE}" "${CNC}"
 	fi
 		
 			echo		
-			echo -e " Arch Linux se instalara en el disco ${CYE}[${CNC}${CRE}$drive${CNC}${CYE}]${CNC} en la particion ${CYE}[${CNC}${CBL}${partroot}${CNC}${CYE}]${CNC}"
-			echo
-			echo
+			printf " Arch Linux se instalara en el disco %s[%s%s%s%s%s]${CNC}%s en la particion %s[%s%s%s%s%s]%s\n\n\n" "${CYE}" "${CNC}" "${CRE}" "${drive}" "${CNC}" "${CYE}" "${CYE}" "${CNC}" "${CBL}" "${partroot}" "${CNC}" "${CYE}" "${CNC}"
 		
 	while true; do
 			read -rp " Deseas continuar? [s/N]: " sn
 		case $sn in
 			[Ss]* ) break;;
 			[Nn]* ) exit;;
-			* ) echo " Error: solo necesitas escribir 's' o 'n'";;
+			* ) printf " Error: solo necesitas escribir 's' o 'n'\n\n";;
 		esac
 	done
 			clear
@@ -507,6 +578,7 @@ logo "Detectando hardware.. espera.."
 #----------------------------------------
 
 logo "Instalando sistema base"
+
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 	pacstrap /mnt \
@@ -527,6 +599,7 @@ logo "Instalando sistema base"
 #----------------------------------------
     
 logo "Generando FSTAB"
+
 		genfstab -U /mnt >> /mnt/etc/fstab
 		okie
 	clear
@@ -537,24 +610,24 @@ logo "Generando FSTAB"
 	
 logo "Configurando Timezone y Locales"
 		
-		$CHROOT ln -sf /usr/share/zoneinfo/"$tzselection" /etc/localtime
-		$CHROOT hwclock --systohc
-		echo
-		echo "${idiomains}".UTF-8 UTF-8 >> /mnt/etc/locale.gen
-		#sed -i 's/#'"${idiomains}"'/'"${idiomains}"'/' /mnt/etc/locale.gen
-		$CHROOT locale-gen
-		echo "LANG=$idiomains".UTF-8 >> /mnt/etc/locale.conf
-		echo "KEYMAP=$setkmap" >> /mnt/etc/vconsole.conf
-		echo "FONT=ter-v18n" >> /mnt/etc/vconsole.conf
-		export LANG=${idiomains}.UTF-8
-		okie
-		clear
+	$CHROOT ln -sf /usr/share/zoneinfo/"$tzselection" /etc/localtime
+	$CHROOT hwclock --systohc
+	echo
+	echo "${idiomains}".UTF-8 UTF-8 >> /mnt/etc/locale.gen
+	$CHROOT locale-gen
+	echo "LANG=$idiomains".UTF-8 >> /mnt/etc/locale.conf
+	echo "KEYMAP=$setkmap" >> /mnt/etc/vconsole.conf
+	echo "FONT=ter-v18n" >> /mnt/etc/vconsole.conf
+	export LANG=${idiomains}.UTF-8
+	okie
+	clear
 
 #----------------------------------------
 #          Hostname & Hosts
 #----------------------------------------
 
 logo "Configurando Internet"
+
 	echo "${HNAME}" >> /mnt/etc/hostname
 	cat >> /mnt/etc/hosts <<- EOL		
 		127.0.0.1   localhost
@@ -569,12 +642,13 @@ logo "Configurando Internet"
 #----------------------------------------
     
 logo "Usuario Y Passwords"
+
 	echo "root:$PASSWDR" | $CHROOT chpasswd
 	$CHROOT useradd -m -g users -G wheel -s /usr/bin/zsh "${USR}"
 	echo "$USR:$PASSWD" | $CHROOT chpasswd
 	sed -i 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/; /^root ALL=(ALL:ALL) ALL/a '"${USR}"' ALL=(ALL:ALL) ALL' /mnt/etc/sudoers
 	echo "Defaults insults" >> /mnt/etc/sudoers
-	echo -e " ${CBL}root${CNC} : ${CRE}$PASSWDR${CNC}\n ${CYE}$USR${CNC} : ${CRE}$PASSWD${CNC}"
+	printf " %sroot%s : %s%s%s\n %s%s%s : %s%s%s" "${CBL}" "${CNC}" "${CRE}" "${PASSWDR}" "${CNC}" "${CYE}" "${USR}" "${CNC}" "${CRE}" "${PASSWD}" "${CNC}"
 	okie
 	sleep 3
 	clear
@@ -584,6 +658,7 @@ logo "Usuario Y Passwords"
 #----------------------------------------
 
 logo "Refrescando mirros en la nueva Instalacion"
+
 	$CHROOT reflector --verbose --latest 5 --country 'United States' --age 6 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 	$CHROOT pacman -Syy
 	okie
@@ -617,49 +692,46 @@ logo "Instalando GRUB"
 
 logo "Aplicando optmizaciones.."
 
-	echo -e "${CYE}Enchulando pacman${CNC}"
+	titleopts "Editando pacman. Se activan descargas paralelas, el color y el easter egg ILoveCandy"
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /mnt/etc/pacman.conf
 	okie
     
-	echo -e "\n${CYE}Tunning ext4 file system for SSD and SpeedUp${CNC}"
+    titleopts "Optimiza y acelera ext4 para SSD"
 	sed -i '0,/relatime/s/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
 	$CHROOT tune2fs -O fast_commit "${partroot}" >/dev/null
 	okie
     
-	echo -e "\n${CYE}Optimizando las make flags para acelerar tiempos de compilado${CNC}\n"
-	echo -e "Tienes ${CBL}$(nproc)${CNC} cores."
+    titleopts "Optimizando las make flags para acelerar tiempos de compilado"
+	printf "Tienes %s%s%s cores\n" "${CBL}" "$(nproc)" "${CNC}"
 	sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
 	okie
-	clear
-	
-logo "Aplicando optmizaciones.."
     
-	echo -e "\n${CYE}Configurando CPU a modo performance${CNC}"
+    titleopts "Configurando CPU a modo performance"
 	$CHROOT pacman -S cpupower --noconfirm >/dev/null
 	sed -i "s/#governor='ondemand'/governor='performance'/" /mnt/etc/default/cpupower
 	okie
     
-	echo -e "\n${CYE}Cambiando el scheduler del kernel a mq-deadline${CNC}"
+    titleopts "Cambiando el scheduler del kernel a mq-deadline"
 	cat >> /mnt/etc/udev/rules.d/60-ssd.rules <<- EOL
 		ACTION=="add|change", KERNEL=="sd[a-z]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
 	EOL
 	okie
+	clear
+	
+logo "Aplicando optmizaciones.."
 
-	echo -e "\n${CYE}Configurando swappiness${CNC}"
+	titleopts "Modificando swappiness"
 	cat >> /mnt/etc/sysctl.d/99-swappiness.conf <<- EOL
 		vm.swappiness=10
 		vm.vfs_cache_pressure=50
 	EOL
 	okie
-	clear
 
-logo "Aplicando optmizaciones.."
-
-	echo -e "\n${CYE}Deshabilitando Journal logs..${CNC}"
+	titleopts "Deshabilitando Journal logs.."
 	sed -i 's/#Storage=auto/Storage=none/' /mnt/etc/systemd/journald.conf
 	okie
     
-	echo -e "\n${CYE}Desabilitando modulos del kernel innecesarios${CNC}"
+    titleopts "Desabilitando modulos del kernel innecesarios"
 	cat >> /mnt/etc/modprobe.d/blacklist.conf <<- EOL
 		blacklist iTCO_wdt
 		blacklist mousedev
@@ -667,12 +739,15 @@ logo "Aplicando optmizaciones.."
 		blacklist uvcvideo
 	EOL
 	okie
-		
-	echo -e "\n${CYE}Deshabilitando servicios innecesarios${CNC}\n"
+	
+	titleopts "Deshabilitando servicios innecesarios"
 	$CHROOT systemctl mask lvm2-monitor.service systemd-random-seed.service
 	okie
-		
-	echo -e "\n${CYE}Acelerando internet con los DNS de Cloudflare${CNC}"
+	clear
+	
+logo "Aplicando optmizaciones.."
+	
+	titleopts "Acelerando internet con los DNS de Cloudflare"
 	if $CHROOT pacman -Qi dhcpcd > /dev/null ; then
 	cat >> /mnt/etc/dhcpcd.conf <<- EOL
 		noarp
@@ -691,19 +766,18 @@ logo "Aplicando optmizaciones.."
 	
 logo "Aplicando optmizaciones.."
 
-		echo -e "\n${CYE}Configurando almacenamiento personal${CNC}\n"
-		ntfsuuid=$(blkid -o value -s UUID "${ntfspart}") 
-		cat >> /mnt/etc/fstab <<-EOL		
-		# My sTuFF
-		UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
-		EOL
-		cat /mnt/etc/fstab
-		echo
-		echo -e "${CYE}Tu particion compartida NTFS 'WINDOWS' Se cargara automaticamente en cada inicio para que puedas compartir archivos entre Linux y Windows.${CNC}"
-		sleep 5
-		okie
-		clear
-	fi
+	titleopts "Configurando almacenamiento personal"
+	ntfsuuid=$(blkid -o value -s UUID "${ntfspart}") 
+	cat >> /mnt/etc/fstab <<-EOL		
+	# My sTuFF
+	UUID=${ntfsuuid}		/run/media/$USR/windows	ntfs-3g		auto,rw,uid=1000,gid=984,hide_hid_files,windows_names,big_writes,noatime,dmask=022,fmask=133 0 0
+	EOL
+	
+	printf "La particion Windows %s %s Se cargara automaticamente en cada inicio para compartir archivos entre tu Linux y Windows.\n" "${ntfspart}" "${ntfsuuid}"
+	sleep 5
+	okie
+	clear
+	fi	
 	
 #----------------------------------------
 #          Installing Packages
@@ -770,7 +844,7 @@ logo "Instalando soporte WIFI"
 	if [ "$WIFI" = "y" ]; then
 			$CHROOT pacman -S iwd dialog wpa_supplicant wireless_tools --noconfirm
 		else
-			echo -e " No tienes tarjeta de red WIFI. No se instala.."
+			printf " No tienes tarjeta de red WIFI. No se instala.."
 			sleep 5
 	fi
 	clear
@@ -919,9 +993,15 @@ logo "Restaurando mis dotfiles"
 		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
 		$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
 		$CHROOT rm -rf /home/"$USR"/.themes
-		$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
+		
+		# Some images
+		printf "Descargando algunas images y mi version modificada del theme DRACULA"
+		curl -sLO https://github.com/gh0stzk/dotfiles/raw/master/gh0st.png | $CHROOT su "$USR"
+		curl -sLO https://github.com/gh0stzk/dotfiles/raw/master/arch.png | $CHROOT su "$USR"
+		mv /mnt/home/"$USR"/{arch.png,gh0st.png} /usr/share/pixmaps/
 		
 		# My Firefox theme
+		printf " Descargando y aplicando z0mbi3-F0x Firefox theme\n Espera.."
 		git clone https://github.com/gh0stzk/z0mbi3-f0x.git >/dev/null 2>&1 | $CHROOT su "$USR"
 		mv /mnt/home/"$USR"/z0mbi3-f0x/z0mbi3-Fox-Theme/chrome /mnt/home/"$USR"/.mozilla/firefox/*.default-release/
 		mv /mnt/home/"$USR"/z0mbi3-f0x/z0mbi3-Fox-Theme/user.js /mnt/home/"$USR"/.mozilla/firefox/*.default-release/
@@ -936,6 +1016,7 @@ logo "Restaurando mis dotfiles"
 
 logo "Limpiando sistema para su primer arranque"
 	sleep 2
+	rm -rf /mnt/home/"$USR"/z0mbi3-f0x/
 	rm -rf /mnt/home/"$USR"/.cache/yay/
 	rm -rf /mnt/home/"$USR"/.cache/electron/
 	rm -rf /mnt/home/"$USR"/.cache/go-build/
@@ -965,6 +1046,6 @@ clear
 		case $sn in
 			[Ss]* ) umount -a >/dev/null 2>&1;reboot;;
 			[Nn]* ) exit;;
-			* ) echo "Error: solo escribe 's' o 'n'";;
+			* ) printf "Error: solo escribe 's' o 'n'\n\n";;
 		esac
 	done
