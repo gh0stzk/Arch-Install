@@ -867,8 +867,8 @@ logo "Instalando soporte WIFI"
 			clear
 		else
 			logo "Necesitas YAY para complemetar BSPWM"
-				echo -e "\n Para instalar Polybar y Picom es necesario YAY.."
-				echo -e " Instalando YAY.."
+				printf "\n Para instalar Polybar y Picom es necesario YAY..\n\n"
+				printf " Instalando YAY..\n\n"
 			sleep 2
 				echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 			clear
@@ -1009,24 +1009,24 @@ EOL
 			echo "cd && git clone https://github.com/gh0stzk/dotfiles.git" | $CHROOT su "$USR"
 			printf "\n Moviendo los archivos de configuracion..\n"
 			mv /mnt/home/"$USR"/dotfiles/{arch.png,gh0st.png,bg_1.jpg} /mnt/usr/share/pixmaps/
-			echo "cd && mv /mnt/home/"$USR"/dotfiles/.zshrc /mnt/home/"$USR"/" | $CHROOT su "$USR"
-			echo "cd && mv /mnt/home/"$USR"/dotfiles/config/* /mnt/home/"$USR"/.config/" | $CHROOT su "$USR"
-			echo "mkdir -p /mnt/home/"$USR"/.local/share/" | $CHROOT su "$USR"
-			echo "cd && mv /mnt/home/"$USR"/dotfiles/local/* /mnt/home/"$USR"/.local/share/" | $CHROOT su "$USR"
+			echo "cd && mv dotfiles/.zshrc ~" | $CHROOT su "$USR"
+			echo "cd && mv dotfiles/config/* ~/.config/" | $CHROOT su "$USR"
+			echo "mkdir -p .local/share/" | $CHROOT su "$USR"
+			echo "cd && mv dotfiles/local/* ~/.local/share/" | $CHROOT su "$USR"
 		
 			# Dando permisos
-			echo "cd && chmod +x dotfiles/.zshrc" | $CHROOT su "$USR"
-			echo "cd && chmod +x dotfiles/config/bspwm/{bspwmrc,external_rules}" | $CHROOT su "$USR"
-			echo "cd && chmod +x dotfiles/config/polybar/launch.sh" | $CHROOT su "$USR"
-			echo "cd && chmod +x dotfiles/config/polybar/scripts/updates.sh" | $CHROOT su "$USR"
-			echo "cd && chmod +x dotfiles/config/sxhkd/sxhkdrc" | $CHROOT su "$USR"
-			echo "cd && chmod +x dotfiles/local/asciiart/colorscript" | $CHROOT su "$USR"
-			echo "cd && chmod +x -R dotfiles/local/asciiart/scripts/" | $CHROOT su "$USR"
+			echo "cd && chmod +x .zshrc" | $CHROOT su "$USR"
+			echo "cd && chmod +x .config/bspwm/{bspwmrc,external_rules}" | $CHROOT su "$USR"
+			echo "cd && chmod +x .config/polybar/launch.sh" | $CHROOT su "$USR"
+			echo "cd && chmod +x .config/polybar/scripts/updates.sh" | $CHROOT su "$USR"
+			echo "cd && chmod +x .config/sxhkd/sxhkdrc" | $CHROOT su "$USR"
+			echo "cd && chmod +x .local/asciiart/colorscript" | $CHROOT su "$USR"
+			echo "cd && chmod +x -R .local/asciiart/scripts/" | $CHROOT su "$USR"
 		
 			# Aplicando algunos cambios
 			bspmonitor=$(ls /sys/class/drm/*/edid | awk '{gsub("/sys/class/drm/card0-", "");print}' | awk '{gsub("/edid", "");print}')
-			sed -i 's/bspc monitor/bspc monitor '"${bspmonitor}"'/' /mnt/home/"$USR"/dotfiles/config/bspwm/bspwmrc
-			sed -i 's/monitor =/monitor = '"${bspmonitor}"'/' /mnt/home/"$USR"/dotfiles/config/polybar/config.ini
+			sed -i 's/bspc monitor/bspc monitor '"${bspmonitor}"'/' /mnt/home/"$USR"/.config/bspwm/bspwmrc
+			sed -i 's/monitor =/monitor = '"${bspmonitor}"'/' /mnt/home/"$USR"/.config/polybar/config.ini
 			okie
 			sleep 5
 			clear
