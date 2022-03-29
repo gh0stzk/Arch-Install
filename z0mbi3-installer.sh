@@ -389,7 +389,7 @@ logo "Creando Formatenado y Montando Particiones"
 	select partroot in $(fdisk -l "${drive}" | grep Linux | cut -d" " -f1) 
 		do
 			if [ "$partroot" ]; then
-				printf " \nFormateando la particion RAIZ %s\n Espere..\n" "{$partroot}"
+				printf " \nFormateando la particion RAIZ %s\n Espere..\n" "${partroot}"
 				sleep 3
 				mkfs.ext4 -L Arch "${partroot}" >/dev/null 2>&1
 				mount "${partroot}" /mnt
@@ -1011,7 +1011,7 @@ EOL
 			mv /mnt/home/"$USR"/dotfiles/{arch.png,gh0st.png,bg_1.jpg} /mnt/usr/share/pixmaps/
 			echo "cd && mv dotfiles/.zshrc ~" | $CHROOT su "$USR"
 			echo "cd && mv dotfiles/config/* ~/.config/" | $CHROOT su "$USR"
-			echo "mkdir -p .local/share/" | $CHROOT su "$USR"
+			echo "cd && mkdir -p .local/share/" | $CHROOT su "$USR"
 			echo "cd && mv dotfiles/local/* ~/.local/share/" | $CHROOT su "$USR"
 		
 			# Dando permisos
