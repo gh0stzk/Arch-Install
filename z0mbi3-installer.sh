@@ -272,7 +272,7 @@ logo "Ingresa la informacion Necesaria"
 				DE='bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome';
 				DM='lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx';
 				SDM='lightdm';
-				aurbspwm='picom-jonaburg-fix polybar xtitle';
+				aurbspwm='picom-jonaburg-fix polybar xtitle termite checkupdates-aur nerd-fonts-jetbrains-mono';
 				break;;
 			2)
 				DEN='Gnome Minimal';DE='gnome';DM='gdm';SDM='gdm.service';break;;
@@ -880,9 +880,9 @@ logo "Instalando soporte WIFI"
 		
 	if [ "${YAYH}" == "Si" ]; then
 
-		logo "zramswap termite"
+		logo "zramswap"
 			sleep 2
-				echo "cd && yay -S zramswap termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+				echo "cd && yay -S zramswap --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
 		logo "spotify spotify-adblock mpv popcorn-time"
 			sleep 2
@@ -894,7 +894,7 @@ logo "Instalando soporte WIFI"
 			clear
 		logo "Iconos, fuentes & stacer"
 			sleep 2
-				echo "cd && yay -S stacer nerd-fonts-jetbrains-mono nerd-fonts-ubuntu-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+				echo "cd && yay -S stacer nerd-fonts-ubuntu-mono qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 			clear
 		fi
 
@@ -928,7 +928,7 @@ EOL
 	clear
 
 #----------------------------------------
-#          My DOTFILES
+#          Xorg conf only intel
 #----------------------------------------
 
 	if [ "${gpu_name}" == "Intel Integrated" ]; then
@@ -983,41 +983,53 @@ EOL
 	fi
 	
 #----------------------------------------
-#          BSPWM Dotfiles
+#          Restoring my dotfiles
 #----------------------------------------
 	
-	if [ "${DEN}" == "Bspwm" ]; then
-	
-logo " Descargando la configuracion para BSPWM"
+	if [[ "${DEN}" == "Bspwm" ]] && [[ "${ntfsuuid}" == "01D3AE59075CA1F0" ]]; then 
+
+			logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
+			mkdir /mnt/dots
+			mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
+			echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
+			$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
+			$CHROOT rm -rf /home/"$USR"/.themes
+			$CHROOT cp /dots/stuff/zfetch /usr/bin/
+			$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
+			$CHROOT cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/
+			$CHROOT cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/
+			okie
+			sleep 5
+			clear
+
+		else
 		
-		printf "\n Descargando archivos desde github\n"
-		git clone https://github.com/gh0stzk/dotfiles.git >/dev/null 2>&1 | $CHROOT su "$USR"
-		printf "\n Moviendo los archivos de configuracion..\n"
-		mv /mnt/home/"$USR"/dotfiles/{arch.png,gh0st.png,bg_1.jpg} /mnt/usr/share/pixmaps/
-		mv /mnt/home/"$USR"/dotfiles/.zshrc /mnt/home/"$USR"/
-		mv /mnt/home/"$USR"/dotfiles/config/* /mnt/home/"$USR"/.config/
-		mkdir -p /mnt/home/"$USR"/.local/share/
-		mv /mnt/home/"$USR"/dotfiles/local/* /mnt/home/"$USR"/.local/share/
-		okie
-		clear
-	fi
-	
-	
-	if [ "${DOTS}" == "Si" ]; then
+			logo " Descargando la configuracion para BSPWM para que sea usable"
+			printf "\n Descargando archivos desde github\n"
+			echo "cd && git clone https://github.com/gh0stzk/dotfiles.git" | $CHROOT su "$USR"
+			printf "\n Moviendo los archivos de configuracion..\n"
+			mv /mnt/home/"$USR"/dotfiles/{arch.png,gh0st.png,bg_1.jpg} /mnt/usr/share/pixmaps/
+			echo "cd && mv /mnt/home/"$USR"/dotfiles/.zshrc /mnt/home/"$USR"/" | $CHROOT su "$USR"
+			echo "cd && mv /mnt/home/"$USR"/dotfiles/config/* /mnt/home/"$USR"/.config/" | $CHROOT su "$USR"
+			echo "mkdir -p /mnt/home/"$USR"/.local/share/" | $CHROOT su "$USR"
+			echo "cd && mv /mnt/home/"$USR"/dotfiles/local/* /mnt/home/"$USR"/.local/share/" | $CHROOT su "$USR"
 		
-logo "Restaurando mis dotfiles"
+			# Dando permisos
+			echo "cd && chmod +x dotfiles/.zshrc" | $CHROOT su "$USR"
+			echo "cd && chmod +x dotfiles/config/bspwm/{bspwmrc,external_rules}" | $CHROOT su "$USR"
+			echo "cd && chmod +x dotfiles/config/polybar/launch.sh" | $CHROOT su "$USR"
+			echo "cd && chmod +x dotfiles/config/polybar/scripts/updates.sh" | $CHROOT su "$USR"
+			echo "cd && chmod +x dotfiles/config/sxhkd/sxhkdrc" | $CHROOT su "$USR"
+			echo "cd && chmod +x dotfiles/local/asciiart/colorscript" | $CHROOT su "$USR"
+			echo "cd && chmod +x -R dotfiles/local/asciiart/scripts/" | $CHROOT su "$USR"
 		
-		titleopts "Aviso!! Esta opcion solo funciona en mi maquina, diseñada para mi instalacion. Tu veras mensajes de error, no hay de que preocuparse."
-		mkdir /mnt/dots
-		mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
-		echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
-		$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
-		$CHROOT rm -rf /home/"$USR"/.themes
-		$CHROOT cp /dots/stuff/zfetch /usr/bin/
-		$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
-		$CHROOT cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/
-		$CHROOT cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/
-		clear
+			# Aplicando algunos cambios
+			bspmonitor=$(ls /sys/class/drm/*/edid | awk '{gsub("/sys/class/drm/card0-", "");print}' | awk '{gsub("/edid", "");print}')
+			sed -i 's/bspc monitor/bspc monitor '"${bspmonitor}"'/' /mnt/home/"$USR"/dotfiles/config/bspwm/bspwmrc
+			sed -i 's/monitor =/monitor = '"${bspmonitor}"'/' /mnt/home/"$USR"/dotfiles/config/polybar/config.ini
+			okie
+			sleep 5
+			clear
 	fi
 
 #----------------------------------------
