@@ -102,7 +102,7 @@ logo "Creando Formatenado y Montando Particiones"
 
 logo "Creando Formatenado y Montando Particiones"
 
-			echo
+			cfdisk "${drive}"
 			lsblk "${drive}" -I 8 -o NAME,SIZE,FSTYPE,PARTTYPENAME
 			echo
 			
