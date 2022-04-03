@@ -27,7 +27,7 @@ titleopts () {
 logo() {
 	
 	local text="${1:?}"
-	printf ' \033[0;31m[ \033[0m\033[1;93m%s\033[0m \033[0;31m]\033[0m\n' "${text}"
+	printf ' \033[0;31m[ \033[0m\033[1;93m%s\033[0m \033[0;31m]\033[0m\n\n' "${text}"
 }
 	
 
@@ -105,9 +105,13 @@ logo "Selecciona el disco para la instalacion"
 #          Creando y Montando particion raiz
 #----------------------------------------
 
-logo "Formatenado y Montando Particiones"
+logo "Creando Particiones"
 
 			cfdisk "${drive}"
+			clear
+			
+logo "Formatenado y Montando Particiones"
+
 			lsblk "${drive}" -I 8 -o NAME,SIZE,FSTYPE,PARTTYPENAME
 			echo
 			
@@ -115,7 +119,7 @@ logo "Formatenado y Montando Particiones"
 	select partroot in $(fdisk -l "${drive}" | grep Linux | cut -d" " -f1) 
 		do
 			if [ "$partroot" ]; then
-				printf " \nFormateando la particion RAIZ %s\n Espere..\n" "${partroot}"
+				printf " \n Formateando la particion RAIZ %s\n Espere..\n" "${partroot}"
 				sleep 2
 				mkfs.ext4 -L Arch "${partroot}" >/dev/null 2>&1
 				mount "${partroot}" /mnt
@@ -178,7 +182,7 @@ logo "Configurando SWAP"
 		printf " Hostname:  %s%s%s\n" "${CBL}" "$HNAME" "${CNC}"
 	
 	if [ "$swappart" = "Crear archivo swap" ]; then
-			printf " Swap:      %sSi%s se crea archivo swap de 2G\n" "${CGR}" "${CNC}"
+			printf " Swap:      %sSi%s se crea archivo swap de 4G\n" "${CGR}" "${CNC}"
 	elif [ "$swappart" = "No quiero swap" ]; then
 			printf " Swap:      %sNo%s\n" "${CRE}" "${CNC}"
 	elif [ "$swappart" ]; then
@@ -186,7 +190,7 @@ logo "Configurando SWAP"
 	fi
 		
 			echo		
-			printf " \nArch Linux se instalara en el disco %s[%s%s%s%s%s]%s en la particion %s[%s%s%s%s%s]%s\n\n\n" "${CYE}" "${CNC}" "${CRE}" "${drive}" "${CNC}" "${CYE}" "${CNC}" "${CYE}" "${CNC}" "${CBL}" "${partroot}" "${CNC}" "${CYE}" "${CNC}"
+			printf "\n Arch Linux se instalara en el disco %s[%s%s%s%s%s]%s en la particion %s[%s%s%s%s%s]%s\n\n\n" "${CYE}" "${CNC}" "${CRE}" "${drive}" "${CNC}" "${CYE}" "${CNC}" "${CYE}" "${CNC}" "${CBL}" "${partroot}" "${CNC}" "${CYE}" "${CNC}"
 		
 	while true; do
 			read -rp " Deseas continuar? [s/N]: " sn
@@ -391,7 +395,8 @@ logo "Aplicando optmizaciones.."
 #          Installing Packages
 #----------------------------------------
 
-logo "Instalando Audio & Video"	
+logo "Instalando Audio & Video"
+
 	$CHROOT pacman -S \
 					  mesa-amber xorg-server xf86-video-intel \
 					  xorg-xinput xorg-xsetroot \
@@ -400,6 +405,7 @@ logo "Instalando Audio & Video"
 	clear
 	
 logo "Instalando codecs multimedia y utilidades"
+
 	$CHROOT pacman -S \
                       ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl \
                       jasper openjpeg2 libwebp webp-pixbuf-loader \
@@ -408,6 +414,7 @@ logo "Instalando codecs multimedia y utilidades"
 	clear
 	
 logo "Instalando soporte para montar volumenes y dispositivos multimedia extraibles"
+
 	$CHROOT pacman -S \
 					  libmtp gvfs-nfs gvfs gvfs-mtp \
 					  dosfstools usbutils net-tools \
@@ -416,6 +423,7 @@ logo "Instalando soporte para montar volumenes y dispositivos multimedia extraib
 	clear
 	
 logo "Instalando apps que yo uso"
+
 	$CHROOT pacman -S \
 					  android-file-transfer bleachbit gimp gcolor3 geany gparted simplescreenrecorder \
 					  thunar thunar-archive-plugin tumbler xarchiver \
@@ -426,9 +434,6 @@ logo "Instalando apps que yo uso"
 					  papirus-icon-theme ttf-joypixels terminus-font grsync git \
 					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
-	clear
-	
-logo "Instalando Entorno de Escritorio"
 
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
 	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
@@ -557,9 +562,6 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 #----------------------------------------
 
 	sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /mnt/etc/sudoers
-	okie
-	sleep 2
-	clear
 
 #----------------------------------------
 #          Cleaning Garbage
@@ -603,7 +605,7 @@ echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}'
 		echo
 		
 	while true; do
-			read -rp "Quieres reiniciar ahora? [s/N]: " sn
+			read -rp " Quieres reiniciar ahora? [s/N]: " sn
 		case $sn in
 			[Ss]* ) umount -a >/dev/null 2>&1;reboot;;
 			[Nn]* ) exit;;
