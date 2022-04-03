@@ -22,14 +22,21 @@ titleopts () {
 	
 	local textopts="${1:?}"
 	printf " \n%s>>>%s %s%s%s\n" "${CBL}" "${CNC}" "${CYE}" "${textopts}" "${CNC}"
-	
 }
+
+logo() {
+	
+	local text="${1:?}"
+	printf ' \033[0;31m[ \033[0m\033[1;93m%s\033[0m \033[0;31m]\033[0m\n' "${text}"
+}
+	
 
 #----------------------------------------
 #          Getting Information   
 #----------------------------------------
 
-	
+logo "Ingresa la informacion Necesaria"
+
 	while true
 		do 
 				read -rp "Ingresa tu usuario: " USR
@@ -75,14 +82,12 @@ titleopts () {
 			printf "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
 		done
 	clear
-		
-logo "Ingresa la informacion Necesaria"
 
 #----------------------------------------
 #          Select DISK
 #----------------------------------------
 
-logo "Creando Formatenado y Montando Particiones"
+logo "Selecciona el disco para la instalacion"
 			
 		lsblk -d -e 7,11 -o NAME,SIZE,TYPE,MODEL
 		printf "%s\n" "------------------------------"
@@ -100,7 +105,7 @@ logo "Creando Formatenado y Montando Particiones"
 #          Creando y Montando particion raiz
 #----------------------------------------
 
-logo "Creando Formatenado y Montando Particiones"
+logo "Formatenado y Montando Particiones"
 
 			cfdisk "${drive}"
 			lsblk "${drive}" -I 8 -o NAME,SIZE,FSTYPE,PARTTYPENAME
@@ -111,10 +116,10 @@ logo "Creando Formatenado y Montando Particiones"
 		do
 			if [ "$partroot" ]; then
 				printf " \nFormateando la particion RAIZ %s\n Espere..\n" "${partroot}"
-				sleep 3
+				sleep 2
 				mkfs.ext4 -L Arch "${partroot}" >/dev/null 2>&1
 				mount "${partroot}" /mnt
-				sleep 3	
+				sleep 2
 				break
 			fi
 		done
@@ -134,14 +139,14 @@ logo "Configurando SWAP"
 		do
 			if [ "$swappart" = "Crear archivo swap" ]; then
 				
-				printf "Creando archivo swap.."
+				printf "\n Creando archivo swap..\n"
 				sleep 2
 				fallocate -l 4096M /mnt/swapfile
 				chmod 600 /mnt/swapfile
 				mkswap -L SWAP /mnt/swapfile >/dev/null
-				printf " Montando Swap, espera.."
+				printf " Montando Swap, espera..\n"
 				swapon /mnt/swapfile
-				sleep 3
+				sleep 2
 				okie
 				break
 					
@@ -152,12 +157,12 @@ logo "Configurando SWAP"
 			elif [ "$swappart" ]; then
 				
 				echo
-				printf " Formateando la particion swap, espera..\n"
+				printf " \nFormateando la particion swap, espera..\n"
 				sleep 2
 				mkswap -L SWAP "${swappart}" >/dev/null 2>&1
 				printf " Montando Swap, espera..\n"
 				swapon "${swappart}"
-				sleep 3
+				sleep 2
 				okie
 				break
 			fi
@@ -358,9 +363,6 @@ logo "Aplicando optmizaciones.."
 	echo
 	$CHROOT systemctl mask lvm2-monitor.service systemd-random-seed.service
 	okie
-	clear
-	
-logo "Aplicando optmizaciones.."
 	
 	titleopts "Acelerando internet con los DNS de Cloudflare"
 	if $CHROOT pacman -Qi dhcpcd > /dev/null ; then
@@ -375,7 +377,6 @@ logo "Aplicando optmizaciones.."
 	EOL
 	fi
 	okie
-	clear
 
 	titleopts "Configurando almacenamiento personal"
 	cat >> /mnt/etc/fstab <<-EOL		
@@ -423,6 +424,7 @@ logo "Instalando apps que yo uso"
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna \
 					  firefox firefox-i18n-es-mx transmission-gtk \
 					  papirus-icon-theme ttf-joypixels terminus-font grsync git \
+					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
 	clear
 	
@@ -467,15 +469,6 @@ logo "Activando Servicios"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
 	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
-	
-#----------------------------------------
-#          Reverting No Pasword Privileges
-#----------------------------------------
-
-	sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /mnt/etc/sudoers
-	okie
-	sleep 2
-	clear
 
 #----------------------------------------
 #          Xorg conf only intel
@@ -560,6 +553,15 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 	clear
 
 #----------------------------------------
+#          Reverting No Pasword Privileges
+#----------------------------------------
+
+	sed -i 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /mnt/etc/sudoers
+	okie
+	sleep 2
+	clear
+
+#----------------------------------------
 #          Cleaning Garbage
 #----------------------------------------
 
@@ -571,6 +573,11 @@ logo "Limpiando sistema para su primer arranque"
 	rm -rf /mnt/home/"$USR"/.cache/go-build/
 	rm -rf /mnt/home/"$USR"/.cargo/
 	rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop}
+	rm -rf /mnt/usr/lib/firmware/{amd,amdgpu,amd-ucode,mellanox,mwlwifi,netronome,nvidia,radeon,rtlwifi}
+	rm -rf /mnt/usr/share/icons/{Qogir-manjaro,Qogir-manjaro-dark,Papirus-Light}
+	rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop}
+	rm -f /mnt/opt/whatsapp-nativefier/locales/{am.pak,ar.pak,bg.pak,bn.pak,ca.pak,cs.pak,da.pak,de.pak,el.pak,en-GB.pak,et.pak,fa.pak,fi.pak,fil.pak,fr.pak,gu.pak,he.pak,hi.pak,hr.pak,hu.pak,id.pak,it.pak,ja.pak,kn.pak,ko.pak,lt.pak,lv.pak,ml.pak,mr.pak,ms.pak,nb.pak,nl.pak,pl.pak,pt-BR.pak,pt-PT.pak,ro.pak,ru.pak,sk.pak,sl.pak,sr.pak,sv.pak,sw.pak,ta.pak,te.pak,th.pak,tr.pak,uk.pak,vi.pak,zh-CN.pak,zh-TW.pak}
+	rm -f /mnt/usr/lib/firmware/{iwlwifi-100-5.ucode,iwlwifi-105-6.ucode,iwlwifi-135-6.ucode,iwlwifi-1000-3.ucode,iwlwifi-1000-5.ucode,iwlwifi-2000-6.ucode,iwlwifi-2030-6.ucode,iwlwifi-3160-7.ucode,iwlwifi-3160-8.ucode,iwlwifi-3160-9.ucode,iwlwifi-3160-10.ucode,iwlwifi-3160-12.ucode,iwlwifi-3160-13.ucode,iwlwifi-3160-16.ucode,iwlwifi-3160-17.ucode,iwlwifi-3168-21.ucode,iwlwifi-3168-22.ucode,iwlwifi-3168-27.ucode,iwlwifi-3168-29.ucode,iwlwifi-3945-2.ucode,iwlwifi-4965-2.ucode,iwlwifi-5000-1.ucode,iwlwifi-5000-2.ucode,iwlwifi-5000-5.ucode,iwlwifi-5150-2.ucode,iwlwifi-6000-4.ucode,iwlwifi-6000g2a-5.ucode,iwlwifi-6000g2a-6.ucode,iwlwifi-6000g2b-5.ucode,iwlwifi-6000g2b-6.ucode,iwlwifi-6050-4.ucode,iwlwifi-6050-5.ucode,iwlwifi-7260-7.ucode,iwlwifi-7260-8.ucode,iwlwifi-7260-9.ucode,iwlwifi-7260-10.ucode,iwlwifi-7260-12.ucode,iwlwifi-7260-13.ucode,iwlwifi-7260-16.ucode,iwlwifi-7260-17.ucode,iwlwifi-7265-8.ucode,iwlwifi-7265-9.ucode,iwlwifi-7265-10.ucode,iwlwifi-7265-12.ucode,iwlwifi-7265-13.ucode,iwlwifi-7265-16.ucode,iwlwifi-7265-17.ucode,iwlwifi-7265D-10.ucode,iwlwifi-7265D-12.ucode,iwlwifi-7265D-13.ucode,iwlwifi-7265D-16.ucode,iwlwifi-7265D-17.ucode,iwlwifi-7265D-21.ucode,iwlwifi-7265D-22.ucode,iwlwifi-7265D-27.ucode,iwlwifi-7265D-29.ucode,iwlwifi-8000C-13.ucode,iwlwifi-8000C-16.ucode,iwlwifi-8000C-21.ucode,iwlwifi-8000C-22.ucode,iwlwifi-8000C-27.ucode,iwlwifi-8000C-31.ucode,iwlwifi-8000C-34.ucode,iwlwifi-8000C-36.ucode,iwlwifi-8265-21.ucode,iwlwifi-8265-22.ucode,iwlwifi-8265-27.ucode,iwlwifi-8265-31.ucode,iwlwifi-8265-34.ucode,iwlwifi-8265-36.ucode,iwlwifi-9000-pu-b0-jf-b0-33.ucode,iwlwifi-9000-pu-b0-jf-b0-34.ucode,iwlwifi-9000-pu-b0-jf-b0-38.ucode,iwlwifi-9000-pu-b0-jf-b0-41.ucode,iwlwifi-9000-pu-b0-jf-b0-43.ucode,iwlwifi-9000-pu-b0-jf-b0-46.ucode,iwlwifi-9260-th-b0-jf-b0-33.ucode,iwlwifi-9260-th-b0-jf-b0-34.ucode,iwlwifi-9260-th-b0-jf-b0-38.ucode,iwlwifi-9260-th-b0-jf-b0-41.ucode,iwlwifi-9260-th-b0-jf-b0-43.ucode,iwlwifi-9260-th-b0-jf-b0-46.ucode,iwlwifi-cc-a0-46.ucode,iwlwifi-cc-a0-48.ucode,iwlwifi-cc-a0-50.ucode,iwlwifi-cc-a0-53.ucode,iwlwifi-cc-a0-55.ucode,iwlwifi-cc-a0-59.ucode,iwlwifi-cc-a0-62.ucode,iwlwifi-cc-a0-63.ucode,iwlwifi-Qu-b0-hr-b0-48.ucode,iwlwifi-Qu-b0-hr-b0-50.ucode,iwlwifi-Qu-b0-hr-b0-53.ucode,iwlwifi-Qu-b0-hr-b0-55.ucode,iwlwifi-Qu-b0-hr-b0-59.ucode,iwlwifi-Qu-b0-hr-b0-62.ucode,iwlwifi-Qu-b0-hr-b0-63.ucode,iwlwifi-Qu-b0-jf-b0-48.ucode,iwlwifi-Qu-b0-jf-b0-50.ucode,iwlwifi-Qu-b0-jf-b0-53.ucode,iwlwifi-Qu-b0-jf-b0-55.ucode,iwlwifi-Qu-b0-jf-b0-59.ucode,iwlwifi-Qu-b0-jf-b0-62.ucode,iwlwifi-Qu-b0-jf-b0-63.ucode,iwlwifi-Qu-c0-hr-b0-48.ucode,iwlwifi-Qu-c0-hr-b0-50.ucode,iwlwifi-Qu-c0-hr-b0-53.ucode,iwlwifi-Qu-c0-hr-b0-55.ucode,iwlwifi-Qu-c0-hr-b0-59.ucode,iwlwifi-Qu-c0-hr-b0-62.ucode,iwlwifi-Qu-c0-hr-b0-63.ucode,iwlwifi-Qu-c0-jf-b0-48.ucode,iwlwifi-Qu-c0-jf-b0-50.ucode,iwlwifi-Qu-c0-jf-b0-53.ucode,iwlwifi-Qu-c0-jf-b0-55.ucode,iwlwifi-Qu-c0-jf-b0-59.ucode,iwlwifi-Qu-c0-jf-b0-62.ucode,iwlwifi-Qu-c0-jf-b0-63.ucode,iwlwifi-QuZ-a0-hr-b0-48.ucode,iwlwifi-QuZ-a0-hr-b0-50.ucode,iwlwifi-QuZ-a0-hr-b0-53.ucode,iwlwifi-QuZ-a0-hr-b0-55.ucode,iwlwifi-QuZ-a0-hr-b0-59.ucode,iwlwifi-QuZ-a0-hr-b0-62.ucode,iwlwifi-QuZ-a0-hr-b0-63.ucode,iwlwifi-QuZ-a0-jf-b0-48.ucode,iwlwifi-QuZ-a0-jf-b0-50.ucode,iwlwifi-QuZ-a0-jf-b0-53.ucode,iwlwifi-QuZ-a0-jf-b0-55.ucode,iwlwifi-QuZ-a0-jf-b0-59.ucode,iwlwifi-QuZ-a0-jf-b0-62.ucode,iwlwifi-QuZ-a0-jf-b0-63.ucode,iwlwifi-so-a0-gf-a0.pnvm,iwlwifi-so-a0-gf-a0-64.ucode,iwlwifi-so-a0-hr-b0-64.ucode,iwlwifi-so-a0-jf-b0-64.ucode,iwlwifi-ty-a0-gf-a0.pnvm,iwlwifi-ty-a0-gf-a0-59.ucode,iwlwifi-ty-a0-gf-a0-62.ucode,iwlwifi-ty-a0-gf-a0-63.ucode,iwlwifi-ty-a0-gf-a0-66.ucode}
 
 	$CHROOT pacman -Scc
 	$CHROOT pacman -Rns go --noconfirm >/dev/null 2>&1
@@ -583,10 +590,14 @@ clear
 #                Bye
 #----------------------------------------
 
-	curl -s https://raw.githubusercontent.com/gh0stzk/Arch-Install/main/zfetch > zfetch
-	mv zfetch /mnt/usr/bin/
-	chmod +x /mnt/usr/bin/zfetch
-	$CHROOT /usr/bin/zfetch
+echo -e "          .            "
+echo -e "         / \           I use Arch BTW.."
+echo -e "        /   \          ==========================="     
+echo -e "       /^.   \         os       $(awk -F '"' '/PRETTY_NAME/ { print $2 }' /etc/os-release)"    
+echo -e "      /  .-.  \        Kernel   $(arch-chroot /mnt uname -r)"   
+echo -e "     /  (   ) _\       pkgs     $(arch-chroot /mnt pacman -Q | wc -l)"
+echo -e "    / _.~   ~._^\      ram      $(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/''\2 MB/p')"
+echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}')"
 		
 		echo
 		echo
