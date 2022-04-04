@@ -398,7 +398,7 @@ logo "Aplicando optmizaciones.."
 logo "Instalando Audio & Video"
 
 	$CHROOT pacman -S \
-					  mesa-amber xorg-server xf86-video-intel \
+					  mesa-amber libva-mesa-driver xorg-server xf86-video-intel \
 					  xorg-xinput xorg-xsetroot \
 					  pipewire pipewire-pulse pipewire-alsa \
 					  --noconfirm
@@ -432,6 +432,7 @@ logo "Instalando apps que yo uso"
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna \
 					  firefox firefox-i18n-es-mx transmission-gtk \
 					  papirus-icon-theme ttf-joypixels terminus-font grsync git \
+					  bspwm rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome \
 					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
 
@@ -516,7 +517,7 @@ EOL
 Section "InputClass"
 		Identifier	"system-keyboard"
 		MatchIsKeyboard	"on"
-		Option	"XkbLayout"	"${x11keymap}"
+		Option	"XkbLayout"	"latam"
 EndSection
 EOL
 		printf "%s00-keyboard.conf%s generated in --> /etc/X11/xorg.conf.d\n" "${CGR}" "${CNC}"
@@ -547,12 +548,14 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 	mkdir /mnt/dots
 	mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
 	echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
+	
 	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
 	$CHROOT rm -rf /home/"$USR"/.themes
 	$CHROOT cp /dots/stuff/zfetch /usr/bin/
 	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
-	$CHROOT cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/
-	$CHROOT cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/
+	
+	echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
+	echo "cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
 	okie
 	sleep 5
 	clear
@@ -569,7 +572,6 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 
 logo "Limpiando sistema para su primer arranque"
 	sleep 2
-	rm -rf /mnt/home/"$USR"/dotfiles/
 	rm -rf /mnt/home/"$USR"/.cache/yay/
 	rm -rf /mnt/home/"$USR"/.cache/electron/
 	rm -rf /mnt/home/"$USR"/.cache/go-build/
@@ -599,7 +601,7 @@ echo -e "       /^.   \         os       $(awk -F '"' '/PRETTY_NAME/ { print $2 
 echo -e "      /  .-.  \        Kernel   $(arch-chroot /mnt uname -r)"   
 echo -e "     /  (   ) _\       pkgs     $(arch-chroot /mnt pacman -Q | wc -l)"
 echo -e "    / _.~   ~._^\      ram      $(free --mega | sed -n -E '2s/^[^0-9]*([0-9]+) *([0-9]+).*/''\2 MB/p')"
-echo -e "   /.^         ^.\     Disk     $(df -h / | grep "/" | awk '{print $3}')"
+echo -e "   /.^         ^.\     Disk     $(arch-chroot /mnt df -h / | grep "/" | awk '{print $3}')"
 		
 		echo
 		echo
