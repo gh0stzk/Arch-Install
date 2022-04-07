@@ -397,9 +397,17 @@ logo "Aplicando optmizaciones.."
 
 logo "Instalando Audio & Video"
 
+    mkdir /mnt/dots
+	mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
+
 	$CHROOT pacman -S \
-					  mesa-amber libva-mesa-driver xorg-server xf86-video-intel \
-					  xorg-xinput xorg-xsetroot \
+					  xorg-server xorg-xinput xorg-xsetroot \
+					  --noconfirm
+					  
+	$CHROOT pacman -U /dots/stuff/mesa-i915g-21.2.3-2-x86_64.pkg.tar.zst
+	$CHROOT pacman -U /dots/stuff/xf86-video-intel-git-1:2.99.917+916+g31486f40-1-x86_64.pkg.tar.zst
+	
+	$CHROOT pacman -S \
 					  pipewire pipewire-pulse pipewire-alsa \
 					  --noconfirm
 	clear
@@ -457,12 +465,16 @@ logo "Instalando apps que yo uso"
 #          AUR Packages
 #----------------------------------------
 
+
 	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
-	echo "cd && yay -S picom-jonaburg-fix polybar xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-	echo "cd && yay -S zramswap --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-	echo "cd && yay -S stacer nerd-fonts-ubuntu-mono qogir-icon-theme nerd-fonts-jetbrains-mono --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	
+	$CHROOT pacman -U /dots/stuff/{perl-checkupdates-aur-0.04-1-any.pkg.tar.zst,checkupdates-aur-0.04-1-any.pkg.tar.zst,mpv-git-0.34.0_247_g73a06ffae6-1-x86_64.pkg.tar.zst,nerd-fonts-jetbrains-mono-2.1.0-3-any.pkg.tar.zst,nerd-fonts-ubuntu-mono-2.1.0-2-any.pkg.tar.zst,picom-jonaburg-fix-0.1-2-x86_64.pkg.tar.zst,polybar-3.6.2-1-x86_64.pkg.tar.zst,popcorntime-bin-0.4.7-1-x86_64.pkg.tar.zst,qogir-icon-theme-2022.01.12-1-any.pkg.tar.zst,spotify-1:1.1.80.699-1-x86_64.pkg.tar.zst,spotify-adblock-git-1:1.0.1.r7.g05793f6-1-x86_64.pkg.tar.zst,stacer-1.1.0-1-x86_64.pkg.tar.zst,telegram-desktop-bin-3.6.1-1-x86_64.pkg.tar.zst,termite-16.3-1-x86_64.pkg.tar.zst,whatsapp-nativefier-2.2206.5-1-x86_64.pkg.tar.zst,xtitle-0.4.4-2-x86_64.pkg.tar.zst,zram-swap-git-02.r6.g205ea1e-1-any.pkg.tar.zst}
+	
+	#echo "cd && yay -S picom-jonaburg-fix polybar xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	#echo "cd && yay -S zramswap --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	#echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	#echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	#echo "cd && yay -S stacer nerd-fonts-ubuntu-mono qogir-icon-theme nerd-fonts-jetbrains-mono --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 
 #----------------------------------------
 #          Enable Services & other stuff
@@ -471,7 +483,7 @@ logo "Instalando apps que yo uso"
 logo "Activando Servicios"
 
 	$CHROOT systemctl enable dhcpcd.service lightdm cpupower systemd-timesyncd.service
-	$CHROOT systemctl enable zramswap
+	$CHROOT systemctl enable zram-swap.service
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
 	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
@@ -483,16 +495,16 @@ logo "Activando Servicios"
 	
 logo "Generating my XORG config files"
 	
-	cat >> /mnt/etc/X11/xorg.conf.d/20-intel.conf <<EOL		
-Section "Device"
-	Identifier	"Intel Graphics"
-	Driver		"Intel"
-	Option		"AccelMethod"	"sna"
-	Option		"DRI"		"3"
-	Option		"TearFree"	"true"
-EndSection
-EOL
-		printf "%s20-intel.conf%s generated in --> /etc/X11/xorg.conf.d\n" "${CGR}" "${CNC}"
+	#cat >> /mnt/etc/X11/xorg.conf.d/20-intel.conf <<EOL		
+#Section "Device"
+	#Identifier	"Intel Graphics"
+	#Driver		"Intel"
+	#Option		"AccelMethod"	"sna"
+	#Option		"DRI"		"3"
+	#Option		"TearFree"	"true"
+#EndSection
+#EOL
+		#printf "%s20-intel.conf%s generated in --> /etc/X11/xorg.conf.d\n" "${CGR}" "${CNC}"
 		  
 	cat >> /mnt/etc/X11/xorg.conf.d/10-monitor.conf <<EOL
 Section "Monitor"
@@ -522,19 +534,19 @@ EndSection
 EOL
 		printf "%s00-keyboard.conf%s generated in --> /etc/X11/xorg.conf.d\n" "${CGR}" "${CNC}"
 		
-	cat >> /mnt/etc/drirc <<EOL
-<driconf>
+	#cat >> /mnt/etc/drirc <<EOL
+#<driconf>
 
-	<device driver="i915">
-		<application name="Default">
-			<option name="stub_occlusion_query" value="true" />
-			<option name="fragment_shader" value="true" />
-		</application>
-	</device>
+	#<device driver="i915">
+		#<application name="Default">
+			#<option name="stub_occlusion_query" value="true" />
+			#<option name="fragment_shader" value="true" />
+		#</application>
+	#</device>
 	
-</driconf>
-EOL
-		printf "%sdrirc%s generated in --> /etc" "${CGR}" "${CNC}"
+#</driconf>
+#EOL
+		#printf "%sdrirc%s generated in --> /etc" "${CGR}" "${CNC}"
 		sleep 2
 		clear
 	
@@ -545,8 +557,6 @@ EOL
 
 logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 			
-	mkdir /mnt/dots
-	mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
 	echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
 	
 	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
