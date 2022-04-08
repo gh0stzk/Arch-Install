@@ -404,8 +404,7 @@ logo "Instalando Audio & Video"
 					  xorg-server xorg-xinput xorg-xsetroot \
 					  --noconfirm
 					  
-	$CHROOT pacman -U /dots/stuff/mesa-i915g-21.2.3-2-x86_64.pkg.tar.zst
-	$CHROOT pacman -U /dots/stuff/xf86-video-intel-git-1:2.99.917+916+g31486f40-1-x86_64.pkg.tar.zst
+	$CHROOT pacman -U /dots/stuff/apps/{mesa-i915g-21.2.3-2-x86_64.pkg.tar.zst,xf86-video-intel-git-1:2.99.917+916+g31486f40-1-x86_64.pkg.tar.zst}
 	
 	$CHROOT pacman -S \
 					  pipewire pipewire-pulse pipewire-alsa \
@@ -468,7 +467,7 @@ logo "Instalando apps que yo uso"
 
 	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 	
-	$CHROOT pacman -U /dots/stuff/{perl-checkupdates-aur-0.04-1-any.pkg.tar.zst,checkupdates-aur-0.04-1-any.pkg.tar.zst,mpv-git-0.34.0_247_g73a06ffae6-1-x86_64.pkg.tar.zst,nerd-fonts-jetbrains-mono-2.1.0-3-any.pkg.tar.zst,nerd-fonts-ubuntu-mono-2.1.0-2-any.pkg.tar.zst,picom-jonaburg-fix-0.1-2-x86_64.pkg.tar.zst,polybar-3.6.2-1-x86_64.pkg.tar.zst,popcorntime-bin-0.4.7-1-x86_64.pkg.tar.zst,qogir-icon-theme-2022.01.12-1-any.pkg.tar.zst,spotify-1:1.1.80.699-1-x86_64.pkg.tar.zst,spotify-adblock-git-1:1.0.1.r7.g05793f6-1-x86_64.pkg.tar.zst,stacer-1.1.0-1-x86_64.pkg.tar.zst,telegram-desktop-bin-3.6.1-1-x86_64.pkg.tar.zst,termite-16.3-1-x86_64.pkg.tar.zst,whatsapp-nativefier-2.2206.5-1-x86_64.pkg.tar.zst,xtitle-0.4.4-2-x86_64.pkg.tar.zst,zram-swap-git-02.r6.g205ea1e-1-any.pkg.tar.zst}
+	$CHROOT pacman -U /dots/stuff/apps/{checkupdates-aur-0.04-1-any.pkg.tar.zst,perl-checkupdates-aur-0.04-1-any.pkg.tar.zst,mpv-git-0.34.0_247_g73a06ffae6-1-x86_64.pkg.tar.zst,nerd-fonts-jetbrains-mono-2.1.0-3-any.pkg.tar.zst,nerd-fonts-ubuntu-mono-2.1.0-2-any.pkg.tar.zst,picom-jonaburg-fix-0.1-2-x86_64.pkg.tar.zst,polybar-3.6.2-1-x86_64.pkg.tar.zst,popcorntime-bin-0.4.7-1-x86_64.pkg.tar.zst,qogir-icon-theme-2022.01.12-1-any.pkg.tar.zst,spotify-1:1.1.80.699-1-x86_64.pkg.tar.zst,spotify-adblock-git-1:1.0.1.r7.g05793f6-1-x86_64.pkg.tar.zst,stacer-1.1.0-1-x86_64.pkg.tar.zst,telegram-desktop-bin-3.6.1-1-x86_64.pkg.tar.zst,termite-16.3-1-x86_64.pkg.tar.zst,whatsapp-nativefier-2.2206.5-1-x86_64.pkg.tar.zst,xtitle-0.4.4-2-x86_64.pkg.tar.zst,zram-swap-git-02.r6.g205ea1e-1-any.pkg.tar.zst}
 	
 	#echo "cd && yay -S picom-jonaburg-fix polybar xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	#echo "cd && yay -S zramswap --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
@@ -561,11 +560,11 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 	
 	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
 	$CHROOT rm -rf /home/"$USR"/.themes
-	$CHROOT cp /dots/stuff/zfetch /usr/bin/
+	$CHROOT cp /dots/stuff/apps/zfetch /usr/bin/
 	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
 	
 	echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
-	echo "cp /dots/stuff/z0mbi3-Fox-Theme/chrome/user.js /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
+	echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
 	okie
 	sleep 5
 	clear
