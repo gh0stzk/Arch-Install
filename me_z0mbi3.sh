@@ -469,6 +469,8 @@ logo "Instalando apps que yo uso"
 	
 	$CHROOT pacman -U /dots/stuff/apps/{checkupdates-aur-0.04-1-any.pkg.tar.zst,perl-checkupdates-aur-0.04-1-any.pkg.tar.zst,mpv-git-0.34.0_247_g73a06ffae6-1-x86_64.pkg.tar.zst,nerd-fonts-jetbrains-mono-2.1.0-3-any.pkg.tar.zst,nerd-fonts-ubuntu-mono-2.1.0-2-any.pkg.tar.zst,picom-jonaburg-fix-0.1-2-x86_64.pkg.tar.zst,polybar-3.6.2-1-x86_64.pkg.tar.zst,popcorntime-bin-0.4.7-1-x86_64.pkg.tar.zst,qogir-icon-theme-2022.01.12-1-any.pkg.tar.zst,spotify-1:1.1.80.699-1-x86_64.pkg.tar.zst,spotify-adblock-git-1:1.0.1.r7.g05793f6-1-x86_64.pkg.tar.zst,stacer-1.1.0-1-x86_64.pkg.tar.zst,telegram-desktop-bin-3.6.1-1-x86_64.pkg.tar.zst,termite-16.3-1-x86_64.pkg.tar.zst,whatsapp-nativefier-2.2206.5-1-x86_64.pkg.tar.zst,xtitle-0.4.4-2-x86_64.pkg.tar.zst,zram-swap-git-02.r6.g205ea1e-1-any.pkg.tar.zst}
 	
+	$CHROOT fc-cache -rv
+	
 	#echo "cd && yay -S picom-jonaburg-fix polybar xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	#echo "cd && yay -S zramswap --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	#echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
