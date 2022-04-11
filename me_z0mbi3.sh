@@ -246,7 +246,6 @@ logo "Configurando Timezone y Locales"
 	$CHROOT locale-gen
 	echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
 	echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
-	echo "FONT=ter-v18n" >> /mnt/etc/vconsole.conf
 	export LANG=es_MX.UTF-8
 	okie
 	clear
@@ -496,16 +495,16 @@ logo "Activando Servicios"
 	
 logo "Generating my XORG config files"
 	
-	#cat >> /mnt/etc/X11/xorg.conf.d/20-intel.conf <<EOL		
-#Section "Device"
-	#Identifier	"Intel Graphics"
-	#Driver		"Intel"
-	#Option		"AccelMethod"	"sna"
-	#Option		"DRI"		"3"
-	#Option		"TearFree"	"true"
-#EndSection
-#EOL
-		#printf "%s20-intel.conf%s generated in --> /etc/X11/xorg.conf.d\n" "${CGR}" "${CNC}"
+	cat >> /mnt/etc/X11/xorg.conf.d/20-intel.conf <<EOL		
+Section "Device"
+	Identifier	"Intel Graphics"
+	Driver		"Intel"
+	Option		"AccelMethod"	"sna"
+	Option		"DRI"		"3"
+	Option		"TearFree"	"true"
+EndSection
+EOL
+		printf "%s20-intel.conf%s generated in --> /etc/X11/xorg.conf.d\n" "${CGR}" "${CNC}"
 		  
 	cat >> /mnt/etc/X11/xorg.conf.d/10-monitor.conf <<EOL
 Section "Monitor"
@@ -535,19 +534,19 @@ EndSection
 EOL
 		printf "%s00-keyboard.conf%s generated in --> /etc/X11/xorg.conf.d\n" "${CGR}" "${CNC}"
 		
-	#cat >> /mnt/etc/drirc <<EOL
-#<driconf>
+	cat >> /mnt/etc/drirc <<EOL
+<driconf>
 
-	#<device driver="i915">
-		#<application name="Default">
-			#<option name="stub_occlusion_query" value="true" />
-			#<option name="fragment_shader" value="true" />
-		#</application>
-	#</device>
+	<device driver="i915">
+		<application name="Default">
+			<option name="stub_occlusion_query" value="true" />
+			<option name="fragment_shader" value="true" />
+		</application>
+	</device>
 	
-#</driconf>
-#EOL
-		#printf "%sdrirc%s generated in --> /etc" "${CGR}" "${CNC}"
+</driconf>
+EOL
+		printf "%sdrirc%s generated in --> /etc" "${CGR}" "${CNC}"
 		sleep 2
 		clear
 	
