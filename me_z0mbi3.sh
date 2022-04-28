@@ -396,11 +396,9 @@ logo "Instalando Audio & Video"
 
     mkdir /mnt/dots
 	mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
-	
-	$CHROOT pacman -U /dots/stuff/apps/mesa-21.3.7-2-x86_64.pkg.tar.zst
-	
+		
 	$CHROOT pacman -S \
-					  xorg-server xf86-video-intel xorg-xinput xorg-xsetroot \
+					  mesa-amber xorg-server xf86-video-intel xorg-xinput xorg-xrdb xorg-xsetroot \
 					  --noconfirm
 					  	
 	$CHROOT pacman -S \
@@ -480,6 +478,7 @@ logo "Activando Servicios"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
 	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
+	echo "export __GLX_VENDOR_LIBRARY_NAME=amber" >> /mnt/etc/profile
 
 #----------------------------------------
 #          Xorg conf only intel
