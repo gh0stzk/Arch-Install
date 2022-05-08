@@ -478,7 +478,8 @@ logo "Activando Servicios"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
 	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
-	echo "export __GLX_VENDOR_LIBRARY_NAME=amber" >> /mnt/etc/profile
+	#echo "export __GLX_VENDOR_LIBRARY_NAME=amber" >> /mnt/etc/profile
+	sed -i 's/#_zram_fixedsize="2G"/_zram_fixedsize="1G"/' /mnt/etc/default/zram-swap
 
 #----------------------------------------
 #          Xorg conf only intel
