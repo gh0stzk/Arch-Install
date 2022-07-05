@@ -554,7 +554,6 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 	
 	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
 	$CHROOT rm -rf /home/"$USR"/.themes
-	$CHROOT cp /dots/stuff/zfetch /usr/bin/
 	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
 	
 	echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
