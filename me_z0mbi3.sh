@@ -429,13 +429,13 @@ logo "Instalando apps que yo uso"
 	$CHROOT pacman -S \
 					  android-file-transfer bleachbit gimp gcolor3 geany gparted simplescreenrecorder \
 					  thunar thunar-archive-plugin tumbler xarchiver \
-					  ranger htop scrot cmatrix ueberzug viewnior zathura zathura-pdf-poppler neovim \
-					  retroarch retroarch-assets-xmb retroarch-assets-ozone \
+					  ranger htop scrot cmatrix ueberzug viewnior zathura zathura-pdf-poppler neovim lsd \
+					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp \
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna \
 					  firefox firefox-i18n-es-mx transmission-gtk \
 					  papirus-icon-theme ttf-joypixels terminus-font grsync git \
-					  bspwm polybar rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome \
-					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
+					  polybar rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome \
+					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx libxpresent \
 					  --noconfirm
 
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
@@ -461,7 +461,7 @@ logo "Instalando apps que yo uso"
 	
 	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 	
-	echo "cd && yay -S picom-jonaburg-fix xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S bspwm-rounded-corners-git picom-arian8j2-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S zram-swap-git stacer --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
