@@ -430,7 +430,7 @@ logo "Instalando apps que yo uso"
 					  android-file-transfer bleachbit gimp gcolor3 geany gparted simplescreenrecorder \
 					  thunar thunar-archive-plugin tumbler xarchiver \
 					  ranger htop scrot cmatrix ueberzug viewnior zathura zathura-pdf-poppler neovim lsd \
-					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp \
+					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp mpc \
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna \
 					  firefox firefox-i18n-es-mx transmission-gtk \
 					  papirus-icon-theme ttf-joypixels terminus-font grsync git \
@@ -461,7 +461,7 @@ logo "Instalando apps que yo uso"
 	
 	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 	
-	echo "cd && yay -S bspwm-rounded-corners-git picom-arian8j2-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S bspwm-rounded-corners picom-arian8j2-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S zram-swap-git stacer --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
