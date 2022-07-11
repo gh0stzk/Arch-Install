@@ -382,7 +382,7 @@ logo "Aplicando optmizaciones.."
 	titleopts "Configurando almacenamiento personal"
 	cat >> /mnt/etc/fstab <<-EOL		
 	# My sTuFF
-	UUID=01D3AE59075CA1F0		/run/media/z0mbi3/windows 	ntfs3		auto,rw,uid=1000,gid=984,dmask=022,fmask=133,discard,noatime,nohidden,sys_immutable	0 0
+	UUID=01D3AE59075CA1F0		/run/media/z0mbi3/windows 	ntfs-3g		auto,rw,users,big_writes,hide_hid_files,windows_names,umask=000,noatime	0 0
 	EOL
 	
 	okie
@@ -433,7 +433,7 @@ logo "Instalando apps que yo uso"
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp mpc \
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna \
 					  firefox firefox-i18n-es-mx transmission-gtk \
-					  papirus-icon-theme ttf-joypixels terminus-font grsync git \
+					  papirus-icon-theme ttf-joypixels grsync \
 					  polybar rofi sxhkd dunst lxappearance nitrogen pavucontrol polkit-gnome \
 					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx libxpresent \
 					  --noconfirm
