@@ -475,6 +475,7 @@ logo "Activando Servicios"
 
 	$CHROOT systemctl enable dhcpcd.service lightdm cpupower systemd-timesyncd.service
 	$CHROOT systemctl enable zram-swap.service
+	echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
 	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
