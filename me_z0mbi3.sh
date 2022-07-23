@@ -433,7 +433,7 @@ logo "Instalando apps que yo uso"
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp mpc \
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna grsync \
 					  firefox firefox-i18n-es-mx transmission-gtk \
-					  papirus-icon-theme ttf-joypixels ttf-inconsolata \
+					  papirus-icon-theme ttf-jetbrains-mono ttf-joypixels ttf-inconsolata \
 					  bspwm polybar rofi sxhkd dunst lxappearance feh pavucontrol polkit-gnome \
 					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
