@@ -409,7 +409,7 @@ logo "Instalando Audio & Video"
 logo "Instalando codecs multimedia y utilidades"
 
 	$CHROOT pacman -S \
-                      ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl \
+                      ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl libxpresent \
                       jasper openjpeg2 libwebp webp-pixbuf-loader \
                       unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils \
                       --noconfirm
@@ -431,11 +431,11 @@ logo "Instalando apps que yo uso"
 					  thunar thunar-archive-plugin tumbler xarchiver \
 					  ranger htop maim cmatrix ueberzug viewnior zathura zathura-pdf-poppler neovim lsd \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp mpc \
-					  pacman-contrib pass xclip playerctl yt-dlp minidlna \
+					  pacman-contrib pass xclip playerctl yt-dlp minidlna grsync \
 					  firefox firefox-i18n-es-mx transmission-gtk \
-					  papirus-icon-theme ttf-joypixels grsync \
-					  polybar rofi sxhkd dunst lxappearance feh pavucontrol polkit-gnome \
-					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx libxpresent \
+					  papirus-icon-theme ttf-joypixels ttf-inconsolata \
+					  bspwm polybar rofi sxhkd dunst lxappearance feh pavucontrol polkit-gnome \
+					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
 
 	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
@@ -461,7 +461,7 @@ logo "Instalando apps que yo uso"
 	
 	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 	
-	echo "cd && yay -S bspwm-rounded-corners picom-arian8j2-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S eww-git picom-arian8j2-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S zram-swap-git stacer --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
