@@ -443,7 +443,7 @@ logo "Instalando apps que yo uso"
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<- EOL
 		[greeter]
 		icon-theme-name = Qogir-ubuntu
-		background = /usr/share/pixmaps/arch.png
+		background = /usr/share/pixmaps/arch.jpg
 		user-background = false
 		default-user-image = /usr/share/pixmaps/gh0st.png
 		indicators = ~host;~spacer;~clock;~spacer;~session;~power
@@ -554,8 +554,9 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 	echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
 	
 	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
+	$CHROOT mv /home/"$USR"/.themes/Threamy /usr/share/themes
 	$CHROOT rm -rf /home/"$USR"/.themes
-	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
+	$CHROOT cp /dots/stuff/{arch.jpg,gh0st.png} /usr/share/pixmaps/
 	
 	echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
 	echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
