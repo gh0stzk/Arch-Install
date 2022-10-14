@@ -398,18 +398,18 @@ logo "Instalando Audio & Video"
 	mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
 		
 	$CHROOT pacman -S \
-					  mesa-amber xorg-server xf86-video-intel xorg-xinput xorg-xrdb xorg-xsetroot xorg-xwininfo \
+					  mesa-amber xorg-server xf86-video-intel xorg-xinput xorg-xrdb xorg-xsetroot xorg-xwininfo xorg-xkill \
 					  --noconfirm
 					  	
 	$CHROOT pacman -S \
-					  pipewire pipewire-pulse pipewire-alsa alsa-utils\
+					  pipewire pipewire-pulse \
 					  --noconfirm
 	clear
 	
 logo "Instalando codecs multimedia y utilidades"
 
 	$CHROOT pacman -S \
-                      ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl libxpresent \
+                      ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl \
                       jasper openjpeg2 libwebp webp-pixbuf-loader \
                       unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils \
                       --noconfirm
@@ -430,9 +430,9 @@ logo "Instalando apps que yo uso"
 					  android-file-transfer bleachbit gimp gcolor3 geany gparted simplescreenrecorder \
 					  thunar thunar-archive-plugin tumbler xarchiver \
 					  ranger htop maim cmatrix ueberzug viewnior zathura zathura-pdf-poppler neovim lsd \
-					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp mpc \
+					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp mpc pamixer \
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna grsync \
-					  firefox firefox-i18n-es-mx transmission-gtk \
+					  firefox firefox-i18n-es-mx transmission-gtk jq \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-joypixels ttf-inconsolata \
 					  bspwm polybar rofi sxhkd dunst lxappearance feh pavucontrol polkit-gnome \
 					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
@@ -461,11 +461,11 @@ logo "Instalando apps que yo uso"
 	
 	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 	
-	echo "cd && yay -S eww-git picom-arian8j2-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S eww picom-arian8j2-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S zram-swap-git stacer --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-	echo "cd && yay -S nerd-fonts-ubuntu-mono qogir-icon-theme nerd-fonts-jetbrains-mono --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S nerd-fonts-ubuntu-mono nerd-fonts-terminus nerd-fonts-cozette-ttf scientifica-font qogir-icon-theme nerd-fonts-jetbrains-mono --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 
 #----------------------------------------
 #          Enable Services & other stuff
@@ -556,7 +556,7 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
 	$CHROOT mv /home/"$USR"/.themes/Threamy /usr/share/themes
 	$CHROOT rm -rf /home/"$USR"/.themes
-	$CHROOT cp /dots/stuff/{arch.jpg,gh0st.png} /usr/share/pixmaps/
+	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
 	
 	echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
 	echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
