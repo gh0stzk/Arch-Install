@@ -554,7 +554,6 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 	echo "rsync -vrtlpX /dots/dotfiles/ /home/$USR/" | $CHROOT su "$USR"
 	
 	$CHROOT mv /home/"$USR"/.themes/Dracula /usr/share/themes
-	$CHROOT mv /home/"$USR"/.themes/Threamy /usr/share/themes
 	$CHROOT rm -rf /home/"$USR"/.themes
 	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
 	
