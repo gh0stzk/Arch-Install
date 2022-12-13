@@ -433,7 +433,7 @@ logo "Instalando apps que yo uso"
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp mpc pamixer \
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna grsync \
 					  firefox firefox-i18n-es-mx transmission-gtk jq \
-					  papirus-icon-theme ttf-jetbrains-mono ttf-joypixels ttf-inconsolata \
+					  papirus-icon-theme ttf-jetbrains-mono ttf-joypixels ttf-inconsolata ttf-ubuntumono-nerd ttf-terminus-nerd \
 					  bspwm polybar rofi sxhkd dunst lxappearance feh pavucontrol polkit-gnome \
 					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
@@ -443,7 +443,7 @@ logo "Instalando apps que yo uso"
 	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<- EOL
 		[greeter]
 		icon-theme-name = Qogir-ubuntu
-		background = /usr/share/pixmaps/arch.jpg
+		background = /usr/share/pixmaps/arch.png
 		user-background = false
 		default-user-image = /usr/share/pixmaps/gh0st.png
 		indicators = ~host;~spacer;~clock;~spacer;~session;~power
@@ -465,7 +465,7 @@ logo "Instalando apps que yo uso"
 	echo "cd && yay -S zram-swap-git stacer --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-	echo "cd && yay -S nerd-fonts-ubuntu-mono nerd-fonts-terminus nerd-fonts-cozette-ttf scientifica-font qogir-icon-theme nerd-fonts-jetbrains-mono --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S nerd-fonts-cozette-ttf scientifica-font qogir-icon-theme nerd-fonts-jetbrains-mono --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 
 #----------------------------------------
 #          Enable Services & other stuff
