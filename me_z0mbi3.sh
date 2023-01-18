@@ -474,7 +474,7 @@ logo "Instalando apps que yo uso"
 logo "Activando Servicios"
 
 	$CHROOT systemctl enable dhcpcd.service lightdm cpupower systemd-timesyncd.service
-	$CHROOT systemctl enable zram-swap.service
+	$CHROOT systemctl enable zramswap.service
 	echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
