@@ -434,7 +434,7 @@ logo "Instalando apps que yo uso"
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna grsync \
 					  firefox firefox-i18n-es-mx transmission-gtk jq \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-joypixels ttf-inconsolata ttf-ubuntumono-nerd ttf-terminus-nerd \
-					  bspwm polybar rofi sxhkd dunst lxappearance feh pavucontrol polkit-gnome \
+					  polybar rofi sxhkd dunst lxappearance feh pavucontrol polkit-gnome \
 					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
 
@@ -461,7 +461,7 @@ logo "Instalando apps que yo uso"
 	
 	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 	
-	echo "cd && yay -S eww picom-arian8j2-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S bspwm-git eww picom-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S zram-swap-git stacer --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
