@@ -462,7 +462,7 @@ logo "Instalando apps que yo uso"
 	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 	
 	echo "cd && yay -S bspwm-git eww picom-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-	echo "cd && yay -S zram-swap-git stacer --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S zramswap stacer --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S nerd-fonts-cozette-ttf scientifica-font qogir-icon-theme nerd-fonts-jetbrains-mono --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
@@ -480,7 +480,7 @@ logo "Activando Servicios"
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
 	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
 	#echo "export __GLX_VENDOR_LIBRARY_NAME=amber" >> /mnt/etc/profile
-	sed -i 's/#_zram_fixedsize="2G"/_zram_fixedsize="1G"/' /mnt/etc/default/zram-swap
+	sed -i 's/20/30/' /mnt/etc/zramswap.conf
 
 #----------------------------------------
 #          Xorg conf only intel
