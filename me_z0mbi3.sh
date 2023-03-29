@@ -428,13 +428,13 @@ logo "Instalando apps que yo uso"
 
 	$CHROOT pacman -S \
 					  android-file-transfer bleachbit gimp gcolor3 geany gparted simplescreenrecorder \
-					  thunar thunar-archive-plugin tumbler xarchiver \
-					  ranger htop maim cmatrix ueberzug viewnior zathura zathura-pdf-poppler neovim lsd \
+					  thunar thunar-archive-plugin tumbler xarchiver alacritty \
+					  ranger htop maim ueberzug viewnior zathura zathura-pdf-poppler neovim lsd \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp mpc pamixer \
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna grsync \
-					  firefox firefox-i18n-es-mx transmission-gtk jq \
+					  firefox firefox-i18n-es-mx jq \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
-					  polybar rofi sxhkd dunst lxappearance feh pavucontrol polkit-gnome \
+					  polybar rofi sxhkd picom dunst lxappearance feh pavucontrol polkit-gnome \
 					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
 
@@ -461,11 +461,11 @@ logo "Instalando apps que yo uso"
 	
 	echo "cd && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd && rm -rf yay" | $CHROOT su "$USR"
 	
-	echo "cd && yay -S bspwm-git eww picom-git xtitle termite checkupdates-aur --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S bspwm-git eww --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S zramswap stacer --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S spotify spotify-adblock-git mpv-git popcorntime-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 	echo "cd && yay -S whatsapp-nativefier telegram-desktop-bin --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
-	echo "cd && yay -S nerd-fonts-cozette-ttf scientifica-font qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
+	echo "cd && yay -S cmatrix-git transmission-gtk3 qogir-icon-theme --noconfirm --removemake --cleanafter" | $CHROOT su "$USR"
 
 #----------------------------------------
 #          Enable Services & other stuff
