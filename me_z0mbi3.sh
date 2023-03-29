@@ -427,12 +427,12 @@ logo "Instalando soporte para montar volumenes y dispositivos multimedia extraib
 logo "Instalando apps que yo uso"
 
 	$CHROOT pacman -S \
-					  android-file-transfer bleachbit gimp gcolor3 geany gparted simplescreenrecorder \
+					  bleachbit gimp gcolor3 geany gparted simplescreenrecorder \
 					  thunar thunar-archive-plugin tumbler xarchiver alacritty \
 					  ranger htop maim ueberzug viewnior zathura zathura-pdf-poppler neovim lsd \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm mpd ncmpcpp mpc pamixer \
 					  pacman-contrib pass xclip playerctl yt-dlp minidlna grsync \
-					  firefox firefox-i18n-es-mx jq \
+					  firefox firefox-i18n-es-mx jq zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting\
 					  papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
 					  polybar rofi sxhkd picom dunst lxappearance feh pavucontrol polkit-gnome \
 					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
