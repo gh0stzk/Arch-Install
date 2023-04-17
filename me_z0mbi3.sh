@@ -470,7 +470,7 @@ logo "Instalando apps que yo uso"
 
 	$CHROOT pacman -S rustup --noconfirm
 	
-	echo "cd && git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si --noconfirm && cd && rm -rf paru" | $CHROOT su "$USR"
+	echo "cd && git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si --noconfirm && cd" | $CHROOT su "$USR"
 	
 	echo "cd && paru -S eww --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S zramswap stacer --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
@@ -587,10 +587,10 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 
 logo "Limpiando sistema para su primer arranque"
 	sleep 2
-	rm -rf /mnt/home/"$USR"/.cache/yay/
+	rm -rf /mnt/home/"$USR"/.cache/paru/
 	rm -rf /mnt/home/"$USR"/.cache/electron/
 	rm -rf /mnt/home/"$USR"/.cache/go-build/
-	rm -rf /mnt/home/"$USR"/.cargo/
+	rm -rf /mnt/home/"$USR"/{paru,.cargo,.rustup}
 	rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop,lstopo.desktop,rofi.desktop,rofi-theme-selector.desktop}
 	rm -rf /mnt/usr/lib/firmware/{amd,amdgpu,amd-ucode,mellanox,mwlwifi,netronome,nvidia,radeon,rtlwifi}
 	rm -rf /mnt/usr/share/icons/{Qogir-manjaro,Qogir-manjaro-dark,Papirus-Light}
