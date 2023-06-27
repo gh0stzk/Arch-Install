@@ -469,6 +469,7 @@ logo "Instalando apps que yo uso"
 #----------------------------------------
 
 	$CHROOT pacman -S rustup --noconfirm
+	$CHROOT rustup default stable
 	
 	echo "cd && git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si --noconfirm && cd" | $CHROOT su "$USR"
 	
