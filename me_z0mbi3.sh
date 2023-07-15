@@ -473,7 +473,7 @@ logo "Instalando apps que yo uso"
 	
 	echo "cd && git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si --noconfirm && cd" | $CHROOT su "$USR"
 	
-	echo "cd && paru -S eww tdrop-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+	echo "cd && paru -S eww simple-mtpfs tdrop-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S zramswap stacer --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S spotify spotify-adblock-git mpv-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S whatsapp-nativefier telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
