@@ -10,6 +10,7 @@ CRE=$(tput setaf 1)
 CYE=$(tput setaf 3)
 CGR=$(tput setaf 2)
 CBL=$(tput setaf 4)
+CBO=$(tput bold)
 CNC=$(tput sgr0)
 CHROOT="arch-chroot /mnt"
 
@@ -27,7 +28,7 @@ titleopts () {
 logo() {
 	
 	local text="${1:?}"
-	printf ' \033[0;31m[ \033[0m\033[1;93m%s\033[0m \033[0;31m]\033[0m\n\n' "${text}"
+	printf ' %s%s[%s %s %s]%s\n\n' "$CBO" "$CRE" "$CYE" "${text}" "$CRE" "$CNC"
 }
 	
 
@@ -37,50 +38,51 @@ logo() {
 
 logo "Ingresa la informacion Necesaria"
 
-	while true
-		do 
-				read -rp "Ingresa tu usuario: " USR
-			if [[ "${USR}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
-				then 
-					break
-			fi 
-			printf "Incorrecto!! Solo se permiten minusculas.\n\n"
-		done  
-		
-			echo
-	while
-			read -rsp "Ingresa tu password: " PASSWD
-			echo
-			read -rsp "Confirma tu password: " CONF_PASSWD
-			echo
-			[ "$PASSWD" != "$CONF_PASSWD" ]
-		do 
-			printf "Los passwords no coinciden!!\n\n"; 
-		done
-			printf "Password correcto\n"
-		
-	while        
-			echo
-			read -rsp "Ingresa password para ROOT: " PASSWDR
-			echo
-			read -rsp "Confirma el password: " CONF_PASSWDR
-			echo
-			[ "$PASSWDR" != "$CONF_PASSWDR" ]
-		do 
-			printf "Los passwords no coinciden!!\n"; 
-		done
-			printf "Password correcto\n"
-			
-	while true
-		do
-				echo
-				read -rp "Ingresa el nombre de tu maquina: " HNAME
-			if [[ "${HNAME}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
-				then 
-					break 
-			fi
-			printf "Incorrecto!! No puede incluir mayusculas ni simbolos especiales\n"
-		done
+while true; do
+	read -rp "Ingresa tu usuario: " USR
+		if [[ "${USR}" =~ ^[a-z][_a-z0-9-]{0,30}$ ]]; then
+			break
+		else
+			printf "\n%sIncorrecto!! Solo se permiten minúsculas.%s\n\n" "$CRE" "$CNC"
+		fi 		
+done 
+
+while true; do
+    read -rsp "Ingresa tu password: " PASSWD
+    echo
+    read -rsp "Confirma tu password: " CONF_PASSWD
+
+    if [ "$PASSWD" != "$CONF_PASSWD" ]; then
+        printf "\n%sLas contraseñas no coinciden. Intenta nuevamente.!!%s\n\n" "$CRE" "$CNC"
+    else
+        printf "\n\n%sContraseña confirmada correctamente.\n\n%s" "$CGR" "$CNC"
+        break
+    fi
+done
+
+while true; do
+    read -rsp "Ingresa tu password para ROOT: " PASSWDR
+    echo
+    read -rsp "Confirma tu password: " CONF_PASSWDR
+
+    if [ "$PASSWDR" != "$CONF_PASSWDR" ]; then
+        printf "\n%sLas contraseñas no coinciden. Intenta nuevamente.!!%s\n\n" "$CRE" "$CNC"
+    else
+        printf "\n\n%sContraseña confirmada correctamente.%s\n\n" "$CGR" "$CNC"
+        break
+    fi
+done
+
+while true; do
+    read -rp "Ingresa el nombre de tu máquina: " HNAME
+    
+    if [[ "$HNAME" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]; then
+        break
+    else
+        printf "%sIncorrecto!! El nombre no puede incluir mayúsculas ni símbolos especiales.%s\n\n" "$CRE" "$CNC"
+    fi
+done
+
 	clear
 
 #----------------------------------------
@@ -88,11 +90,15 @@ logo "Ingresa la informacion Necesaria"
 #----------------------------------------
 
 logo "Selecciona el disco para la instalacion"
-			
-		lsblk -d -e 7,11 -o NAME,SIZE,TYPE,MODEL
-		printf "%s\n" "------------------------------"
-		echo
-		PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
+
+# Mostrar información de los discos disponibles
+echo "Discos disponibles:"
+lsblk -d -e 7,11 -o NAME,SIZE,TYPE,MODEL
+echo "------------------------------"
+echo
+
+# Seleccionar el disco para la instalación de Arch Linux
+PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
 	select drive in $(lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd\|nvme\|mmcblk') 
 		do
 			if [ "$drive" ]; then
@@ -193,7 +199,7 @@ logo "Configurando SWAP"
 			printf "\n Arch Linux se instalara en el disco %s[%s%s%s%s%s]%s en la particion %s[%s%s%s%s%s]%s\n\n\n" "${CYE}" "${CNC}" "${CRE}" "${drive}" "${CNC}" "${CYE}" "${CNC}" "${CYE}" "${CNC}" "${CBL}" "${partroot}" "${CNC}" "${CYE}" "${CNC}"
 		
 	while true; do
-			read -rp " Deseas continuar? [s/N]: " sn
+			read -rp " ¿Deseas continuar? [s/N]: " sn
 		case $sn in
 			[Ss]* ) break;;
 			[Nn]* ) exit;;
@@ -211,16 +217,14 @@ logo "Instalando sistema base"
 
 	sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
 	pacstrap /mnt \
-	         base \
-	         base-devel \
-	         linux-zen \
-	         linux-firmware \
+	         base base-devel \
+	         linux-zen linux-firmware \
 	         dhcpcd \
 	         intel-ucode \
 	         mkinitcpio \
 	         reflector \
-	         zsh \
-	         git
+	         zsh git
+	         
 	okie
 	clear
 
