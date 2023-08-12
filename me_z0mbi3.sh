@@ -442,42 +442,22 @@ logo "Instalando todo el entorno bspwm"
 logo "Instalando apps que yo uso"
 
 	$CHROOT pacman -S \
-					  bleachbit gimp gcolor3 geany gparted xdotool physlock \
+					  bleachbit gimp gcolor3 geany xdotool physlock ly \
 					  htop ueberzug viewnior zathura zathura-pdf-poppler neovim \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm \
 					  pass xclip yt-dlp minidlna grsync \
 					  firefox firefox-i18n-es-mx lxappearance pavucontrol \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
-					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
-
-	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
-	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
-	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<- EOL
-		[greeter]
-		icon-theme-name = Qogir-ubuntu
-		background = /usr/share/pixmaps/arch.png
-		user-background = false
-		default-user-image = /usr/share/pixmaps/gh0st.png
-		indicators = ~host;~spacer;~clock;~spacer;~session;~power
-		position = 50%,center 83%,center
-		screensaver-timeout = 0
-		theme-name = Dracula
-		font-name = UbuntuMono Nerd Font 11
-	EOL
-	
 	clear
 		
 #----------------------------------------
 #          AUR Packages
 #----------------------------------------
-
-	$CHROOT pacman -S rustup --noconfirm
-	echo "rustup default stable" | $CHROOT su "$USR"
 	
 	echo "cd && git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si --noconfirm && cd" | $CHROOT su "$USR"
 	
-	echo "cd && paru -S eww simple-mtpfs tdrop-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+	echo "cd && paru -S eww-x11 simple-mtpfs tdrop-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S zramswap stacer --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S spotify spotify-adblock-git mpv-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S whatsapp-nativefier telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
@@ -489,12 +469,12 @@ logo "Instalando apps que yo uso"
 
 logo "Activando Servicios"
 
-	$CHROOT systemctl enable dhcpcd.service lightdm cpupower systemd-timesyncd.service
+	$CHROOT systemctl enable dhcpcd.service ly.service cpupower systemd-timesyncd.service
 	$CHROOT systemctl enable zramswap.service
 	echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
-	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
+	echo "timeout 1s librewolf --headless" | $CHROOT su "$USR"
 	#echo "export __GLX_VENDOR_LIBRARY_NAME=amber" >> /mnt/etc/profile
 	sed -i 's/20/30/' /mnt/etc/zramswap.conf
 
@@ -574,8 +554,8 @@ logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 	$CHROOT rm -rf /home/"$USR"/.themes
 	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
 	
-	echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
-	echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.mozilla/firefox/*.default-release/" | $CHROOT su "$USR"
+	echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.librewolf/*.default-default/" | $CHROOT su "$USR"
+	echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.librewolf/*.default-default/" | $CHROOT su "$USR"
 	okie
 	sleep 5
 	clear
