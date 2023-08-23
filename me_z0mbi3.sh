@@ -442,15 +442,33 @@ logo "Instalando todo el entorno bspwm"
 logo "Instalando apps que yo uso"
 
 	$CHROOT pacman -S \
-					  bleachbit gimp gcolor3 geany xdotool physlock ly \
+					  bleachbit gimp gcolor3 geany xdotool physlock \
 					  htop ueberzug viewnior zathura zathura-pdf-poppler neovim \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm \
 					  pass xclip yt-dlp minidlna grsync \
 					  firefox firefox-i18n-es-mx lxappearance pavucontrol \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
+					  lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings numlockx \
 					  --noconfirm
 	clear
 		
+	sed -i 's/#greeter-setup-script=/greeter-setup-script=\/usr\/bin\/numlockx on/' /mnt/etc/lightdm/lightdm.conf
+	rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
+	cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<- EOL
+		[greeter]
+		icon-theme-name = Qogir-ubuntu
+		background = /usr/share/pixmaps/arch.png
+		user-background = false
+		default-user-image = /usr/share/pixmaps/gh0st.png
+		indicators = ~host;~spacer;~clock;~spacer;~session;~power
+		position = 50%,center 83%,center
+		screensaver-timeout = 0
+		theme-name = Dracula
+		font-name = UbuntuMono Nerd Font 11
+	EOL
+	
+	clear
+	
 #----------------------------------------
 #          AUR Packages
 #----------------------------------------
@@ -469,7 +487,7 @@ logo "Instalando apps que yo uso"
 
 logo "Activando Servicios"
 
-	$CHROOT systemctl enable dhcpcd.service ly.service cpupower systemd-timesyncd.service
+	$CHROOT systemctl enable dhcpcd.service lightdm cpupower systemd-timesyncd.service
 	$CHROOT systemctl enable zramswap.service
 	echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
