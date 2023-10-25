@@ -448,7 +448,7 @@ function install_apps_que_uso() {
 					  htop ueberzug viewnior zathura zathura-pdf-poppler \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm \
 					  pass xclip xsel micro yt-dlp minidlna grsync \
-					  firefox firefox-i18n-es-mx lxappearance pavucontrol \
+					  lxappearance pavucontrol \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
 					  --noconfirm
 	clear
@@ -613,6 +613,7 @@ function install_bspwm() {
 }
 
 function install_nitrogen() {
+	$CHROOT pacman -S gtkmm --noconfirm
 	echo "cd && git clone https://github.com/professorjamesmoriarty/nitrogen.git" | $CHROOT su "$USR"
 	echo "cd && cd nitrogen && autoreconf -fi && ./configure && make" | $CHROOT su "$USR"
 	$CHROOT cd /home/"$USR"/nitrogen && make install 
