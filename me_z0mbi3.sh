@@ -444,7 +444,7 @@ function install_bspwm_enviroment() {
 function install_apps_que_uso() {
 	logo "Instalando apps que yo uso"
 	$CHROOT pacman -S \
-					  bleachbit gimp gcolor3 geany \
+					  bleachbit gimp gcolor3 geany mpv \
 					  htop ueberzug viewnior zathura zathura-pdf-poppler \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm \
 					  pass xclip xsel micro yt-dlp minidlna grsync \
@@ -487,10 +487,10 @@ function aur_paru() {
 
 function aur_apps() {	
 	echo "cd && paru -S simple-mtpfs tdrop-git xqp --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-	echo "cd && paru -S mpv-git stacer --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+	echo "cd && paru -S cmatrix-git stacer --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S spotify spotify-adblock-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S whatsapp-nativefier telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-	echo "cd && paru -S cmatrix-git qogir-icon-theme --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+	echo "cd && paru -S librewolf-bin qogir-icon-theme --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
 
 #---------- Enable Services & other stuff ----------
@@ -606,21 +606,21 @@ function restore_dotfiles() {
 
 #---------- Install Eww, Bspwm & Nitrogen ----------
 function install_bspwm() {
-	$CHROOT pacman -S libxcb xcb-util xcb-util-wm xcb-util-keysyms
-	echo "git clone https://github.com/baskerville/bspwm.git" | $CHROOT su "$USR"
-	echo "cd bspwm && make" | $CHROOT su "$USR"
+	$CHROOT pacman -S libxcb xcb-util xcb-util-wm xcb-util-keysyms --noconfirm
+	echo "cd && git clone https://github.com/baskerville/bspwm.git" | $CHROOT su "$USR"
+	echo "cd && cd bspwm && make" | $CHROOT su "$USR"
 	$CHROOT cd /home/"$USR"/bspwm && make install 
 }
 
 function install_nitrogen() {
 	echo "cd && git clone https://github.com/professorjamesmoriarty/nitrogen.git" | $CHROOT su "$USR"
-	echo "cd nitrogen && autoreconf -fi && ./configure && make" | $CHROOT su "$USR"
+	echo "cd && cd nitrogen && autoreconf -fi && ./configure && make" | $CHROOT su "$USR"
 	$CHROOT cd /home/"$USR"/nitrogen && make install 
 }
 
 function install_eww() {
 	echo "cd && git clone https://github.com/elkowar/eww" | $CHROOT su "$USR"
-	echo "cd eww && cargo build --release --no-default-features --features x11" | $CHROOT su "$USR"
+	echo "cd && cd eww && cargo build --release --no-default-features --features x11" | $CHROOT su "$USR"
 	$CHROOT install -m 755 /home/"$USR"/eww/target/release/eww -t /usr/bin/
 }
 
