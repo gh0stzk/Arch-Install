@@ -431,7 +431,7 @@ function install_mount_multimedia_support() {
 function install_bspwm_enviroment() {
 	logo "Instalando todo el entorno bspwm"
 	$CHROOT pacman -S \
-					  bspwm sxhkd polybar picom rofi dunst \
+					  sxhkd polybar picom rofi dunst \
 					  alacritty ranger maim lsd feh polkit-gnome \
 					  mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
 					  thunar thunar-archive-plugin tumbler xarchiver jq \
@@ -608,15 +608,13 @@ function restore_dotfiles() {
 function install_bspwm() {
 	$CHROOT pacman -S libxcb xcb-util xcb-util-wm xcb-util-keysyms --noconfirm
 	echo "cd && git clone https://github.com/baskerville/bspwm.git" | $CHROOT su "$USR"
-	echo "cd && cd bspwm && make" | $CHROOT su "$USR"
-	$CHROOT cd /home/"$USR"/bspwm && make install 
+	echo "cd && cd bspwm && make && sudo make install" | $CHROOT su "$USR"
 }
 
 function install_nitrogen() {
 	$CHROOT pacman -S gtkmm --noconfirm
 	echo "cd && git clone https://github.com/professorjamesmoriarty/nitrogen.git" | $CHROOT su "$USR"
-	echo "cd && cd nitrogen && autoreconf -fi && ./configure && make" | $CHROOT su "$USR"
-	$CHROOT cd /home/"$USR"/nitrogen && make install 
+	echo "cd && cd nitrogen && autoreconf -fi && ./configure && make && sudo make install" | $CHROOT su "$USR"
 }
 
 function install_eww() {
