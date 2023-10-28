@@ -368,22 +368,6 @@ function opts_servicios_innecesarios() {
 	okie
 }
 
-function opts_dns_cloudflare() {
-	titleopts "Acelerando internet con los DNS de Cloudflare"
-	if $CHROOT pacman -Qi dhcpcd > /dev/null ; then
-	cat >> /mnt/etc/dhcpcd.conf <<- EOL
-		noarp
-		static domain_name_servers=1.1.1.1 1.0.0.1
-	EOL
-		else
-	cat >> /mnt/etc/NetworkManager/conf.d/dns-servers.conf <<- EOL
-		[global-dns-domain-*]
-		servers=1.1.1.1,1.0.0.1
-	EOL
-	fi
-	okie
-}
-
 function opts_my_stuff() {
 	titleopts "Configurando almacenamiento personal"
 	cat >> /mnt/etc/fstab <<-EOL		
@@ -497,7 +481,7 @@ function aur_apps() {
 function activando_servicios() {
 	logo "Activando Servicios"
 
-	$CHROOT systemctl enable dhcpcd.service cpupower systemd-timesyncd.service
+	$CHROOT systemctl enable systemd-networkd systemd-resolved.service cpupower systemd-timesyncd.service
 	echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
@@ -587,6 +571,20 @@ function conf_zram() {
 	clear
 }
 
+function conf_network() {
+	cat >> /mnt/etc/systemd/network/wired.network <<-EOL
+	[Match]
+	Name=enp1s0
+
+	[Network]
+	DHCP=yes
+	EOL
+	printf "%swired.network%s added to --> /etc/systemd/network\n" "${CGR}" "${CNC}"
+	
+	sed -i /mnt/systemd/resolved.conf \
+		-e 's/#DNSOverTLS=no/DNSOverTLS=opportunistic/' \
+		-e 's/DNS=.*/DNS=1.1.1.1 1.0.0.1/'
+}
 #---------- Restoring my dotfiles ----------
 function restore_dotfiles() {
 	logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
@@ -701,7 +699,6 @@ opts_swappiness
 opts_journal
 opts_innec_kernel_modules
 opts_servicios_innecesarios
-opts_dns_cloudflare
 opts_my_stuff
 
 install_video_sound
@@ -720,6 +717,7 @@ conf_xorg
 conf_monitor
 conf_keyboard
 conf_zram
+conf_network
 
 restore_dotfiles
 install_bspwm
