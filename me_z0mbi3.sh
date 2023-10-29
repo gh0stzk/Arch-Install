@@ -432,7 +432,7 @@ function install_apps_que_uso() {
 					  htop ueberzug viewnior zathura zathura-pdf-poppler \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm \
 					  pass xclip xsel micro yt-dlp minidlna grsync \
-					  lxappearance pavucontrol \
+					  lxappearance pavucontrol piper \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
 					  --noconfirm
 	clear
