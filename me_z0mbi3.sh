@@ -481,7 +481,7 @@ function aur_apps() {
 function activando_servicios() {
 	logo "Activando Servicios"
 
-	$CHROOT systemctl enable systemd-networkd systemd-resolved.service cpupower systemd-timesyncd.service
+	$CHROOT systemctl enable systemd-networkd cpupower systemd-timesyncd.service systemd-resolved.service
 	echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
@@ -583,7 +583,7 @@ function conf_network() {
 	
 	sed -i /mnt/systemd/resolved.conf \
 		-e 's/#DNSOverTLS=no/DNSOverTLS=opportunistic/' \
-		-e 's/DNS=.*/DNS=1.1.1.1 1.0.0.1/'
+		-e 's/#DNS=.*/DNS=1.1.1.1 1.0.0.1/'
 }
 #---------- Restoring my dotfiles ----------
 function restore_dotfiles() {
@@ -616,6 +616,7 @@ function install_nitrogen() {
 }
 
 function install_eww() {
+	$CHROOT pacman -S rustup --noconfirm
 	echo "cd && git clone https://github.com/elkowar/eww" | $CHROOT su "$USR"
 	echo "cd && cd eww && cargo build --release --no-default-features --features x11" | $CHROOT su "$USR"
 	$CHROOT install -m 755 /home/"$USR"/eww/target/release/eww -t /usr/bin/
