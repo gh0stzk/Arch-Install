@@ -430,7 +430,7 @@ function install_apps_que_uso() {
 	$CHROOT pacman -S \
 					  bleachbit gimp gcolor3 geany mpv screenkey \
 					  htop ueberzug viewnior zathura zathura-pdf-poppler \
-					  retroarch retroarch-assets-xmb retroarch-assets-ozone libxxf86vm \
+					  retroarch retroarch-assets-xmb retroarch-assets-ozone \
 					  pass xclip xsel micro yt-dlp minidlna grsync \
 					  lxappearance pavucontrol piper \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
@@ -581,7 +581,7 @@ function conf_network() {
 	EOL
 	printf "%swired.network%s added to --> /etc/systemd/network\n" "${CGR}" "${CNC}"
 	
-	sed -i /mnt/systemd/resolved.conf \
+	sed -i /mnt/etc/systemd/resolved.conf \
 		-e 's/#DNSOverTLS=no/DNSOverTLS=opportunistic/' \
 		-e 's/#DNS=.*/DNS=1.1.1.1 1.0.0.1/'
 }
