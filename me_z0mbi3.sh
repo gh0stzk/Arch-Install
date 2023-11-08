@@ -432,7 +432,7 @@ function install_apps_que_uso() {
 					  htop ueberzug viewnior zathura zathura-pdf-poppler \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone \
 					  pass xclip xsel micro yt-dlp minidlna grsync \
-					  lxappearance pavucontrol piper \
+					  lxappearance pavucontrol piper firefox firefox-i18n-es-mx \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
 					  --noconfirm
 	clear
@@ -474,7 +474,7 @@ function aur_apps() {
 	echo "cd && paru -S cmatrix-git stacer --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S spotify spotify-adblock-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 	echo "cd && paru -S whatsapp-nativefier telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-	echo "cd && paru -S librewolf-bin qogir-icon-theme --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+	echo "cd && paru -S qogir-icon-theme --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
 
 #---------- Enable Services & other stuff ----------
@@ -485,7 +485,7 @@ function activando_servicios() {
 	echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
-	echo "timeout 1s librewolf --headless" | $CHROOT su "$USR"
+	echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
 	#echo "export __GLX_VENDOR_LIBRARY_NAME=amber" >> /mnt/etc/profile
 }
 
@@ -595,8 +595,8 @@ function restore_dotfiles() {
 	$CHROOT rm -rf /home/"$USR"/.themes
 	$CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
 
-	echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.librewolf/*.default-default/" | $CHROOT su "$USR"
-	echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.librewolf/*.default-default/" | $CHROOT su "$USR"
+	echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/*.default-default/" | $CHROOT su "$USR"
+	echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.mozilla/*.default-default/" | $CHROOT su "$USR"
 	okie
 	sleep 5
 	clear
