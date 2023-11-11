@@ -209,9 +209,7 @@ function base_install() {
 	pacstrap /mnt \
 			base base-devel \
 			linux-zen linux-firmware \
-			dhcpcd \
-			intel-ucode \
-			mkinitcpio \
+			intel-ucode mkinitcpio \
 			reflector zsh git
 	okie
 	clear
@@ -289,7 +287,7 @@ function install_grub() {
 	$CHROOT grub-install --target=i386-pc "$drive"
 	
 	sed -i 's/quiet/zswap.enabled=0 mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
-	sed -i "s/MODULES=()/MODULES=(intel_agp i915)/" /mnt/etc/mkinitcpio.conf
+	sed -i "s/MODULES=()/MODULES=(intel_agp i915 zram)/" /mnt/etc/mkinitcpio.conf
 	echo
 	$CHROOT grub-mkconfig -o /boot/grub/grub.cfg
 	okie
@@ -428,7 +426,7 @@ function install_bspwm_enviroment() {
 function install_apps_que_uso() {
 	logo "Instalando apps que yo uso"
 	$CHROOT pacman -S \
-					  bleachbit gimp gcolor3 geany mpv screenkey \
+					  bleachbit gimp gcolor3 geany mpv screenkey timeshift \
 					  htop ueberzug viewnior zathura zathura-pdf-poppler \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone \
 					  pass xclip xsel micro yt-dlp minidlna grsync \
@@ -459,6 +457,7 @@ function install_lightdm() {
 		font-name = UbuntuMono Nerd Font 11
 	EOL
 	
+	$CHROOT systemctl enable lightdm
 	clear
 }
 
@@ -552,10 +551,6 @@ EOL
 }
 
 function conf_zram() {
-	cat >> /mnt/etc/modules-load.d/zram.conf <<-EOL
-	zram
-	EOL
-	printf "%szram.conf%s generated in --> /etc/modules-load.d\n" "${CGR}" "${CNC}"
 	
 	cat >> /mnt/etc/udev/rules.d/99-zram.rules <<-EOL
 	ACTION=="add", KERNEL=="zram0", ATTR{comp_algorithm}="lz4", ATTR{disksize}="2048M", RUN="/usr/bin/mkswap -U clear /dev/%k", TAG+="systemd"
@@ -634,7 +629,7 @@ function clean_garbage() {
 	rm -rf /mnt/home/"$USR"/.cache/paru/
 	rm -rf /mnt/home/"$USR"/.cache/electron/
 	rm -rf /mnt/home/"$USR"/.cache/go-build/
-	rm -rf /mnt/home/"$USR"/{eww,paru,.cargo,.rustup}
+	rm -rf /mnt/home/"$USR"/{bspwm,nitrogen,eww,paru,.cargo,.rustup}
 	rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop,lstopo.desktop,rofi.desktop,rofi-theme-selector.desktop}
 	rm -rf /mnt/usr/lib/firmware/{amd,amdgpu,amd-ucode,mellanox,mwlwifi,netronome,nvidia,radeon,rtlwifi}
 	rm -rf /mnt/usr/share/icons/{Qogir-manjaro,Qogir-manjaro-dark,Papirus-Light}
