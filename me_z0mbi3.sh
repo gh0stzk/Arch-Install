@@ -457,7 +457,6 @@ function install_lightdm() {
 		font-name = UbuntuMono Nerd Font 11
 	EOL
 	
-	$CHROOT systemctl enable lightdm
 	clear
 }
 
@@ -480,7 +479,7 @@ function aur_apps() {
 function activando_servicios() {
 	logo "Activando Servicios"
 
-	$CHROOT systemctl enable systemd-networkd cpupower systemd-timesyncd.service systemd-resolved.service
+	$CHROOT systemctl enable systemd-networkd cpupower systemd-timesyncd.service systemd-resolved.service lightdm.service
 	echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
 	echo "xdg-user-dirs-update" | $CHROOT su "$USR"
@@ -702,7 +701,7 @@ install_codecs_utilities
 install_mount_multimedia_support
 install_bspwm_enviroment
 install_apps_que_uso
-#install_lightdm
+install_lightdm
 
 aur_paru
 aur_apps
