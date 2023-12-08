@@ -383,7 +383,7 @@ function install_video_sound() {
 	mount -U 6bca691d-82f3-4dd5-865b-994f99db54e1 -w /mnt/dots
 	$CHROOT pacman -S \
 					  mesa-amber xorg-server xf86-video-intel \
-					  xorg-xinput xorg-xrdb xorg-xsetroot xorg-xwininfo xorg-xkill \
+					  xorg-xinput xorg-xrdb xorg-xsetroot xorg-xwininfo xorg-xkill xorg-xdpyinfo \
 					  --noconfirm
 					  	
 	$CHROOT pacman -S pipewire pipewire-pulse --noconfirm
