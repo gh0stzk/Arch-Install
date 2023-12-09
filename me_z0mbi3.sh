@@ -394,7 +394,7 @@ function install_codecs_utilities() {
 	logo "Instalando codecs multimedia y utilidades"
 	$CHROOT pacman -S \
                       ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl \
-                      jasper openjpeg2 libwebp webp-pixbuf-loader \
+                      jasper openjpeg2 libwebp webp-pixbuf-loader imagemagick \
                       unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils \
                       --noconfirm
 	clear
