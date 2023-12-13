@@ -429,7 +429,7 @@ function install_apps_que_uso() {
 					  bleachbit gimp gcolor3 geany mpv screenkey timeshift \
 					  htop ueberzug viewnior zathura zathura-pdf-poppler \
 					  retroarch retroarch-assets-xmb retroarch-assets-ozone \
-					  pass xclip xsel micro yt-dlp minidlna grsync \
+					  pass xclip xsel neovim yt-dlp minidlna grsync \
 					  lxappearance pavucontrol piper firefox firefox-i18n-es-mx \
 					  papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
 					  --noconfirm
@@ -601,6 +601,8 @@ function install_bspwm() {
 	$CHROOT pacman -S libxcb xcb-util xcb-util-wm xcb-util-keysyms --noconfirm
 	echo "cd && git clone https://github.com/baskerville/bspwm.git" | $CHROOT su "$USR"
 	echo "cd && cd bspwm && make && sudo make install" | $CHROOT su "$USR"
+	$CHROOT mkdir -p /usr/share/xsessions
+	$CHROOT cp -r /usr/local/share/xsessions/bspwm.desktop /usr/share/xsessions/bspwm.desktop
 }
 
 function install_nitrogen() {
