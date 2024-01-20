@@ -417,7 +417,7 @@ function install_bspwm_enviroment() {
 					  alacritty ranger maim lsd feh polkit-gnome \
 					  mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
 					  thunar thunar-archive-plugin tumbler xarchiver jq \
-					  xdo xdotool jgmenu stalonetray physlock \
+					  xdo xdotool jgmenu stalonetray physlock fd ripgrep \
 					  zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting \
 					  --noconfirm
 	clear
