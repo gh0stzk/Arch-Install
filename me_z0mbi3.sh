@@ -286,7 +286,7 @@ function install_grub() {
     $CHROOT pacman -S grub os-prober ntfs-3g --noconfirm >/dev/null
     $CHROOT grub-install --target=i386-pc "$drive"
 
-    sed -i 's/quiet/zswap.enabled=0 mitigations=off nowatchdog/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
+    sed -i 's/quiet/zswap.enabled=0 mitigations=off nowatchdog transparent_hugepage=madvise/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
     sed -i "s/MODULES=()/MODULES=(intel_agp i915 zram)/" /mnt/etc/mkinitcpio.conf
     echo
     $CHROOT grub-mkconfig -o /boot/grub/grub.cfg
@@ -405,7 +405,7 @@ function install_mount_multimedia_support() {
     $CHROOT pacman -S \
         libmtp gvfs-nfs gvfs gvfs-mtp \
         dosfstools usbutils net-tools \
-        xdg-user-dirs gtk-engine-murrine \
+        xdg-user-dirs gtk-engine-murrine gnome-themes-extra \
         --noconfirm
     clear
 }
@@ -417,7 +417,7 @@ function install_bspwm_enviroment() {
         alacritty ranger maim lsd feh polkit-gnome \
         mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
         thunar thunar-archive-plugin tumbler xarchiver jq \
-        xdo xdotool jgmenu stalonetray physlock fd ripgrep rtkit \
+        xdo xdotool jgmenu physlock fd ripgrep rtkit \
         zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting \
         --noconfirm
     clear
