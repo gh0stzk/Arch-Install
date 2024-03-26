@@ -210,7 +210,7 @@ function base_install() {
         base base-devel \
         linux-zen linux-firmware \
         intel-ucode mkinitcpio \
-        reflector zsh git
+        reflector zsh git networkmanager
     okie
     clear
 }
@@ -429,7 +429,7 @@ function install_apps_que_uso() {
         bleachbit gimp gcolor3 geany mpv screenkey timeshift \
         htop ueberzug viewnior zathura zathura-pdf-poppler \
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
-        pass xclip xsel neovim yt-dlp minidlna grsync \
+        pass xclip xsel neovim yt-dlp minidlna grsync tmux \
         lxappearance pavucontrol piper firefox firefox-i18n-es-mx \
         papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
         --noconfirm
@@ -479,7 +479,7 @@ function aur_apps() {
 function activando_servicios() {
     logo "Activando Servicios"
 
-    $CHROOT systemctl enable systemd-networkd cpupower systemd-timesyncd.service systemd-resolved.service lightdm.service
+    $CHROOT systemctl enable NetworkManager.service cpupower systemd-timesyncd.service lightdm.service
     echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
     echo "xdg-user-dirs-update" | $CHROOT su "$USR"
@@ -579,7 +579,9 @@ function conf_network() {
         -e 's/#DNSOverTLS=no/DNSOverTLS=opportunistic/' \
         -e 's/#DNS=.*/DNS=1.1.1.1 1.0.0.1/'
 }
+
 #---------- Restoring my dotfiles ----------
+
 function restore_dotfiles() {
     logo "Restaurando mis dotfiles. Esto solo funciona es mi maquina z0mbi3-b0x"
 
@@ -612,7 +614,6 @@ function install_nitrogen() {
 }
 
 function install_eww() {
-    $CHROOT pacman -S rustup --noconfirm
     echo "cd && git clone https://github.com/elkowar/eww" | $CHROOT su "$USR"
     echo "cd && cd eww && cargo build --release --no-default-features --features x11" | $CHROOT su "$USR"
     $CHROOT install -m 755 /home/"$USR"/eww/target/release/eww -t /usr/bin/
@@ -714,7 +715,7 @@ conf_xorg
 conf_monitor
 conf_keyboard
 conf_zram
-conf_network
+#conf_network
 
 restore_dotfiles
 install_bspwm
