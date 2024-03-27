@@ -6,6 +6,7 @@ Arch Linux Installer
 </h2>
 
 ## Introduction
+### Please dont install this, i did it for old machine i had, this isnt updated.
 
 Este es mi script altamente personalizado para instalar [Arch Linux](https://www.archlinux.org/). adecuado a mis necesidades y hardware. <b>NOT BLOATED</b> Es una instalacion super ligera, pulida y totalmente funcional.
 
