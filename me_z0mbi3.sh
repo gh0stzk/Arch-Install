@@ -427,9 +427,9 @@ function install_apps_que_uso() {
     logo "Instalando apps que yo uso"
     $CHROOT pacman -S \
         bleachbit gimp gcolor3 geany mpv screenkey timeshift \
-        htop ueberzug viewnior zathura zathura-pdf-poppler \
+        htop ueberzug viewnior zathura npm zathura-pdf-poppler \
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
-        pass xclip xsel neovim yt-dlp minidlna grsync tmux \
+        pass xclip xsel neovim yt-dlp minidlna libappindicator-gtk3 grsync tmux \
         lxappearance pavucontrol piper firefox firefox-i18n-es-mx \
         papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
         --noconfirm
@@ -469,9 +469,9 @@ function aur_paru() {
 
 function aur_apps() {
     echo "cd && paru -S simple-mtpfs tdrop-git xqp --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S cmatrix-git stacer --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S cmatrix-git stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S spotify spotify-adblock-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S whatsapp-nativefier telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S whatsdesk-bin telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S qogir-icon-theme --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
 
