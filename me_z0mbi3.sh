@@ -287,7 +287,7 @@ function install_grub() {
     $CHROOT grub-install --target=i386-pc "$drive"
 
     sed -i 's/quiet/zswap.enabled=0 mitigations=off nowatchdog transparent_hugepage=madvise/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
-    sed -i "s/MODULES=()/MODULES=(intel_agp i915 zram)/" /mnt/etc/mkinitcpio.conf
+    sed -i "s/MODULES=()/MODULES=(intel_agp i915)/" /mnt/etc/mkinitcpio.conf
     echo
     $CHROOT grub-mkconfig -o /boot/grub/grub.cfg
     okie
@@ -313,6 +313,7 @@ function opts_make_flags() {
     titleopts "Optimizando las make flags para acelerar tiempos de compilado"
     printf "\nTienes %s%s%s cores\n" "${CBL}" "$(nproc)" "${CNC}"
     sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
+    sed -i 's/COMPRESSZST=(zstd -c -T0 --ultra -20 -)/COMPRESSZST=(zstd -c -T0 --fast -9 -)/' /mnt/etc/makepkg.conf
     okie
 }
 
@@ -358,7 +359,7 @@ function opts_innec_kernel_modules() {
 	EOL
     okie
 }
-
+	
 function opts_servicios_innecesarios() {
     titleopts "Deshabilitando servicios innecesarios"
     echo
@@ -414,7 +415,7 @@ function install_bspwm_enviroment() {
     logo "Instalando todo el entorno bspwm"
     $CHROOT pacman -S \
         sxhkd polybar picom rofi dunst \
-        alacritty ranger maim lsd feh polkit-gnome \
+        alacritty ranger maim eza bat feh polkit-gnome \
         mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
         thunar thunar-archive-plugin tumbler xarchiver jq \
         xdo xdotool jgmenu physlock fd ripgrep rtkit \
@@ -431,7 +432,7 @@ function install_apps_que_uso() {
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
         pass xclip xsel neovim yt-dlp minidlna libappindicator-gtk3 grsync tmux \
         lxappearance pavucontrol piper firefox firefox-i18n-es-mx \
-        papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd \
+        papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd zram-generator \
         --noconfirm
     clear
 }
@@ -471,7 +472,7 @@ function aur_apps() {
     echo "cd && paru -S simple-mtpfs tdrop-git xqp --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S cmatrix-git stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S spotify spotify-adblock-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S whatsdesk-bin telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S qogir-icon-theme --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
 
@@ -483,7 +484,7 @@ function activando_servicios() {
     echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
 
     echo "xdg-user-dirs-update" | $CHROOT su "$USR"
-    echo "timeout 1s firefox --headless" | $CHROOT su "$USR"
+    echo "timeout 1s firefox --headless --display=0" | $CHROOT su "$USR"
     #echo "export __GLX_VENDOR_LIBRARY_NAME=amber" >> /mnt/etc/profile
 }
 
@@ -550,36 +551,14 @@ EOL
 }
 
 function conf_zram() {
-
-    cat >> /mnt/etc/udev/rules.d/99-zram.rules <<-EOL
-	ACTION=="add", KERNEL=="zram0", ATTR{comp_algorithm}="lz4", ATTR{disksize}="2048M", RUN="/usr/bin/mkswap -U clear /dev/%k", TAG+="systemd"
-	EOL
-    printf "%s99-zram.rules%s generated in --> /etc/udev/rules.d\n" "${CGR}" "${CNC}"
-
-    cat >> /mnt/etc/fstab <<-EOL
-	# zram nodes
-	/dev/zram0 none swap defaults,pri=100 0 0
-	EOL
-    printf "%szram0%s added to --> /etc/fstab\n" "${CGR}" "${CNC}"
-    sleep 2
-    clear
+	cat > /mnt/etc/systemd/zram-generator.conf <<EOL
+[zram0]
+zram-size = ram / 2
+compression-algorithm = lz4
+swap-priority = 100
+fs-type = swap
+EOL
 }
-
-function conf_network() {
-    cat >> /mnt/etc/systemd/network/wired.network <<-EOL
-	[Match]
-	Name=enp1s0
-
-	[Network]
-	DHCP=yes
-	EOL
-    printf "%swired.network%s added to --> /etc/systemd/network\n" "${CGR}" "${CNC}"
-
-    sed -i /mnt/etc/systemd/resolved.conf \
-        -e 's/#DNSOverTLS=no/DNSOverTLS=opportunistic/' \
-        -e 's/#DNS=.*/DNS=1.1.1.1 1.0.0.1/'
-}
-
 #---------- Restoring my dotfiles ----------
 
 function restore_dotfiles() {
@@ -636,7 +615,6 @@ function clean_garbage() {
     rm -rf /mnt/usr/lib/firmware/{amd,amdgpu,amd-ucode,mellanox,mwlwifi,netronome,nvidia,radeon,rtlwifi}
     rm -rf /mnt/usr/share/icons/{Qogir-manjaro,Qogir-manjaro-dark,Papirus-Light}
     rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop}
-    rm -f /mnt/opt/whatsapp-nativefier/locales/{am.pak,ar.pak,bg.pak,bn.pak,ca.pak,cs.pak,da.pak,de.pak,el.pak,en-GB.pak,et.pak,fa.pak,fi.pak,fil.pak,fr.pak,gu.pak,he.pak,hi.pak,hr.pak,hu.pak,id.pak,it.pak,ja.pak,kn.pak,ko.pak,lt.pak,lv.pak,ml.pak,mr.pak,ms.pak,nb.pak,nl.pak,pl.pak,pt-BR.pak,pt-PT.pak,ro.pak,ru.pak,sk.pak,sl.pak,sr.pak,sv.pak,sw.pak,ta.pak,te.pak,th.pak,tr.pak,uk.pak,vi.pak,zh-CN.pak,zh-TW.pak}
     rm -f /mnt/usr/lib/firmware/{iwlwifi-100-5.ucode,iwlwifi-105-6.ucode,iwlwifi-135-6.ucode,iwlwifi-1000-3.ucode,iwlwifi-1000-5.ucode,iwlwifi-2000-6.ucode,iwlwifi-2030-6.ucode,iwlwifi-3160-7.ucode,iwlwifi-3160-8.ucode,iwlwifi-3160-9.ucode,iwlwifi-3160-10.ucode,iwlwifi-3160-12.ucode,iwlwifi-3160-13.ucode,iwlwifi-3160-16.ucode,iwlwifi-3160-17.ucode,iwlwifi-3168-21.ucode,iwlwifi-3168-22.ucode,iwlwifi-3168-27.ucode,iwlwifi-3168-29.ucode,iwlwifi-3945-2.ucode,iwlwifi-4965-2.ucode,iwlwifi-5000-1.ucode,iwlwifi-5000-2.ucode,iwlwifi-5000-5.ucode,iwlwifi-5150-2.ucode,iwlwifi-6000-4.ucode,iwlwifi-6000g2a-5.ucode,iwlwifi-6000g2a-6.ucode,iwlwifi-6000g2b-5.ucode,iwlwifi-6000g2b-6.ucode,iwlwifi-6050-4.ucode,iwlwifi-6050-5.ucode,iwlwifi-7260-7.ucode,iwlwifi-7260-8.ucode,iwlwifi-7260-9.ucode,iwlwifi-7260-10.ucode,iwlwifi-7260-12.ucode,iwlwifi-7260-13.ucode,iwlwifi-7260-16.ucode,iwlwifi-7260-17.ucode,iwlwifi-7265-8.ucode,iwlwifi-7265-9.ucode,iwlwifi-7265-10.ucode,iwlwifi-7265-12.ucode,iwlwifi-7265-13.ucode,iwlwifi-7265-16.ucode,iwlwifi-7265-17.ucode,iwlwifi-7265D-10.ucode,iwlwifi-7265D-12.ucode,iwlwifi-7265D-13.ucode,iwlwifi-7265D-16.ucode,iwlwifi-7265D-17.ucode,iwlwifi-7265D-21.ucode,iwlwifi-7265D-22.ucode,iwlwifi-7265D-27.ucode,iwlwifi-7265D-29.ucode,iwlwifi-8000C-13.ucode,iwlwifi-8000C-16.ucode,iwlwifi-8000C-21.ucode,iwlwifi-8000C-22.ucode,iwlwifi-8000C-27.ucode,iwlwifi-8000C-31.ucode,iwlwifi-8000C-34.ucode,iwlwifi-8000C-36.ucode,iwlwifi-8265-21.ucode,iwlwifi-8265-22.ucode,iwlwifi-8265-27.ucode,iwlwifi-8265-31.ucode,iwlwifi-8265-34.ucode,iwlwifi-8265-36.ucode,iwlwifi-9000-pu-b0-jf-b0-33.ucode,iwlwifi-9000-pu-b0-jf-b0-34.ucode,iwlwifi-9000-pu-b0-jf-b0-38.ucode,iwlwifi-9000-pu-b0-jf-b0-41.ucode,iwlwifi-9000-pu-b0-jf-b0-43.ucode,iwlwifi-9000-pu-b0-jf-b0-46.ucode,iwlwifi-9260-th-b0-jf-b0-33.ucode,iwlwifi-9260-th-b0-jf-b0-34.ucode,iwlwifi-9260-th-b0-jf-b0-38.ucode,iwlwifi-9260-th-b0-jf-b0-41.ucode,iwlwifi-9260-th-b0-jf-b0-43.ucode,iwlwifi-9260-th-b0-jf-b0-46.ucode,iwlwifi-cc-a0-46.ucode,iwlwifi-cc-a0-48.ucode,iwlwifi-cc-a0-50.ucode,iwlwifi-cc-a0-53.ucode,iwlwifi-cc-a0-55.ucode,iwlwifi-cc-a0-59.ucode,iwlwifi-cc-a0-62.ucode,iwlwifi-cc-a0-63.ucode,iwlwifi-Qu-b0-hr-b0-48.ucode,iwlwifi-Qu-b0-hr-b0-50.ucode,iwlwifi-Qu-b0-hr-b0-53.ucode,iwlwifi-Qu-b0-hr-b0-55.ucode,iwlwifi-Qu-b0-hr-b0-59.ucode,iwlwifi-Qu-b0-hr-b0-62.ucode,iwlwifi-Qu-b0-hr-b0-63.ucode,iwlwifi-Qu-b0-jf-b0-48.ucode,iwlwifi-Qu-b0-jf-b0-50.ucode,iwlwifi-Qu-b0-jf-b0-53.ucode,iwlwifi-Qu-b0-jf-b0-55.ucode,iwlwifi-Qu-b0-jf-b0-59.ucode,iwlwifi-Qu-b0-jf-b0-62.ucode,iwlwifi-Qu-b0-jf-b0-63.ucode,iwlwifi-Qu-c0-hr-b0-48.ucode,iwlwifi-Qu-c0-hr-b0-50.ucode,iwlwifi-Qu-c0-hr-b0-53.ucode,iwlwifi-Qu-c0-hr-b0-55.ucode,iwlwifi-Qu-c0-hr-b0-59.ucode,iwlwifi-Qu-c0-hr-b0-62.ucode,iwlwifi-Qu-c0-hr-b0-63.ucode,iwlwifi-Qu-c0-jf-b0-48.ucode,iwlwifi-Qu-c0-jf-b0-50.ucode,iwlwifi-Qu-c0-jf-b0-53.ucode,iwlwifi-Qu-c0-jf-b0-55.ucode,iwlwifi-Qu-c0-jf-b0-59.ucode,iwlwifi-Qu-c0-jf-b0-62.ucode,iwlwifi-Qu-c0-jf-b0-63.ucode,iwlwifi-QuZ-a0-hr-b0-48.ucode,iwlwifi-QuZ-a0-hr-b0-50.ucode,iwlwifi-QuZ-a0-hr-b0-53.ucode,iwlwifi-QuZ-a0-hr-b0-55.ucode,iwlwifi-QuZ-a0-hr-b0-59.ucode,iwlwifi-QuZ-a0-hr-b0-62.ucode,iwlwifi-QuZ-a0-hr-b0-63.ucode,iwlwifi-QuZ-a0-jf-b0-48.ucode,iwlwifi-QuZ-a0-jf-b0-50.ucode,iwlwifi-QuZ-a0-jf-b0-53.ucode,iwlwifi-QuZ-a0-jf-b0-55.ucode,iwlwifi-QuZ-a0-jf-b0-59.ucode,iwlwifi-QuZ-a0-jf-b0-62.ucode,iwlwifi-QuZ-a0-jf-b0-63.ucode,iwlwifi-so-a0-gf-a0.pnvm,iwlwifi-so-a0-gf-a0-64.ucode,iwlwifi-so-a0-hr-b0-64.ucode,iwlwifi-so-a0-jf-b0-64.ucode,iwlwifi-ty-a0-gf-a0.pnvm,iwlwifi-ty-a0-gf-a0-59.ucode,iwlwifi-ty-a0-gf-a0-62.ucode,iwlwifi-ty-a0-gf-a0-63.ucode,iwlwifi-ty-a0-gf-a0-66.ucode}
 
     $CHROOT pacman -Scc
@@ -715,7 +693,6 @@ conf_xorg
 conf_monitor
 conf_keyboard
 conf_zram
-#conf_network
 
 restore_dotfiles
 install_bspwm
