@@ -95,13 +95,12 @@ function select_disk() {
     echo
 
     # Seleccionar el disco para la instalación de Arch Linux
-    PS3="Escoge el DISCO (NO la particion) donde Arch Linux se instalara: "
-    select drive in $(lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd\|nvme\|mmcblk')
-    do
-        if [ "$drive" ]; then
-            break
-        fi
-    done
+	PS3="Escoge el DISCO (NO la partición) donde Arch Linux se instalará: "
+	select drive in $(lsblk -dnp -e 7,11 -o NAME | grep -E '/dev/(sd|hd|vd|nvme|mmcblk)'); do
+		if [ -n "$drive" ] && [ -b "$drive" ]; then
+			break
+		fi
+	done
     clear
 }
 
@@ -118,17 +117,25 @@ function create_mount_root_partition() {
     echo
 
     PS3="Escoge la particion raiz que acabas de crear donde Arch Linux se instalara: "
-    select partroot in $(fdisk -l "${drive}" | grep Linux | cut -d" " -f1)
+    select partroot in $(fdisk -l "${drive}" | grep Linux | awk '{print $1}')
     do
-        if [ "$partroot" ]; then
-            printf " \n Formateando la particion RAIZ %s\n Espere..\n" "${partroot}"
-            sleep 2
-            mkfs.ext4 -L Arch "${partroot}" >/dev/null 2>&1
-            mount "${partroot}" /mnt
-            sleep 2
-            break
-        fi
-    done
+        if [ -n "${partroot}" ] && [ -b "${partroot}" ]; then
+			echo "Formateando la partición RAIZ ${partroot}"
+			echo "Espere..."
+			if mkfs.ext4 -L Arch "${partroot}"; then
+				if mount "${partroot}" /mnt; then
+					echo "Partición ${partroot} formateada y montada exitosamente."
+					break
+				else
+					echo "Error al montar la partición ${partroot}. Intente de nuevo."
+				fi
+			else
+				echo "Error al formatear la partición ${partroot}. Intente de nuevo."
+			fi
+		else
+        echo "Selección inválida. Por favor, elija una partición de la lista."
+		fi
+	done
     okie
     clear
 }
