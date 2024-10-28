@@ -366,7 +366,7 @@ function opts_innec_kernel_modules() {
 	EOL
     okie
 }
-	
+
 function opts_servicios_innecesarios() {
     titleopts "Deshabilitando servicios innecesarios"
     echo
@@ -425,7 +425,7 @@ function install_bspwm_enviroment() {
         alacritty ranger maim eza bat feh polkit-gnome \
         mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
         thunar thunar-archive-plugin tumbler xarchiver jq \
-        xdo xdotool jgmenu physlock fd ripgrep rtkit \
+        xdo xdotool jgmenu fd ripgrep rtkit \
         zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting \
         --noconfirm
     clear
@@ -476,7 +476,7 @@ function aur_paru() {
 }
 
 function aur_apps() {
-    echo "cd && paru -S simple-mtpfs tdrop-git xqp --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S simple-mtpfs tdrop-git xqp i3lock-color --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S cmatrix-git stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S spotify spotify-adblock-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
