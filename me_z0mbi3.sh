@@ -241,7 +241,7 @@ function set_timezone_lang_keyboard() {
     echo "es_MX.UTF-8 UTF-8" >> /mnt/etc/locale.gen
     $CHROOT locale-gen
     echo "LANG=es_MX.UTF-8" >> /mnt/etc/locale.conf
-    echo "KEYMAP=la-latin1" >> /mnt/etc/vconsole.conf
+    echo -e "KEYMAP=es\nFONT=Lat2-Terminus16\nXKBLAYOUT=es" >> /mnt/etc/vconsole.conf
     export LANG=es_MX.UTF-8
     okie
     clear
@@ -311,7 +311,7 @@ function opts_pacman() {
 
 function opts_ext4() {
     titleopts "Optimiza y acelera ext4 para SSD"
-    sed -i '0,/relatime/s/relatime/noatime,commit=120,barrier=0/' /mnt/etc/fstab
+    sed -i '0,/relatime/s/relatime/noatime,commit=120/' /mnt/etc/fstab
     $CHROOT tune2fs -O fast_commit "${partroot}" >/dev/null
     okie
 }
@@ -342,10 +342,10 @@ function opts_scheduler() {
 function opts_swappiness() {
     titleopts "Modificando swappiness"
     cat >> /mnt/etc/sysctl.d/99-swappiness.conf <<- EOL
-		vm.swappiness=180
+		vm.swappiness=10
 		vm.watermark_boost_factor = 0
-		vm.watermark_scale_factor = 125
-		vm.page-cluster = 0
+		vm.watermark_scale_factor = 10
+		vm.page-cluster = 3
 	EOL
     okie
 }
@@ -421,8 +421,8 @@ function install_mount_multimedia_support() {
 function install_bspwm_enviroment() {
     logo "Instalando todo el entorno bspwm"
     $CHROOT pacman -S \
-        sxhkd polybar picom rofi dunst \
-        alacritty ranger maim eza bat feh polkit-gnome \
+        sxhkd polybar picom rofi dunst clipcat \
+        alacritty yazi maim eza bat feh polkit-gnome \
         mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
         thunar thunar-archive-plugin tumbler xarchiver jq \
         xdo xdotool jgmenu fd ripgrep rtkit \
@@ -437,8 +437,8 @@ function install_apps_que_uso() {
         bleachbit gimp gcolor3 geany mpv screenkey timeshift \
         htop ueberzug viewnior zathura npm zathura-pdf-poppler \
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
-        pass xclip xsel neovim yt-dlp minidlna libappindicator-gtk3 grsync tmux \
-        lxappearance pavucontrol piper firefox firefox-i18n-es-mx \
+        keepassxc xclip xsel neovim yt-dlp minidlna libappindicator-gtk3 grsync tmux \
+        lxappearance pavucontrol piper firefox firefox-i18n-es-mx obsidian qalculate-gtk \
         papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd zram-generator \
         --noconfirm
     clear
@@ -476,11 +476,10 @@ function aur_paru() {
 }
 
 function aur_apps() {
-    echo "cd && paru -S simple-mtpfs tdrop-git xqp i3lock-color --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S simple-mtpfs tdrop-git xqp i3lock-color xwinwrap-0.9-bin localsend-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S cmatrix-git stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S spotify spotify-adblock-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S spotify-1.1 spotify-adblock-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S qogir-icon-theme --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
 
 #---------- Enable Services & other stuff ----------
@@ -551,7 +550,7 @@ function conf_keyboard() {
 Section "InputClass"
 		Identifier	"system-keyboard"
 		MatchIsKeyboard	"on"
-		Option	"XkbLayout"	"latam"
+		Option	"XkbLayout"	"es"
 EndSection
 EOL
     printf "%s00-keyboard.conf%s generated in --> /etc/X11/xorg.conf.d\n" "${CGR}" "${CNC}"
@@ -618,10 +617,9 @@ function clean_garbage() {
     rm -rf /mnt/home/"$USR"/.cache/electron/
     rm -rf /mnt/home/"$USR"/.cache/go-build/
     rm -rf /mnt/home/"$USR"/{bspwm,nitrogen,eww,paru,.cargo,.rustup}
-    rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop,lstopo.desktop,rofi.desktop,rofi-theme-selector.desktop}
+    rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop,lstopo.desktop,rofi.desktop,rofi-theme-selector.desktop,electron32.desktop,jgmenu.desktop}
     rm -rf /mnt/usr/lib/firmware/{amd,amdgpu,amd-ucode,mellanox,mwlwifi,netronome,nvidia,radeon,rtlwifi}
     rm -rf /mnt/usr/share/icons/{Qogir-manjaro,Qogir-manjaro-dark,Papirus-Light}
-    rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop}
     rm -f /mnt/usr/lib/firmware/{iwlwifi-100-5.ucode,iwlwifi-105-6.ucode,iwlwifi-135-6.ucode,iwlwifi-1000-3.ucode,iwlwifi-1000-5.ucode,iwlwifi-2000-6.ucode,iwlwifi-2030-6.ucode,iwlwifi-3160-7.ucode,iwlwifi-3160-8.ucode,iwlwifi-3160-9.ucode,iwlwifi-3160-10.ucode,iwlwifi-3160-12.ucode,iwlwifi-3160-13.ucode,iwlwifi-3160-16.ucode,iwlwifi-3160-17.ucode,iwlwifi-3168-21.ucode,iwlwifi-3168-22.ucode,iwlwifi-3168-27.ucode,iwlwifi-3168-29.ucode,iwlwifi-3945-2.ucode,iwlwifi-4965-2.ucode,iwlwifi-5000-1.ucode,iwlwifi-5000-2.ucode,iwlwifi-5000-5.ucode,iwlwifi-5150-2.ucode,iwlwifi-6000-4.ucode,iwlwifi-6000g2a-5.ucode,iwlwifi-6000g2a-6.ucode,iwlwifi-6000g2b-5.ucode,iwlwifi-6000g2b-6.ucode,iwlwifi-6050-4.ucode,iwlwifi-6050-5.ucode,iwlwifi-7260-7.ucode,iwlwifi-7260-8.ucode,iwlwifi-7260-9.ucode,iwlwifi-7260-10.ucode,iwlwifi-7260-12.ucode,iwlwifi-7260-13.ucode,iwlwifi-7260-16.ucode,iwlwifi-7260-17.ucode,iwlwifi-7265-8.ucode,iwlwifi-7265-9.ucode,iwlwifi-7265-10.ucode,iwlwifi-7265-12.ucode,iwlwifi-7265-13.ucode,iwlwifi-7265-16.ucode,iwlwifi-7265-17.ucode,iwlwifi-7265D-10.ucode,iwlwifi-7265D-12.ucode,iwlwifi-7265D-13.ucode,iwlwifi-7265D-16.ucode,iwlwifi-7265D-17.ucode,iwlwifi-7265D-21.ucode,iwlwifi-7265D-22.ucode,iwlwifi-7265D-27.ucode,iwlwifi-7265D-29.ucode,iwlwifi-8000C-13.ucode,iwlwifi-8000C-16.ucode,iwlwifi-8000C-21.ucode,iwlwifi-8000C-22.ucode,iwlwifi-8000C-27.ucode,iwlwifi-8000C-31.ucode,iwlwifi-8000C-34.ucode,iwlwifi-8000C-36.ucode,iwlwifi-8265-21.ucode,iwlwifi-8265-22.ucode,iwlwifi-8265-27.ucode,iwlwifi-8265-31.ucode,iwlwifi-8265-34.ucode,iwlwifi-8265-36.ucode,iwlwifi-9000-pu-b0-jf-b0-33.ucode,iwlwifi-9000-pu-b0-jf-b0-34.ucode,iwlwifi-9000-pu-b0-jf-b0-38.ucode,iwlwifi-9000-pu-b0-jf-b0-41.ucode,iwlwifi-9000-pu-b0-jf-b0-43.ucode,iwlwifi-9000-pu-b0-jf-b0-46.ucode,iwlwifi-9260-th-b0-jf-b0-33.ucode,iwlwifi-9260-th-b0-jf-b0-34.ucode,iwlwifi-9260-th-b0-jf-b0-38.ucode,iwlwifi-9260-th-b0-jf-b0-41.ucode,iwlwifi-9260-th-b0-jf-b0-43.ucode,iwlwifi-9260-th-b0-jf-b0-46.ucode,iwlwifi-cc-a0-46.ucode,iwlwifi-cc-a0-48.ucode,iwlwifi-cc-a0-50.ucode,iwlwifi-cc-a0-53.ucode,iwlwifi-cc-a0-55.ucode,iwlwifi-cc-a0-59.ucode,iwlwifi-cc-a0-62.ucode,iwlwifi-cc-a0-63.ucode,iwlwifi-Qu-b0-hr-b0-48.ucode,iwlwifi-Qu-b0-hr-b0-50.ucode,iwlwifi-Qu-b0-hr-b0-53.ucode,iwlwifi-Qu-b0-hr-b0-55.ucode,iwlwifi-Qu-b0-hr-b0-59.ucode,iwlwifi-Qu-b0-hr-b0-62.ucode,iwlwifi-Qu-b0-hr-b0-63.ucode,iwlwifi-Qu-b0-jf-b0-48.ucode,iwlwifi-Qu-b0-jf-b0-50.ucode,iwlwifi-Qu-b0-jf-b0-53.ucode,iwlwifi-Qu-b0-jf-b0-55.ucode,iwlwifi-Qu-b0-jf-b0-59.ucode,iwlwifi-Qu-b0-jf-b0-62.ucode,iwlwifi-Qu-b0-jf-b0-63.ucode,iwlwifi-Qu-c0-hr-b0-48.ucode,iwlwifi-Qu-c0-hr-b0-50.ucode,iwlwifi-Qu-c0-hr-b0-53.ucode,iwlwifi-Qu-c0-hr-b0-55.ucode,iwlwifi-Qu-c0-hr-b0-59.ucode,iwlwifi-Qu-c0-hr-b0-62.ucode,iwlwifi-Qu-c0-hr-b0-63.ucode,iwlwifi-Qu-c0-jf-b0-48.ucode,iwlwifi-Qu-c0-jf-b0-50.ucode,iwlwifi-Qu-c0-jf-b0-53.ucode,iwlwifi-Qu-c0-jf-b0-55.ucode,iwlwifi-Qu-c0-jf-b0-59.ucode,iwlwifi-Qu-c0-jf-b0-62.ucode,iwlwifi-Qu-c0-jf-b0-63.ucode,iwlwifi-QuZ-a0-hr-b0-48.ucode,iwlwifi-QuZ-a0-hr-b0-50.ucode,iwlwifi-QuZ-a0-hr-b0-53.ucode,iwlwifi-QuZ-a0-hr-b0-55.ucode,iwlwifi-QuZ-a0-hr-b0-59.ucode,iwlwifi-QuZ-a0-hr-b0-62.ucode,iwlwifi-QuZ-a0-hr-b0-63.ucode,iwlwifi-QuZ-a0-jf-b0-48.ucode,iwlwifi-QuZ-a0-jf-b0-50.ucode,iwlwifi-QuZ-a0-jf-b0-53.ucode,iwlwifi-QuZ-a0-jf-b0-55.ucode,iwlwifi-QuZ-a0-jf-b0-59.ucode,iwlwifi-QuZ-a0-jf-b0-62.ucode,iwlwifi-QuZ-a0-jf-b0-63.ucode,iwlwifi-so-a0-gf-a0.pnvm,iwlwifi-so-a0-gf-a0-64.ucode,iwlwifi-so-a0-hr-b0-64.ucode,iwlwifi-so-a0-jf-b0-64.ucode,iwlwifi-ty-a0-gf-a0.pnvm,iwlwifi-ty-a0-gf-a0-59.ucode,iwlwifi-ty-a0-gf-a0-62.ucode,iwlwifi-ty-a0-gf-a0-63.ucode,iwlwifi-ty-a0-gf-a0-66.ucode}
 
     $CHROOT pacman -Scc
