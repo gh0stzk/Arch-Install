@@ -435,7 +435,7 @@ function install_apps_que_uso() {
     logo "Instalando apps que yo uso"
     $CHROOT pacman -S \
         bleachbit gimp gcolor3 geany mpv screenkey timeshift \
-        htop ueberzug viewnior zathura npm zathura-pdf-poppler \
+        htop ueberzugpp viewnior zathura npm zathura-pdf-poppler \
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
         keepassxc xclip xsel neovim yt-dlp minidlna libappindicator-gtk3 grsync tmux \
         lxappearance pavucontrol piper firefox firefox-i18n-es-mx obsidian qalculate-gtk \
