@@ -320,7 +320,7 @@ function opts_make_flags() {
     titleopts "Optimizando las make flags para acelerar tiempos de compilado"
     printf "\nTienes %s%s%s cores\n" "${CBL}" "$(nproc)" "${CNC}"
     sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
-    sed -i 's/COMPRESSZST=(zstd -c -T0 --ultra -20 -)/COMPRESSZST=(zstd -c -T0 --fast -9 -)/' /mnt/etc/makepkg.conf
+    #sed -i 's/COMPRESSZST=(zstd -c -T0 --ultra -20 -)/COMPRESSZST=(zstd -c -T0 --fast -9 -)/' /mnt/etc/makepkg.conf
     okie
 }
 
@@ -342,10 +342,11 @@ function opts_scheduler() {
 function opts_swappiness() {
     titleopts "Modificando swappiness"
     cat >> /mnt/etc/sysctl.d/99-swappiness.conf <<- EOL
-		vm.swappiness=10
-		vm.watermark_boost_factor = 0
-		vm.watermark_scale_factor = 10
-		vm.page-cluster = 3
+		vm.swappiness=20
+        vm.vfs_cache_pressure=50
+        vm.dirty_ratio=10
+        vm.dirty_background_ratio=5
+        vm.page-cluster=0
 	EOL
     okie
 }
@@ -382,6 +383,21 @@ function opts_my_stuff() {
 	EOL
     okie
     clear
+}
+#---------- Add my repo and chaotic-aur repos ----------
+function add_repos() {
+	cat >> /mnt/etc/pacman.conf <<- EOL
+		[gh0stzk-dotfiles]
+		SigLevel = Optional TrustAll
+		Server = http://gh0stzk.github.io/pkgs/x86_64
+
+		[chaotic-aur]
+		Include = /etc/pacman.d/chaotic-mirrorlist
+	EOL
+
+	echo "sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com" | $CHROOT su "$USR"
+	echo "sudo pacman-key --lsign-key 3056513887B78AEB" | $CHROOT su "$USR"
+	$CHROOT pacman -Syy
 }
 
 #---------- Installing Packages ----------
@@ -422,10 +438,10 @@ function install_bspwm_enviroment() {
     logo "Instalando todo el entorno bspwm"
     $CHROOT pacman -S \
         sxhkd polybar picom rofi dunst clipcat \
-        alacritty yazi maim eza bat feh polkit-gnome \
+        alacritty yazi maim eza bat feh lxsession-gtk3 \
         mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
         thunar thunar-archive-plugin tumbler xarchiver jq \
-        xdo xdotool jgmenu fd ripgrep rtkit \
+        xdo xdotool jgmenu fd ripgrep rtkit redshift \
         zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting \
         --noconfirm
     clear
@@ -437,9 +453,9 @@ function install_apps_que_uso() {
         bleachbit gimp gcolor3 geany mpv screenkey timeshift \
         htop ueberzugpp viewnior zathura npm zathura-pdf-poppler \
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
-        keepassxc xclip xsel neovim yt-dlp minidlna libappindicator-gtk3 grsync tmux \
+        keepassxc xclip xsel neovim yt-dlp minidlna grsync tmux \
         lxappearance pavucontrol piper firefox firefox-i18n-es-mx obsidian qalculate-gtk \
-        papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-joypixels ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd zram-generator \
+        papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd noto-fonts-emoji ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd zram-generator \
         --noconfirm
     clear
 }
@@ -468,6 +484,15 @@ function install_lightdm() {
     clear
 }
 
+function install_apps_gh0stzk() {
+	$CHROOT pacman -S \
+		st-gh0stzk gh0stzk-gtk-themes gh0stzk-cursor-qogirr gh0stzk-icons-beautyline \
+        gh0stzk-icons-candy gh0stzk-icons-catppuccin-mocha gh0stzk-icons-dracula \
+        gh0stzk-icons-glassy gh0stzk-icons-gruvbox-plus-dark gh0stzk-icons-hack \
+        gh0stzk-icons-luv gh0stzk-icons-sweet-rainbow gh0stzk-icons-tokyo-night \
+        gh0stzk-icons-vimix-white gh0stzk-icons-zafiro gh0stzk-icons-zafiro-purple
+}
+
 #---------- AUR Packages ----------
 function aur_paru() {
     $CHROOT pacman -S rustup --noconfirm
@@ -476,8 +501,8 @@ function aur_paru() {
 }
 
 function aur_apps() {
-    echo "cd && paru -S simple-mtpfs tdrop-git xqp i3lock-color xwinwrap-0.9-bin localsend-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S cmatrix-git stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S xqp i3lock-color xwinwrap-0.9-bin fzf-tab-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S cmatrix-git simple-mtpfs localsend-bin stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S spotify-1.1 spotify-adblock-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
@@ -578,6 +603,8 @@ function restore_dotfiles() {
 
     echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/*.default-default/" | $CHROOT su "$USR"
     echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.mozilla/*.default-default/" | $CHROOT su "$USR"
+	echo "sudo cp /dots/dotfiles/polybar-update.hook /etc/pacman.d/hooks/" | $CHROOT su "$USR"
+    echo "systemctl --user enable ArchUpdates.timer" | $CHROOT su "$USR"
     okie
     sleep 5
     clear
@@ -682,12 +709,14 @@ opts_innec_kernel_modules
 opts_servicios_innecesarios
 opts_my_stuff
 
+add_repos
 install_video_sound
 install_codecs_utilities
 install_mount_multimedia_support
 install_bspwm_enviroment
 install_apps_que_uso
 install_lightdm
+install_apps_gh0stzk
 
 aur_paru
 aur_apps
