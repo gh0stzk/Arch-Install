@@ -386,6 +386,14 @@ function opts_my_stuff() {
 }
 #---------- Add my repo and chaotic-aur repos ----------
 function add_repos() {
+    titleopts "Adding Chaotic & gh0stzk repos"
+
+    $CHROOT pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+	$CHROOT pacman-key --lsign-key 3056513887B78AEB
+
+    $CHROOT pacman -U https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst
+    $CHROOT pacman -U https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst
+
 	cat >> /mnt/etc/pacman.conf <<- EOL
 		[gh0stzk-dotfiles]
 		SigLevel = Optional TrustAll
@@ -395,8 +403,6 @@ function add_repos() {
 		Include = /etc/pacman.d/chaotic-mirrorlist
 	EOL
 
-	echo "sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com" | $CHROOT su "$USR"
-	echo "sudo pacman-key --lsign-key 3056513887B78AEB" | $CHROOT su "$USR"
 	$CHROOT pacman -Syy
 }
 
