@@ -379,7 +379,7 @@ function opts_my_stuff() {
     titleopts "Configurando almacenamiento personal"
     cat >> /mnt/etc/fstab <<-EOL
 	# My sTuFF
-	UUID=01D3AE59075CA1F0		/run/media/$USR/windows 	ntfs-3g		auto,rw,users,uid=1000,gid=984,dmask=022,fmask=133,big_writes,hide_hid_files,windows_names,noatime	0 0
+    UUID=01D3AE59075CA1F0		/run/media/z0mbi3/windows 	ntfs3		rw,uid=1000,gid=984,umask=022,prealloc,windows_names,noatime	0 0
 	EOL
     okie
     clear
@@ -388,19 +388,9 @@ function opts_my_stuff() {
 function add_repos() {
     titleopts "Adding Chaotic & gh0stzk repos"
 
-    $CHROOT pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-    $CHROOT pacman-key --lsign-key 3056513887B78AEB
-
-    $CHROOT pacman -U https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst
-    $CHROOT pacman -U https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst
-
 	cat >> /mnt/etc/pacman.conf <<- EOL
 		[gh0stzk-dotfiles]
 		SigLevel = Optional TrustAll
-		Server = http://gh0stzk.github.io/pkgs/x86_64
-
-		[chaotic-aur]
-		Include = /etc/pacman.d/chaotic-mirrorlist
 	EOL
 
 	$CHROOT pacman -Syy
