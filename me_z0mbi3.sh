@@ -290,7 +290,7 @@ function refresh_mirrors() {
 function install_grub() {
     logo "Instalando GRUB"
 
-    $CHROOT pacman -S grub os-prober ntfs-3g --noconfirm >/dev/null
+    $CHROOT pacman -S grub os-prober --noconfirm >/dev/null
     $CHROOT grub-install --target=i386-pc "$drive"
 
     sed -i 's/quiet/zswap.enabled=0 mitigations=off nowatchdog transparent_hugepage=madvise/; s/#GRUB_DISABLE_OS_PROBER/GRUB_DISABLE_OS_PROBER/' /mnt/etc/default/grub
@@ -305,7 +305,7 @@ function install_grub() {
 function opts_pacman() {
     logo "Aplicando optmizaciones.."
     titleopts "Editando pacman. Se activan descargas paralelas, el color y el easter egg ILoveCandy"
-    sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /mnt/etc/pacman.conf
+    sed -i 's/#Color/Color/; /^#DisableSandbox/a ILoveCandy' /mnt/etc/pacman.conf
     okie
 }
 
@@ -386,11 +386,12 @@ function opts_my_stuff() {
 }
 #---------- Add my repo and chaotic-aur repos ----------
 function add_repos() {
-    titleopts "Adding Chaotic & gh0stzk repos"
+    titleopts "Adding gh0stzk repo"
 
 	cat >> /mnt/etc/pacman.conf <<- EOL
 		[gh0stzk-dotfiles]
 		SigLevel = Optional TrustAll
+        Server = http://gh0stzk.github.io/pkgs/x86_64
 	EOL
 
 	$CHROOT pacman -Syy
@@ -446,11 +447,11 @@ function install_bspwm_enviroment() {
 function install_apps_que_uso() {
     logo "Instalando apps que yo uso"
     $CHROOT pacman -S \
-        bleachbit gimp gcolor3 geany mpv screenkey timeshift \
+        bleachbit gimp gcolor3 geany mpv screenkey \
         htop ueberzugpp viewnior zathura npm zathura-pdf-poppler \
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
-        keepassxc xclip xsel neovim yt-dlp minidlna grsync tmux \
-        lxappearance pavucontrol piper firefox firefox-i18n-es-mx obsidian qalculate-gtk \
+        pass xclip xsel neovim yt-dlp minidlna grsync tmux \
+        lxappearance pavucontrol piper firefox firefox-i18n-es-mx obsidian \
         papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd noto-fonts-emoji ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd zram-generator \
         --noconfirm
     clear
@@ -466,7 +467,7 @@ function install_lightdm() {
     rm -f /mnt/etc/lightdm/lightdm-gtk-greeter.conf
     cat >> /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<- EOL
 		[greeter]
-		icon-theme-name = Qogir-ubuntu
+		icon-theme-name = Qogirr-Dark
 		background = /usr/share/pixmaps/arch.png
 		user-background = false
 		default-user-image = /usr/share/pixmaps/gh0st.png
@@ -499,7 +500,7 @@ function aur_paru() {
 function aur_apps() {
     echo "cd && paru -S xqp i3lock-color xwinwrap-0.9-bin fzf-tab-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S cmatrix-git simple-mtpfs localsend-bin stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S spotify-1.1 spotify-adblock-git popcorntime-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S spotify-1.1 spotify-adblock-git popcorntime --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
 
@@ -698,7 +699,7 @@ opts_make_flags
 opts_cpupower
 opts_scheduler
 opts_swappiness
-opts_journal
+#opts_journal
 opts_innec_kernel_modules
 opts_servicios_innecesarios
 opts_my_stuff
