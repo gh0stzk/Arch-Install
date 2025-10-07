@@ -416,7 +416,7 @@ function install_codecs_utilities() {
     $CHROOT pacman -S \
         ffmpeg ffmpegthumbnailer aom libde265 x265 x264 libmpeg2 xvidcore libtheora libvpx sdl \
         jasper openjpeg2 libwebp webp-pixbuf-loader imagemagick \
-        unarchiver lha lrzip lzip p7zip lbzip2 arj lzop cpio unrar unzip zip unarj xdg-utils \
+        unarchiver lrzip lzip p7zip lbzip2 lzop cpio unrar unzip zip xdg-utils \
         --noconfirm
     clear
 }
@@ -450,7 +450,7 @@ function install_apps_que_uso() {
         bleachbit gimp gcolor3 geany mpv screenkey \
         htop viewnior zathura npm zathura-pdf-poppler \
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
-        pass xclip xsel neovim yt-dlp minidlna grsync tmux \
+        pass xclip xsel neovim yt-dlp minidlna grsync \
         lxappearance pavucontrol piper firefox firefox-i18n-es-mx obsidian \
         papirus-icon-theme ttf-jetbrains-mono ttf-jetbrains-mono-nerd noto-fonts-emoji ttf-inconsolata ttf-ubuntu-mono-nerd ttf-terminus-nerd zram-generator \
         --noconfirm
@@ -499,7 +499,7 @@ function aur_paru() {
 
 function aur_apps() {
     echo "cd && paru -S xqp i3lock-color xwinwrap-0.9-bin fzf-tab-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S cmatrix-git simple-mtpfs localsend-bin stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S simple-mtpfs localsend-bin stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S spotify-1.1 spotify-adblock-git popcorntime --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
