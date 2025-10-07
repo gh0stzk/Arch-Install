@@ -438,7 +438,7 @@ function install_bspwm_enviroment() {
         alacritty yazi maim eza bat feh lxsession-gtk3 \
         mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
         thunar thunar-archive-plugin tumbler xarchiver jq \
-        xdo xdotool jgmenu fd ripgrep rtkit redshift \
+        xdo xdotool jgmenu fd ripgrep redshift \
         zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting \
         --noconfirm
     clear
@@ -448,7 +448,7 @@ function install_apps_que_uso() {
     logo "Instalando apps que yo uso"
     $CHROOT pacman -S \
         bleachbit gimp gcolor3 geany mpv screenkey \
-        htop ueberzugpp viewnior zathura npm zathura-pdf-poppler \
+        htop viewnior zathura npm zathura-pdf-poppler \
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
         pass xclip xsel neovim yt-dlp minidlna grsync tmux \
         lxappearance pavucontrol piper firefox firefox-i18n-es-mx obsidian \
