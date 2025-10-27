@@ -434,8 +434,8 @@ function install_mount_multimedia_support() {
 function install_bspwm_enviroment() {
     logo "Instalando todo el entorno bspwm"
     $CHROOT pacman -S \
-        sxhkd polybar picom rofi dunst clipcat \
-        alacritty yazi maim eza bat feh lxsession-gtk3 \
+        bspwm sxhkd polybar picom rofi dunst clipcat \
+        alacritty yazi maim eza bat feh lxsession \
         mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
         thunar thunar-archive-plugin tumbler xarchiver jq \
         xdo xdotool jgmenu fd ripgrep redshift xcolor \
@@ -498,9 +498,9 @@ function aur_paru() {
 }
 
 function aur_apps() {
-    echo "cd && paru -S xqp i3lock-color xwinwrap-0.9-bin fzf-tab-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S i3lock-color xwinwrap-0.9-bin fzf-tab-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S simple-mtpfs localsend-bin stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S spotify-1.1 spotify-adblock-git popcorntime --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    echo "cd && paru -S spotify-1.1 spotify-adblock-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
 
@@ -607,14 +607,7 @@ function restore_dotfiles() {
     clear
 }
 
-#---------- Install Eww, Bspwm & Nitrogen ----------
-function install_bspwm() {
-    $CHROOT pacman -S libxcb xcb-util xcb-util-wm xcb-util-keysyms --noconfirm
-    echo "cd && git clone https://github.com/baskerville/bspwm.git" | $CHROOT su "$USR"
-    echo "cd && cd bspwm && make && sudo make install" | $CHROOT su "$USR"
-    $CHROOT mkdir -p /usr/share/xsessions
-    $CHROOT cp -r /usr/local/share/xsessions/bspwm.desktop /usr/share/xsessions/bspwm.desktop
-}
+#---------- Install Eww & Nitrogen ----------
 
 function install_nitrogen() {
     $CHROOT pacman -S gtkmm --noconfirm
@@ -724,7 +717,6 @@ conf_keyboard
 conf_zram
 
 restore_dotfiles
-install_bspwm
 install_nitrogen
 install_eww
 
