@@ -438,7 +438,7 @@ function install_bspwm_enviroment() {
         alacritty yazi maim eza bat feh lxsession-gtk3 \
         mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
         thunar thunar-archive-plugin tumbler xarchiver jq \
-        xdo xdotool jgmenu fd ripgrep redshift \
+        xdo xdotool jgmenu fd ripgrep redshift xcolor \
         zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting \
         --noconfirm
     clear
