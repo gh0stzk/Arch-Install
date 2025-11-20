@@ -426,7 +426,7 @@ function install_mount_multimedia_support() {
     $CHROOT pacman -S \
         libmtp gvfs-nfs gvfs gvfs-mtp \
         dosfstools usbutils net-tools \
-        xdg-user-dirs gtk-engines gtk-engine-murrine gnome-themes-extra \
+        xdg-user-dirs gnome-themes-extra \
         --noconfirm
     clear
 }
