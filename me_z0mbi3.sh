@@ -212,7 +212,7 @@ function print_info() {
 function base_install() {
     logo "Instalando sistema base"
 
-    sed -i 's/#Color/Color/; s/#ParallelDownloads = 5/ParallelDownloads = 5/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
+    sed -i 's/#Color/Color/; /^ParallelDownloads =/a ILoveCandy' /etc/pacman.conf
     pacstrap /mnt \
         base base-devel \
         linux-zen linux-firmware-intel linux-firmware-realtek linux-firmware-whence \
@@ -305,7 +305,7 @@ function install_grub() {
 function opts_pacman() {
     logo "Aplicando optmizaciones.."
     titleopts "Editando pacman. Se activan descargas paralelas, el color y el easter egg ILoveCandy"
-    sed -i 's/#Color/Color/; /^#DisableSandbox/a ILoveCandy' /mnt/etc/pacman.conf
+    sed -i 's/#Color/Color/; /^#DisableSandboxSyscalls/a ILoveCandy' /mnt/etc/pacman.conf
     okie
 }
 
@@ -320,14 +320,13 @@ function opts_make_flags() {
     titleopts "Optimizando las make flags para acelerar tiempos de compilado"
     printf "\nTienes %s%s%s cores\n" "${CBL}" "$(nproc)" "${CNC}"
     sed -i 's/march=x86-64/march=native/; s/mtune=generic/mtune=native/; s/-O2/-O3/; s/#MAKEFLAGS="-j2/MAKEFLAGS="-j'"$(nproc)"'/' /mnt/etc/makepkg.conf
-    #sed -i 's/COMPRESSZST=(zstd -c -T0 --ultra -20 -)/COMPRESSZST=(zstd -c -T0 --fast -9 -)/' /mnt/etc/makepkg.conf
     okie
 }
 
 function opts_cpupower() {
     titleopts "Configurando CPU a modo performance"
     $CHROOT pacman -S cpupower --noconfirm >/dev/null
-    sed -i "s/#governor='ondemand'/governor='performance'/" /mnt/etc/default/cpupower
+    sed -i "s/#GOVERNOR='ondemand'/GOVERNOR='performance'/" /mnt/etc/default/cpupower-servive.conf
     okie
 }
 
@@ -353,7 +352,7 @@ function opts_swappiness() {
 
 function opts_journal() {
     titleopts "Deshabilitando Journal logs.."
-    sed -i 's/#Storage=auto/Storage=none/' /mnt/etc/systemd/journald.conf
+    sed -i 's/#Storage=persistent/Storage=none/' /mnt/etc/systemd/journald.conf
     okie
 }
 
@@ -487,7 +486,7 @@ function install_apps_gh0stzk() {
         gh0stzk-icons-candy gh0stzk-icons-catppuccin-mocha gh0stzk-icons-dracula \
         gh0stzk-icons-glassy gh0stzk-icons-gruvbox-plus-dark gh0stzk-icons-hack \
         gh0stzk-icons-luv gh0stzk-icons-sweet-rainbow gh0stzk-icons-tokyo-night \
-        gh0stzk-icons-vimix-white gh0stzk-icons-zafiro gh0stzk-icons-zafiro-purple
+        gh0stzk-icons-vimix-white gh0stzk-icons-zafiro gh0stzk-icons-zafiro-purple --noconfirm
 }
 
 #---------- AUR Packages ----------
@@ -500,7 +499,7 @@ function aur_paru() {
 function aur_apps() {
     echo "cd && paru -S i3lock-color xwinwrap-0.9-bin fzf-tab-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S simple-mtpfs localsend-bin stacer-bin --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
-    echo "cd && paru -S spotify-1.1 spotify-adblock-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
+    #echo "cd && paru -S spotify-1.1 spotify-adblock-git --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
     echo "cd && paru -S telegram-desktop-bin simplescreenrecorder --skipreview --noconfirm --removemake" | $CHROOT su "$USR"
 }
 
@@ -513,7 +512,6 @@ function activando_servicios() {
 
     echo "xdg-user-dirs-update" | $CHROOT su "$USR"
     echo "timeout 1s firefox --headless --display=0" | $CHROOT su "$USR"
-    #echo "export __GLX_VENDOR_LIBRARY_NAME=amber" >> /mnt/etc/profile
 }
 
 #---------- Generando archivos de configuracion ----------
@@ -692,7 +690,7 @@ opts_make_flags
 opts_cpupower
 opts_scheduler
 opts_swappiness
-#opts_journal
+opts_journal
 opts_innec_kernel_modules
 opts_servicios_innecesarios
 opts_my_stuff
