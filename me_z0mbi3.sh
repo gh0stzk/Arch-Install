@@ -326,7 +326,6 @@ function opts_make_flags() {
 function opts_cpupower() {
     titleopts "Configurando CPU a modo performance"
     $CHROOT pacman -S cpupower --noconfirm >/dev/null
-    sed -i "s/#GOVERNOR='ondemand'/GOVERNOR='performance'/" /mnt/etc/default/cpupower-servive.conf
     okie
 }
 
@@ -509,6 +508,7 @@ function activando_servicios() {
 
     $CHROOT systemctl enable NetworkManager.service cpupower systemd-timesyncd.service lightdm.service
     echo "systemctl --user enable mpd.service" | $CHROOT su "$USR"
+    sed -i "s/#GOVERNOR='ondemand'/GOVERNOR='performance'/" /mnt/etc/default/cpupower-servive.conf
 
     echo "xdg-user-dirs-update" | $CHROOT su "$USR"
     echo "timeout 1s firefox --headless --display=0" | $CHROOT su "$USR"
