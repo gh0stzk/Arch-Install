@@ -253,8 +253,6 @@ function set_hostname_hosts() {
 
     echo "${HNAME}" >> /mnt/etc/hostname
     cat >> /mnt/etc/hosts <<- EOL
-		127.0.0.1   localhost
-		::1         localhost
 		127.0.1.1   ${HNAME}.localdomain ${HNAME}
 	EOL
     okie
@@ -375,7 +373,7 @@ function opts_servicios_innecesarios() {
 
 function opts_my_stuff() {
     titleopts "Configurando almacenamiento personal"
-    cat >> /mnt/etc/fstab <<-EOL
+    cat >> /mnt/etc/fstab <<- EOL
 	# My sTuFF
     UUID=01D3AE59075CA1F0		/run/media/z0mbi3/windows 	ntfs3		rw,uid=1000,gid=984,umask=022,prealloc,windows_names,noatime	0 0
 	EOL
@@ -596,22 +594,17 @@ function restore_dotfiles() {
     $CHROOT rm -rf /home/"$USR"/.themes
     $CHROOT cp /dots/stuff/{arch.png,gh0st.png} /usr/share/pixmaps/
 
-    echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.mozilla/*.default-default/" | $CHROOT su "$USR"
-    echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.mozilla/*.default-default/" | $CHROOT su "$USR"
-	echo "sudo cp /dots/dotfiles/polybar-update.hook /etc/pacman.d/hooks/" | $CHROOT su "$USR"
+    echo "cp -r /dots/stuff/z0mbi3-Fox-Theme/chrome /home/$USR/.config/mozilla/firefox/*.default-default/" | $CHROOT su "$USR"
+    echo "cp /dots/stuff/z0mbi3-Fox-Theme/user.js /home/$USR/.config/mozilla/firefox/*.default-default/" | $CHROOT su "$USR"
+    mkdir -p /mnt/etc/pacman.d/hooks/
+	cp /mnt/dots/dotfiles/polybar-update.hook /mnt/etc/pacman.d/hooks/
     echo "systemctl --user enable ArchUpdates.timer" | $CHROOT su "$USR"
     okie
     sleep 5
     clear
 }
 
-#---------- Install Eww & Nitrogen ----------
-
-function install_nitrogen() {
-    $CHROOT pacman -S gtkmm --noconfirm
-    echo "cd && git clone https://github.com/professorjamesmoriarty/nitrogen.git" | $CHROOT su "$USR"
-    echo "cd && cd nitrogen && autoreconf -fi && ./configure && make && sudo make install" | $CHROOT su "$USR"
-}
+#---------- Install Eww ----------
 
 function install_eww() {
     echo "cd && git clone https://github.com/elkowar/eww" | $CHROOT su "$USR"
@@ -631,7 +624,7 @@ function clean_garbage() {
     rm -rf /mnt/home/"$USR"/.cache/paru/
     rm -rf /mnt/home/"$USR"/.cache/electron/
     rm -rf /mnt/home/"$USR"/.cache/go-build/
-    rm -rf /mnt/home/"$USR"/{bspwm,nitrogen,eww,paru,.cargo,.rustup}
+    rm -rf /mnt/home/"$USR"/{bspwm,eww,paru,.cargo,.rustup}
     rm -f /mnt/usr/share/applications/{avahi-discover.desktop,bssh.desktop,bvnc.desktop,compton.desktop,picom.desktop,qv4l2.desktop,qvidcap.desktop,spotify.desktop,thunar-bulk-rename.desktop,thunar-settings.desktop,xfce4-about.desktop,lstopo.desktop,rofi.desktop,rofi-theme-selector.desktop,electron32.desktop,jgmenu.desktop}
     rm -rf /mnt/usr/share/icons/{Qogir-manjaro,Qogir-manjaro-dark,Papirus-Light}
 
@@ -715,7 +708,6 @@ conf_keyboard
 conf_zram
 
 restore_dotfiles
-install_nitrogen
 install_eww
 
 revert_privileges
