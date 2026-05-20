@@ -374,21 +374,22 @@ function opts_servicios_innecesarios() {
 function opts_my_stuff() {
     titleopts "Configurando almacenamiento personal"
     cat >> /mnt/etc/fstab <<- EOL
-	# My sTuFF
-    UUID=01D3AE59075CA1F0		/run/media/z0mbi3/windows 	ntfs3		rw,uid=1000,gid=984,umask=022,prealloc,windows_names,noatime	0 0
-	EOL
+        # My sTuFF
+        UUID=01D3AE59075CA1F0		/run/media/z0mbi3/windows 	ntfs3		rw,uid=1000,gid=984,umask=022,prealloc,windows_names,noatime	0 0
+EOL
     okie
     clear
 }
+
 #---------- Add my repo and chaotic-aur repos ----------
 function add_repos() {
     titleopts "Adding gh0stzk repo"
 
-	cat >> /mnt/etc/pacman.conf <<- EOL
-		[gh0stzk-dotfiles]
-		SigLevel = Optional TrustAll
+    cat >> /mnt/etc/pacman.conf <<- EOL
+        [gh0stzk-dotfiles]
+        SigLevel = Optional TrustAll
         Server = http://gh0stzk.github.io/pkgs/x86_64
-	EOL
+EOL
 
 	$CHROOT pacman -Syy
 }
@@ -434,7 +435,7 @@ function install_bspwm_enviroment() {
         alacritty yazi maim eza bat feh lxsession \
         mpd ncmpcpp mpc pamixer playerctl pacman-contrib \
         thunar thunar-archive-plugin tumbler xarchiver jq \
-        xdo xdotool jgmenu fd ripgrep redshift xcolor \
+        xdo xdotool jgmenu fd ripgrep redshift xcolor xsettingsd \
         zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting \
         --noconfirm
     clear
@@ -472,7 +473,7 @@ function install_lightdm() {
 		screensaver-timeout = 0
 		theme-name = Dracula
 		font-name = UbuntuMono Nerd Font 11
-	EOL
+EOL
 
     clear
 }
