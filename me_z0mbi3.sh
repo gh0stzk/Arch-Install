@@ -444,7 +444,7 @@ function install_bspwm_enviroment() {
 function install_apps_que_uso() {
     logo "Instalando apps que yo uso"
     $CHROOT pacman -S \
-        bleachbit gimp gcolor3 geany mpv screenkey \
+        bleachbit gimp gcolor3 geany mpv screenkey bc \
         htop viewnior zathura npm zathura-pdf-poppler \
         retroarch retroarch-assets-xmb retroarch-assets-ozone \
         pass xclip xsel neovim yt-dlp minidlna grsync \
